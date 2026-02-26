@@ -1,0 +1,1790 @@
+[
+  {
+    "Category": "Stock",
+    "Name": "Apple",
+    "Ticker": "AAPL",
+    "One-liner": "Apple: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Microsoft",
+    "Ticker": "MSFT",
+    "One-liner": "Microsoft: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "NVIDIA",
+    "Ticker": "NVDA",
+    "One-liner": "NVIDIA: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Amazon",
+    "Ticker": "AMZN",
+    "One-liner": "Amazon: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Alphabet",
+    "Ticker": "GOOGL",
+    "One-liner": "Alphabet: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Meta Platforms",
+    "Ticker": "META",
+    "One-liner": "Meta Platforms: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Tesla",
+    "Ticker": "TSLA",
+    "One-liner": "Tesla: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Berkshire Hathaway",
+    "Ticker": "BRK-B",
+    "One-liner": "Berkshire Hathaway: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "JPMorgan Chase",
+    "Ticker": "JPM",
+    "One-liner": "JPMorgan Chase: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Visa",
+    "Ticker": "V",
+    "One-liner": "Visa: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Mastercard",
+    "Ticker": "MA",
+    "One-liner": "Mastercard: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "UnitedHealth Group",
+    "Ticker": "UNH",
+    "One-liner": "UnitedHealth Group: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Eli Lilly",
+    "Ticker": "LLY",
+    "One-liner": "Eli Lilly: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Exxon Mobil",
+    "Ticker": "XOM",
+    "One-liner": "Exxon Mobil: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Broadcom",
+    "Ticker": "AVGO",
+    "One-liner": "Broadcom: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Walmart",
+    "Ticker": "WMT",
+    "One-liner": "Walmart: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Costco",
+    "Ticker": "COST",
+    "One-liner": "Costco: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Home Depot",
+    "Ticker": "HD",
+    "One-liner": "Home Depot: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Procter & Gamble",
+    "Ticker": "PG",
+    "One-liner": "Procter & Gamble: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Johnson & Johnson",
+    "Ticker": "JNJ",
+    "One-liner": "Johnson & Johnson: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Oracle",
+    "Ticker": "ORCL",
+    "One-liner": "Oracle: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Coca-Cola",
+    "Ticker": "KO",
+    "One-liner": "Coca-Cola: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "PepsiCo",
+    "Ticker": "PEP",
+    "One-liner": "PepsiCo: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Netflix",
+    "Ticker": "NFLX",
+    "One-liner": "Netflix: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Merck",
+    "Ticker": "MRK",
+    "One-liner": "Merck: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "AbbVie",
+    "Ticker": "ABBV",
+    "One-liner": "AbbVie: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Bank of America",
+    "Ticker": "BAC",
+    "One-liner": "Bank of America: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Salesforce",
+    "Ticker": "CRM",
+    "One-liner": "Salesforce: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Chevron",
+    "Ticker": "CVX",
+    "One-liner": "Chevron: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "AMD",
+    "Ticker": "AMD",
+    "One-liner": "AMD: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Thermo Fisher Scientific",
+    "Ticker": "TMO",
+    "One-liner": "Thermo Fisher Scientific: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Accenture",
+    "Ticker": "ACN",
+    "One-liner": "Accenture: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Cisco",
+    "Ticker": "CSCO",
+    "One-liner": "Cisco: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "McDonald's",
+    "Ticker": "MCD",
+    "One-liner": "McDonald's: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Abbott Laboratories",
+    "Ticker": "ABT",
+    "One-liner": "Abbott Laboratories: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Linde",
+    "Ticker": "LIN",
+    "One-liner": "Linde: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Wells Fargo",
+    "Ticker": "WFC",
+    "One-liner": "Wells Fargo: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Disney",
+    "Ticker": "DIS",
+    "One-liner": "Disney: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Adobe",
+    "Ticker": "ADBE",
+    "One-liner": "Adobe: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Philip Morris International",
+    "Ticker": "PM",
+    "One-liner": "Philip Morris International: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Texas Instruments",
+    "Ticker": "TXN",
+    "One-liner": "Texas Instruments: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Danaher",
+    "Ticker": "DHR",
+    "One-liner": "Danaher: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Amgen",
+    "Ticker": "AMGN",
+    "One-liner": "Amgen: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Intuit",
+    "Ticker": "INTU",
+    "One-liner": "Intuit: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "NextEra Energy",
+    "Ticker": "NEE",
+    "One-liner": "NextEra Energy: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "RTX",
+    "Ticker": "RTX",
+    "One-liner": "RTX: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Caterpillar",
+    "Ticker": "CAT",
+    "One-liner": "Caterpillar: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Qualcomm",
+    "Ticker": "QCOM",
+    "One-liner": "Qualcomm: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Honeywell",
+    "Ticker": "HON",
+    "One-liner": "Honeywell: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "IBM",
+    "Ticker": "IBM",
+    "One-liner": "IBM: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Goldman Sachs",
+    "Ticker": "GS",
+    "One-liner": "Goldman Sachs: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Morgan Stanley",
+    "Ticker": "MS",
+    "One-liner": "Morgan Stanley: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "American Express",
+    "Ticker": "AXP",
+    "One-liner": "American Express: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "S&P Global",
+    "Ticker": "SPGI",
+    "One-liner": "S&P Global: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "BlackRock",
+    "Ticker": "BLK",
+    "One-liner": "BlackRock: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Progressive",
+    "Ticker": "PGR",
+    "One-liner": "Progressive: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Stryker",
+    "Ticker": "SYK",
+    "One-liner": "Stryker: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "TJX Companies",
+    "Ticker": "TJX",
+    "One-liner": "TJX Companies: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Citigroup",
+    "Ticker": "C",
+    "One-liner": "Citigroup: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Lockheed Martin",
+    "Ticker": "LMT",
+    "One-liner": "Lockheed Martin: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Bristol Myers Squibb",
+    "Ticker": "BMY",
+    "One-liner": "Bristol Myers Squibb: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Medtronic",
+    "Ticker": "MDT",
+    "One-liner": "Medtronic: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Elevance Health",
+    "Ticker": "ELV",
+    "One-liner": "Elevance Health: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Boeing",
+    "Ticker": "BA",
+    "One-liner": "Boeing: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Nike",
+    "Ticker": "NKE",
+    "One-liner": "Nike: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Charles Schwab",
+    "Ticker": "SCHW",
+    "One-liner": "Charles Schwab: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Gilead Sciences",
+    "Ticker": "GILD",
+    "One-liner": "Gilead Sciences: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Automatic Data Processing",
+    "Ticker": "ADP",
+    "One-liner": "Automatic Data Processing: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Booking Holdings",
+    "Ticker": "BKNG",
+    "One-liner": "Booking Holdings: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Altria",
+    "Ticker": "MO",
+    "One-liner": "Altria: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "General Electric",
+    "Ticker": "GE",
+    "One-liner": "General Electric: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Deere & Company",
+    "Ticker": "DE",
+    "One-liner": "Deere & Company: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Fiserv",
+    "Ticker": "FI",
+    "One-liner": "Fiserv: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "UPS",
+    "Ticker": "UPS",
+    "One-liner": "UPS: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Starbucks",
+    "Ticker": "SBUX",
+    "One-liner": "Starbucks: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Prologis",
+    "Ticker": "PLD",
+    "One-liner": "Prologis: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "ConocoPhillips",
+    "Ticker": "COP",
+    "One-liner": "ConocoPhillips: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Palo Alto Networks",
+    "Ticker": "PANW",
+    "One-liner": "Palo Alto Networks: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "ServiceNow",
+    "Ticker": "NOW",
+    "One-liner": "ServiceNow: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Micron Technology",
+    "Ticker": "MU",
+    "One-liner": "Micron Technology: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Uber Technologies",
+    "Ticker": "UBER",
+    "One-liner": "Uber Technologies: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Intuitive Surgical",
+    "Ticker": "ISRG",
+    "One-liner": "Intuitive Surgical: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Applied Materials",
+    "Ticker": "AMAT",
+    "One-liner": "Applied Materials: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Lam Research",
+    "Ticker": "LRCX",
+    "One-liner": "Lam Research: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "KLA",
+    "Ticker": "KLAC",
+    "One-liner": "KLA: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Marsh McLennan",
+    "Ticker": "MMC",
+    "One-liner": "Marsh McLennan: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Vertex Pharmaceuticals",
+    "Ticker": "VRTX",
+    "One-liner": "Vertex Pharmaceuticals: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "CrowdStrike",
+    "Ticker": "CRWD",
+    "One-liner": "CrowdStrike: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Snowflake",
+    "Ticker": "SNOW",
+    "One-liner": "Snowflake: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Datadog",
+    "Ticker": "DDOG",
+    "One-liner": "Datadog: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Cloudflare",
+    "Ticker": "NET",
+    "One-liner": "Cloudflare: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Palantir",
+    "Ticker": "PLTR",
+    "One-liner": "Palantir: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Taiwan Semiconductor",
+    "Ticker": "TSM",
+    "One-liner": "Taiwan Semiconductor: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "ASML Holding",
+    "Ticker": "ASML",
+    "One-liner": "ASML Holding: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Novo Nordisk",
+    "Ticker": "NVO",
+    "One-liner": "Novo Nordisk: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Shell",
+    "Ticker": "SHEL",
+    "One-liner": "Shell: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "AstraZeneca",
+    "Ticker": "AZN",
+    "One-liner": "AstraZeneca: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "HSBC Holdings",
+    "Ticker": "HSBC",
+    "One-liner": "HSBC Holdings: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Unilever",
+    "Ticker": "UL",
+    "One-liner": "Unilever: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Rio Tinto",
+    "Ticker": "RIO",
+    "One-liner": "Rio Tinto: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "BHP Group",
+    "Ticker": "BHP",
+    "One-liner": "BHP Group: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Toyota Motor",
+    "Ticker": "TM",
+    "One-liner": "Toyota Motor: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Sony Group",
+    "Ticker": "SONY",
+    "One-liner": "Sony Group: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Nintendo",
+    "Ticker": "NTDOY",
+    "One-liner": "Nintendo: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Keyence",
+    "Ticker": "6861.T",
+    "One-liner": "Keyence: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Tokyo Electron",
+    "Ticker": "8035.T",
+    "One-liner": "Tokyo Electron: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "SoftBank Group",
+    "Ticker": "9984.T",
+    "One-liner": "SoftBank Group: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Samsung Electronics",
+    "Ticker": "005930.KS",
+    "One-liner": "Samsung Electronics: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "SK Hynix",
+    "Ticker": "000660.KS",
+    "One-liner": "SK Hynix: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "NAVER",
+    "Ticker": "035420.KS",
+    "One-liner": "NAVER: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Hyundai Motor",
+    "Ticker": "005380.KS",
+    "One-liner": "Hyundai Motor: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Kia",
+    "Ticker": "000270.KS",
+    "One-liner": "Kia: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "LG Energy Solution",
+    "Ticker": "373220.KS",
+    "One-liner": "LG Energy Solution: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "LG Electronics",
+    "Ticker": "066570.KS",
+    "One-liner": "LG Electronics: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Kakao",
+    "Ticker": "035720.KS",
+    "One-liner": "Kakao: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "LVMH",
+    "Ticker": "MC.PA",
+    "One-liner": "LVMH: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "L'Oreal",
+    "Ticker": "OR.PA",
+    "One-liner": "L'Oreal: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Airbus",
+    "Ticker": "AIR.PA",
+    "One-liner": "Airbus: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Schneider Electric",
+    "Ticker": "SU.PA",
+    "One-liner": "Schneider Electric: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Nestle",
+    "Ticker": "NESN.SW",
+    "One-liner": "Nestle: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Novartis",
+    "Ticker": "NOVN.SW",
+    "One-liner": "Novartis: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Roche",
+    "Ticker": "ROG.SW",
+    "One-liner": "Roche: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Siemens",
+    "Ticker": "SIE.DE",
+    "One-liner": "Siemens: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "SAP",
+    "Ticker": "SAP.DE",
+    "One-liner": "SAP: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Deutsche Telekom",
+    "Ticker": "DTE.DE",
+    "One-liner": "Deutsche Telekom: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Reliance Industries",
+    "Ticker": "RELIANCE.NS",
+    "One-liner": "Reliance Industries: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Tata Consultancy Services",
+    "Ticker": "TCS.NS",
+    "One-liner": "Tata Consultancy Services: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "HDFC Bank",
+    "Ticker": "HDFCBANK.NS",
+    "One-liner": "HDFC Bank: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Infosys",
+    "Ticker": "INFY.NS",
+    "One-liner": "Infosys: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Tencent Holdings",
+    "Ticker": "0700.HK",
+    "One-liner": "Tencent Holdings: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Alibaba Group",
+    "Ticker": "9988.HK",
+    "One-liner": "Alibaba Group: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Meituan",
+    "Ticker": "3690.HK",
+    "One-liner": "Meituan: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Commonwealth Bank",
+    "Ticker": "CBA.AX",
+    "One-liner": "Commonwealth Bank: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Shopify",
+    "Ticker": "SHOP.TO",
+    "One-liner": "Shopify: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Royal Bank of Canada",
+    "Ticker": "RY.TO",
+    "One-liner": "Royal Bank of Canada: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "Stock",
+    "Name": "Toronto-Dominion Bank",
+    "Ticker": "TD.TO",
+    "One-liner": "Toronto-Dominion Bank: Durable moat and cash-flow scalability can compound in an AI-automated economy."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P 500 ETF",
+    "Ticker": "SPY",
+    "One-liner": "SPDR S&P 500 ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core S&P 500 ETF",
+    "Ticker": "IVV",
+    "One-liner": "iShares Core S&P 500 ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard S&P 500 ETF",
+    "Ticker": "VOO",
+    "One-liner": "Vanguard S&P 500 ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total Stock Market ETF",
+    "Ticker": "VTI",
+    "One-liner": "Vanguard Total Stock Market ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Schwab U.S. Broad Market ETF",
+    "Ticker": "SCHB",
+    "One-liner": "Schwab U.S. Broad Market ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core S&P Total U.S. Stock Market ETF",
+    "Ticker": "ITOT",
+    "One-liner": "iShares Core S&P Total U.S. Stock Market ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco QQQ Trust",
+    "Ticker": "QQQ",
+    "One-liner": "Invesco QQQ Trust: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco NASDAQ 100 ETF",
+    "Ticker": "QQQM",
+    "One-liner": "Invesco NASDAQ 100 ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR Dow Jones Industrial Average ETF",
+    "Ticker": "DIA",
+    "One-liner": "SPDR Dow Jones Industrial Average ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Russell 2000 ETF",
+    "Ticker": "IWM",
+    "One-liner": "iShares Russell 2000 ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total World Stock ETF",
+    "Ticker": "VT",
+    "One-liner": "Vanguard Total World Stock ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI ACWI ETF",
+    "Ticker": "ACWI",
+    "One-liner": "iShares MSCI ACWI ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard FTSE Developed Markets ETF",
+    "Ticker": "VEA",
+    "One-liner": "Vanguard FTSE Developed Markets ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core MSCI EAFE ETF",
+    "Ticker": "IEFA",
+    "One-liner": "iShares Core MSCI EAFE ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI EAFE ETF",
+    "Ticker": "EFA",
+    "One-liner": "iShares MSCI EAFE ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard FTSE Emerging Markets ETF",
+    "Ticker": "VWO",
+    "One-liner": "Vanguard FTSE Emerging Markets ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core MSCI Emerging Markets ETF",
+    "Ticker": "IEMG",
+    "One-liner": "iShares Core MSCI Emerging Markets ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Emerging Markets ETF",
+    "Ticker": "EEM",
+    "One-liner": "iShares MSCI Emerging Markets ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Japan ETF",
+    "Ticker": "EWJ",
+    "One-liner": "iShares MSCI Japan ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI South Korea ETF",
+    "Ticker": "EWY",
+    "One-liner": "iShares MSCI South Korea ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Germany ETF",
+    "Ticker": "EWG",
+    "One-liner": "iShares MSCI Germany ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI United Kingdom ETF",
+    "Ticker": "EWU",
+    "One-liner": "iShares MSCI United Kingdom ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Canada ETF",
+    "Ticker": "EWC",
+    "One-liner": "iShares MSCI Canada ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Australia ETF",
+    "Ticker": "EWA",
+    "One-liner": "iShares MSCI Australia ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares China Large-Cap ETF",
+    "Ticker": "FXI",
+    "One-liner": "iShares China Large-Cap ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI India ETF",
+    "Ticker": "INDA",
+    "One-liner": "iShares MSCI India ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Taiwan ETF",
+    "Ticker": "EWT",
+    "One-liner": "iShares MSCI Taiwan ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Switzerland ETF",
+    "Ticker": "EWL",
+    "One-liner": "iShares MSCI Switzerland ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI Spain ETF",
+    "Ticker": "EWP",
+    "One-liner": "iShares MSCI Spain ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Technology Select Sector SPDR Fund",
+    "Ticker": "XLK",
+    "One-liner": "Technology Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Financial Select Sector SPDR Fund",
+    "Ticker": "XLF",
+    "One-liner": "Financial Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Health Care Select Sector SPDR Fund",
+    "Ticker": "XLV",
+    "One-liner": "Health Care Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Consumer Discretionary Select Sector SPDR Fund",
+    "Ticker": "XLY",
+    "One-liner": "Consumer Discretionary Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Industrial Select Sector SPDR Fund",
+    "Ticker": "XLI",
+    "One-liner": "Industrial Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Consumer Staples Select Sector SPDR Fund",
+    "Ticker": "XLP",
+    "One-liner": "Consumer Staples Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Utilities Select Sector SPDR Fund",
+    "Ticker": "XLU",
+    "One-liner": "Utilities Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Energy Select Sector SPDR Fund",
+    "Ticker": "XLE",
+    "One-liner": "Energy Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Materials Select Sector SPDR Fund",
+    "Ticker": "XLB",
+    "One-liner": "Materials Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Real Estate Select Sector SPDR Fund",
+    "Ticker": "XLRE",
+    "One-liner": "Real Estate Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Communication Services Select Sector SPDR Fund",
+    "Ticker": "XLC",
+    "One-liner": "Communication Services Select Sector SPDR Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "VanEck Semiconductor ETF",
+    "Ticker": "SMH",
+    "One-liner": "VanEck Semiconductor ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Semiconductor ETF",
+    "Ticker": "SOXX",
+    "One-liner": "iShares Semiconductor ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Expanded Tech-Software Sector ETF",
+    "Ticker": "IGV",
+    "One-liner": "iShares Expanded Tech-Software Sector ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Biotechnology ETF",
+    "Ticker": "IBB",
+    "One-liner": "iShares Biotechnology ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P Biotech ETF",
+    "Ticker": "XBI",
+    "One-liner": "SPDR S&P Biotech ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P Regional Banking ETF",
+    "Ticker": "KRE",
+    "One-liner": "SPDR S&P Regional Banking ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P Bank ETF",
+    "Ticker": "KBE",
+    "One-liner": "SPDR S&P Bank ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P Aerospace & Defense ETF",
+    "Ticker": "XAR",
+    "One-liner": "SPDR S&P Aerospace & Defense ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares U.S. Aerospace & Defense ETF",
+    "Ticker": "ITA",
+    "One-liner": "iShares U.S. Aerospace & Defense ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI USA Quality Factor ETF",
+    "Ticker": "QUAL",
+    "One-liner": "iShares MSCI USA Quality Factor ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI USA Momentum Factor ETF",
+    "Ticker": "MTUM",
+    "One-liner": "iShares MSCI USA Momentum Factor ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI USA Min Vol Factor ETF",
+    "Ticker": "USMV",
+    "One-liner": "iShares MSCI USA Min Vol Factor ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Dividend Appreciation ETF",
+    "Ticker": "VIG",
+    "One-liner": "Vanguard Dividend Appreciation ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Schwab U.S. Dividend Equity ETF",
+    "Ticker": "SCHD",
+    "One-liner": "Schwab U.S. Dividend Equity ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core Dividend Growth ETF",
+    "Ticker": "DGRO",
+    "One-liner": "iShares Core Dividend Growth ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core High Dividend ETF",
+    "Ticker": "HDV",
+    "One-liner": "iShares Core High Dividend ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ProShares S&P 500 Dividend Aristocrats ETF",
+    "Ticker": "NOBL",
+    "One-liner": "ProShares S&P 500 Dividend Aristocrats ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P Dividend ETF",
+    "Ticker": "SDY",
+    "One-liner": "SPDR S&P Dividend ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco S&P 500 Low Volatility ETF",
+    "Ticker": "SPLV",
+    "One-liner": "Invesco S&P 500 Low Volatility ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core U.S. Aggregate Bond ETF",
+    "Ticker": "AGG",
+    "One-liner": "iShares Core U.S. Aggregate Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total Bond Market ETF",
+    "Ticker": "BND",
+    "One-liner": "Vanguard Total Bond Market ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 20+ Year Treasury Bond ETF",
+    "Ticker": "TLT",
+    "One-liner": "iShares 20+ Year Treasury Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 7-10 Year Treasury Bond ETF",
+    "Ticker": "IEF",
+    "One-liner": "iShares 7-10 Year Treasury Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 1-3 Year Treasury Bond ETF",
+    "Ticker": "SHY",
+    "One-liner": "iShares 1-3 Year Treasury Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares TIPS Bond ETF",
+    "Ticker": "TIP",
+    "One-liner": "iShares TIPS Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares iBoxx Investment Grade Corporate Bond ETF",
+    "Ticker": "LQD",
+    "One-liner": "iShares iBoxx Investment Grade Corporate Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares iBoxx High Yield Corporate Bond ETF",
+    "Ticker": "HYG",
+    "One-liner": "iShares iBoxx High Yield Corporate Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares J.P. Morgan USD Emerging Markets Bond ETF",
+    "Ticker": "EMB",
+    "One-liner": "iShares J.P. Morgan USD Emerging Markets Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total International Bond ETF",
+    "Ticker": "BNDX",
+    "One-liner": "Vanguard Total International Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Intermediate-Term Corporate Bond ETF",
+    "Ticker": "VCIT",
+    "One-liner": "Vanguard Intermediate-Term Corporate Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares National Muni Bond ETF",
+    "Ticker": "MUB",
+    "One-liner": "iShares National Muni Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 0-3 Month Treasury Bond ETF",
+    "Ticker": "SGOV",
+    "One-liner": "iShares 0-3 Month Treasury Bond ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR Gold Shares",
+    "Ticker": "GLD",
+    "One-liner": "SPDR Gold Shares: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Gold Trust",
+    "Ticker": "IAU",
+    "One-liner": "iShares Gold Trust: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Silver Trust",
+    "Ticker": "SLV",
+    "One-liner": "iShares Silver Trust: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "abrdn Physical Platinum Shares ETF",
+    "Ticker": "PPLT",
+    "One-liner": "abrdn Physical Platinum Shares ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco DB Commodity Index Tracking Fund",
+    "Ticker": "DBC",
+    "One-liner": "Invesco DB Commodity Index Tracking Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco Optimum Yield Diversified Commodity Strategy ETF",
+    "Ticker": "PDBC",
+    "One-liner": "Invesco Optimum Yield Diversified Commodity Strategy ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "United States Oil Fund",
+    "Ticker": "USO",
+    "One-liner": "United States Oil Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "United States Natural Gas Fund",
+    "Ticker": "UNG",
+    "One-liner": "United States Natural Gas Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco DB Agriculture Fund",
+    "Ticker": "DBA",
+    "One-liner": "Invesco DB Agriculture Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Real Estate ETF",
+    "Ticker": "VNQ",
+    "One-liner": "Vanguard Real Estate ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Schwab U.S. REIT ETF",
+    "Ticker": "SCHH",
+    "One-liner": "Schwab U.S. REIT ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR Dow Jones REIT ETF",
+    "Ticker": "RWR",
+    "One-liner": "SPDR Dow Jones REIT ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Mortgage Real Estate ETF",
+    "Ticker": "REM",
+    "One-liner": "iShares Mortgage Real Estate ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Robotics & Artificial Intelligence ETF",
+    "Ticker": "BOTZ",
+    "One-liner": "Global X Robotics & Artificial Intelligence ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ROBO Global Robotics and Automation ETF",
+    "Ticker": "ROBO",
+    "One-liner": "ROBO Global Robotics and Automation ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ARK Innovation ETF",
+    "Ticker": "ARKK",
+    "One-liner": "ARK Innovation ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ARK Autonomous Technology & Robotics ETF",
+    "Ticker": "ARKQ",
+    "One-liner": "ARK Autonomous Technology & Robotics ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "First Trust NASDAQ Cybersecurity ETF",
+    "Ticker": "CIBR",
+    "One-liner": "First Trust NASDAQ Cybersecurity ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ETFMG Prime Cyber Security ETF",
+    "Ticker": "HACK",
+    "One-liner": "ETFMG Prime Cyber Security ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Cloud Computing ETF",
+    "Ticker": "CLOU",
+    "One-liner": "Global X Cloud Computing ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Artificial Intelligence & Technology ETF",
+    "Ticker": "AIQ",
+    "One-liner": "Global X Artificial Intelligence & Technology ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Lithium & Battery Tech ETF",
+    "Ticker": "LIT",
+    "One-liner": "Global X Lithium & Battery Tech ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Bitcoin Trust ETF",
+    "Ticker": "IBIT",
+    "One-liner": "iShares Bitcoin Trust ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Fidelity Wise Origin Bitcoin Fund",
+    "Ticker": "FBTC",
+    "One-liner": "Fidelity Wise Origin Bitcoin Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Bitwise Bitcoin ETF",
+    "Ticker": "BITB",
+    "One-liner": "Bitwise Bitcoin ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ARK 21Shares Bitcoin ETF",
+    "Ticker": "ARKB",
+    "One-liner": "ARK 21Shares Bitcoin ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "VanEck Bitcoin ETF",
+    "Ticker": "HODL",
+    "One-liner": "VanEck Bitcoin ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "ProShares Bitcoin Strategy ETF",
+    "Ticker": "BITO",
+    "One-liner": "ProShares Bitcoin Strategy ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Ethereum Trust ETF",
+    "Ticker": "ETHA",
+    "One-liner": "iShares Ethereum Trust ETF: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "ETF",
+    "Name": "Fidelity Ethereum Fund",
+    "Ticker": "FETH",
+    "One-liner": "Fidelity Ethereum Fund: Diversified exposure to singularity beneficiaries with lower single-name risk."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bitcoin",
+    "Ticker": "BTC",
+    "One-liner": "Bitcoin: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Ethereum",
+    "Ticker": "ETH",
+    "One-liner": "Ethereum: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "BNB",
+    "Ticker": "BNB",
+    "One-liner": "BNB: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Solana",
+    "Ticker": "SOL",
+    "One-liner": "Solana: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "XRP",
+    "Ticker": "XRP",
+    "One-liner": "XRP: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Cardano",
+    "Ticker": "ADA",
+    "One-liner": "Cardano: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Dogecoin",
+    "Ticker": "DOGE",
+    "One-liner": "Dogecoin: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "TRON",
+    "Ticker": "TRX",
+    "One-liner": "TRON: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Toncoin",
+    "Ticker": "TON",
+    "One-liner": "Toncoin: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Avalanche",
+    "Ticker": "AVAX",
+    "One-liner": "Avalanche: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Chainlink",
+    "Ticker": "LINK",
+    "One-liner": "Chainlink: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Polkadot",
+    "Ticker": "DOT",
+    "One-liner": "Polkadot: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Polygon",
+    "Ticker": "POL",
+    "One-liner": "Polygon: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Litecoin",
+    "Ticker": "LTC",
+    "One-liner": "Litecoin: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bitcoin Cash",
+    "Ticker": "BCH",
+    "One-liner": "Bitcoin Cash: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Stellar",
+    "Ticker": "XLM",
+    "One-liner": "Stellar: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Cosmos",
+    "Ticker": "ATOM",
+    "One-liner": "Cosmos: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Uniswap",
+    "Ticker": "UNI",
+    "One-liner": "Uniswap: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Ethereum Classic",
+    "Ticker": "ETC",
+    "One-liner": "Ethereum Classic: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Monero",
+    "Ticker": "XMR",
+    "One-liner": "Monero: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Filecoin",
+    "Ticker": "FIL",
+    "One-liner": "Filecoin: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Aptos",
+    "Ticker": "APT",
+    "One-liner": "Aptos: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Sui",
+    "Ticker": "SUI",
+    "One-liner": "Sui: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Optimism",
+    "Ticker": "OP",
+    "One-liner": "Optimism: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Arbitrum",
+    "Ticker": "ARB",
+    "One-liner": "Arbitrum: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "NEAR Protocol",
+    "Ticker": "NEAR",
+    "One-liner": "NEAR Protocol: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Internet Computer",
+    "Ticker": "ICP",
+    "One-liner": "Internet Computer: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Hedera",
+    "Ticker": "HBAR",
+    "One-liner": "Hedera: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "VeChain",
+    "Ticker": "VET",
+    "One-liner": "VeChain: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Algorand",
+    "Ticker": "ALGO",
+    "One-liner": "Algorand: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Aave",
+    "Ticker": "AAVE",
+    "One-liner": "Aave: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Maker",
+    "Ticker": "MKR",
+    "One-liner": "Maker: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Injective",
+    "Ticker": "INJ",
+    "One-liner": "Injective: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "THORChain",
+    "Ticker": "RUNE",
+    "One-liner": "THORChain: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Sei",
+    "Ticker": "SEI",
+    "One-liner": "Sei: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Stacks",
+    "Ticker": "STX",
+    "One-liner": "Stacks: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bittensor",
+    "Ticker": "TAO",
+    "One-liner": "Bittensor: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "The Graph",
+    "Ticker": "GRT",
+    "One-liner": "The Graph: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Render",
+    "Ticker": "RNDR",
+    "One-liner": "Render: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Celestia",
+    "Ticker": "TIA",
+    "One-liner": "Celestia: Potential trust layer for decentralized settlement and value transfer in machine economies."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Gold Futures",
+    "Ticker": "GC=F",
+    "One-liner": "Gold Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Silver Futures",
+    "Ticker": "SI=F",
+    "One-liner": "Silver Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Copper Futures",
+    "Ticker": "HG=F",
+    "One-liner": "Copper Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Platinum Futures",
+    "Ticker": "PL=F",
+    "One-liner": "Platinum Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Palladium Futures",
+    "Ticker": "PA=F",
+    "One-liner": "Palladium Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "WTI Crude Oil Futures",
+    "Ticker": "CL=F",
+    "One-liner": "WTI Crude Oil Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Brent Crude Oil Futures",
+    "Ticker": "BZ=F",
+    "One-liner": "Brent Crude Oil Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Natural Gas Futures",
+    "Ticker": "NG=F",
+    "One-liner": "Natural Gas Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "RBOB Gasoline Futures",
+    "Ticker": "RB=F",
+    "One-liner": "RBOB Gasoline Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Heating Oil Futures",
+    "Ticker": "HO=F",
+    "One-liner": "Heating Oil Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Corn Futures",
+    "Ticker": "ZC=F",
+    "One-liner": "Corn Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Wheat Futures",
+    "Ticker": "ZW=F",
+    "One-liner": "Wheat Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Soybean Futures",
+    "Ticker": "ZS=F",
+    "One-liner": "Soybean Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Coffee Futures",
+    "Ticker": "KC=F",
+    "One-liner": "Coffee Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Cocoa Futures",
+    "Ticker": "CC=F",
+    "One-liner": "Cocoa Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Sugar Futures",
+    "Ticker": "SB=F",
+    "One-liner": "Sugar Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Cotton Futures",
+    "Ticker": "CT=F",
+    "One-liner": "Cotton Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Live Cattle Futures",
+    "Ticker": "LE=F",
+    "One-liner": "Live Cattle Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Lean Hogs Futures",
+    "Ticker": "HE=F",
+    "One-liner": "Lean Hogs Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Lumber Futures",
+    "Ticker": "LBS=F",
+    "One-liner": "Lumber Futures: Physical scarcity and supply constraints can retain pricing power in AI-driven growth cycles."
+  }
+]
