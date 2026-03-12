@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RegretZero Web
 
-## Getting Started
+RegretZero Web is a Next.js app that visualizes long-term investing outcomes and compares cash vs. asset growth.
 
-First, run the development server:
+## Local Run
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production Check
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+Current status: build passes successfully.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy + Custom Domain (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push this project to GitHub.
+2. Import the repo at [Vercel](https://vercel.com/new).
+3. In Vercel project settings, add environment variable:
+   `NEXT_PUBLIC_SITE_URL=https://YOUR_DOMAIN`
+4. Deploy once.
+5. Go to `Settings > Domains`, add your purchased domain.
+6. At your domain provider, apply the DNS records shown by Vercel.
+7. Wait for SSL issuance and DNS propagation, then open your domain.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Domain Test Checklist
 
-## Deploy on Vercel
+1. Main page opens on `https://YOUR_DOMAIN`.
+2. `https://YOUR_DOMAIN/sitemap.xml` is accessible.
+3. `https://YOUR_DOMAIN/robots.txt` is accessible.
+4. Browser console has no critical errors.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- SEO metadata, `sitemap.xml`, and `robots.txt` are already configured.
+- The site URL is controlled by `NEXT_PUBLIC_SITE_URL`.

@@ -1,27 +1,27 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
 export const OPPORTUNITY_ITEMS = [
     { name: "스타벅스 아메리카노", price: 5_000 },
     { name: "BBQ 황금올리브 치킨", price: 25_000 },
-    { name: "하이엔드 오마카세 2인", price: 300_000 },
-    { name: "에어팟 프로 2세대", price: 350_000 },
-    { name: "아이패드 프로 13인치", price: 1_200_000 },
-    { name: "맥북 프로 16인치 M3 Max", price: 6_000_000 },
-    { name: "샤넬 클래식 플랩백", price: 15_000_000 },
+    { name: "에어팟 프로 2", price: 300_000 },
+    { name: "아이폰 17 프로", price: 1_800_000 },
+    { name: "아이패드 프로 13인치", price: 2_000_000 },
+    { name: "맥북 프로 16인치", price: 4_500_000 },
+    { name: "오메가 스피드마스터", price: 9_000_000 },
     { name: "롤렉스 서브마리너", price: 20_000_000 },
-    { name: "테슬라 모델 3 롱레인지", price: 60_000_000 },
-    { name: "테슬라 모델 Y 퍼포먼스", price: 72_000_000 },
-    { name: "포르쉐 911 카레라 S", price: 200_000_000 },
-    { name: "페라리 로마", price: 350_000_000 },
+    { name: "테슬라 모델 3", price: 52_000_000 },
+    { name: "테슬라 모델 Y", price: 68_000_000 },
+    { name: "포르쉐 911 카레라", price: 190_000_000 },
+    { name: "페라리 로마", price: 380_000_000 },
     { name: "서울 소형 아파트", price: 800_000_000 },
-    { name: "서울 마포구 국평 아파트", price: 1_500_000_000 },
-    { name: "강남구 신축 국평 아파트", price: 3_000_000_000 },
+    { name: "서울 신축 국평 아파트", price: 1_500_000_000 },
+    { name: "강남 아파트 한 채", price: 3_000_000_000 },
     { name: "한강뷰 펜트하우스", price: 7_000_000_000 },
-    { name: "한남더힐 100평", price: 12_000_000_000 },
-    { name: "로또 1등 당첨 최고액", price: 40_000_000_000 },
-    { name: "오징어 게임 상금", price: 45_600_000_000 },
+    { name: "비트코인 100개", price: 12_000_000_000 },
+    { name: "로또 1등 누적급", price: 40_000_000_000 },
+    { name: "메이저 게임사 인수금", price: 45_600_000_000 },
 ];
 
 const KRW = new Intl.NumberFormat("ko-KR", {

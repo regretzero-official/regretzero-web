@@ -1,225 +1,286 @@
-"use client";
+﻿"use client";
 
-import React from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
 import {
-    CartesianGrid,
-    ComposedChart,
-    Area,
-    Line,
-    ReferenceDot,
-    ReferenceLine,
-    Label,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Line,
+  ReferenceDot,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { RACE_DURATION_MS, ChartPoint, CURRENT_YEAR } from "../data/assets";
+import type { ChartPoint } from "../data/assets";
+
+type Mode = "REGRET" | "SINGULARITY";
+
+type Props = {
+  series: ChartPoint[];
+  marker: {
+    month: number;
+    year: number;
+    bank: number;
+    asset: number;
+    isFuture: boolean;
+  };
+  mode: Mode;
+  isFinished: boolean;
+  compact?: boolean;
+  events?: { year: number; label: string }[];
+  assetPriceUsd?: number;
+  assetPriceKrw?: number;
+  benchmarkLabel?: string;
+  labelSafePadding?: number;
+};
 
 const KRW = new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-    maximumFractionDigits: 0,
+  style: "currency",
+  currency: "KRW",
+  maximumFractionDigits: 0,
 });
 
-function TooltipCard({
-    active,
-    payload,
-    mode,
-}: {
-    active?: boolean;
-    payload?: { payload: ChartPoint }[];
-    mode: "REGRET" | "SINGULARITY";
-}) {
-    if (!active || !payload?.length) return null;
-    const data = payload[0].payload;
-    const isSingularity = mode === "SINGULARITY";
-    const themeColor = isSingularity ? "#FFD700" : "#E31937";
-    const bgGlow = isSingularity
-        ? "shadow-[0_0_20px_rgba(255,215,0,0.4)] border-[#FFD700]/40"
-        : "shadow-[0_0_20px_rgba(227,25,55,0.4)] border-[#E31937]/40";
-
-    return (
-        <div className={`rounded-xl border bg-black/95 p-3 text-xs text-white backdrop-blur-md ${bgGlow}`}>
-            <p className="font-mono text-zinc-400">{`YEAR ${data.year.toFixed(1)}`}</p>
-            <div className="mt-2 space-y-1 font-mono">
-                <p className="text-zinc-500">Bank: {KRW.format(data.bank)}</p>
-                <p className="font-bold text-sm" style={{ color: themeColor }}>
-                    Asset: {KRW.format(data.asset)}
-                </p>
-            </div>
-        </div>
-    );
+function formatAxisLabel(value: number) {
+  if (value >= 100_000_000) return `${(value / 100_000_000).toFixed(0)}억`;
+  if (value >= 10_000) return `${Math.round(value / 10_000)}만`;
+  return `${Math.round(value)}`;
 }
 
-const RaceChart = dynamic<{
-    series: ChartPoint[];
-    marker: ChartPoint;
-    mode: "REGRET" | "SINGULARITY";
-    isFinished: boolean;
-}>(
-    async () =>
-        function RaceChartClient({ series, marker, mode, isFinished }: { series: ChartPoint[], marker: ChartPoint, mode: "REGRET" | "SINGULARITY", isFinished: boolean }) {
-            const isSingularity = mode === "SINGULARITY";
-            const themeColor = isSingularity ? "#FFD700" : "#E31937";
-            const dropShadow = isSingularity
-                ? "drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8))"
-                : "drop-shadow(0px 0px 8px rgba(227, 25, 55, 0.6))";
+function formatYear(value: number) {
+  return `${Math.floor(value)}`;
+}
 
-            // State for hovered pin
-            const [hoveredPin, setHoveredPin] = React.useState<{ x: number, y: number, msg: string } | null>(null);
+export default function RaceChart({
+  series,
+  marker,
+  mode,
+  isFinished,
+  compact = false,
+  events = [],
+  assetPriceUsd,
+  assetPriceKrw,
+  benchmarkLabel = "금(GLD)",
+  labelSafePadding = 0.08,
+}: Props) {
+  const [mounted, setMounted] = useState(false);
 
-            // Active conviction points that the marker has already passed
-            const passedConvictions = series.filter(p => p.isConvictionPoint && p.year <= marker.year);
-            const latestConviction = passedConvictions.length > 0 ? passedConvictions[passedConvictions.length - 1] : null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-            // Emphasize the last conviction message for a while
-            const showMainOverlay = !isFinished && latestConviction && (marker.year - latestConviction.year) < 0.5;
+  const visibleSeries = useMemo(() => {
+    if (isFinished) return series;
 
-            return (
-                <div className="relative w-full h-full">
-                    {/* Main Conviction Overlay (Briefly active during the fall) */}
-                    {showMainOverlay && (
-                        <div className="absolute inset-x-0 top-1/4 z-10 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
-                            <span className="animate-bounce bg-black/80 text-[#FFD700] border border-[#FFD700]/50 rounded-2xl px-4 py-2 text-sm font-bold shadow-[0_0_15px_rgba(255,215,0,0.5)]">
-                                {latestConviction?.convictionMessage}
-                            </span>
-                        </div>
-                    )}
+    const low = Math.max(0, Math.floor(marker.month));
+    const high = Math.min(low + 1, series.length - 1);
+    const ratio = Math.min(Math.max(marker.month - low, 0), 1);
+    const p0 = series[low] ?? series[0];
+    const p1 = series[high] ?? p0;
 
-                    {/* Hover Pin Tooltip (Active after finish) */}
-                    {isFinished && hoveredPin && (
-                        <div
-                            className="absolute z-20 bg-black text-white p-2 rounded border border-[#FFD700]/50 shadow-[0_0_10px_rgba(255,215,0,0.3)] text-[10px] w-48 text-center"
-                            style={{
-                                left: hoveredPin.x,
-                                top: hoveredPin.y - 40,
-                                transform: 'translate(-50%, -100%)'
-                            }}
-                        >
-                            {hoveredPin.msg}
-                        </div>
-                    )}
+    const partial = series.slice(0, low + 1);
+    if (high > low) {
+      partial.push({
+        ...p0,
+        month: marker.month,
+        year: marker.year,
+        bank: p0.bank + (p1.bank - p0.bank) * ratio,
+        asset: p0.asset + (p1.asset - p0.asset) * ratio,
+        isFuture: marker.isFuture,
+      });
+    }
 
-                    <ResponsiveContainer width="100%" height="100%" minHeight={320}>
-                        <ComposedChart data={series} margin={{ top: 25, right: 15, bottom: 0, left: 0 }}>
-                            <defs>
-                                <linearGradient id="colorAsset" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={themeColor} stopOpacity={0.6} />
-                                    <stop offset="95%" stopColor={themeColor} stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid stroke="#1A1A1A" strokeDasharray="3 3" vertical={false} />
-                            <XAxis
-                                dataKey="year"
-                                stroke="#444444"
-                                type="number"
-                                domain={['dataMin', 'dataMax']}
-                                tick={{ fontSize: 10, fill: "#666666", fontWeight: 600 }}
-                                tickFormatter={(v) => `${Number(v).toFixed(0)}`}
-                                minTickGap={30}
-                                axisLine={false}
-                                tickLine={false}
-                            />
-                            <YAxis
-                                stroke="#444444"
-                                tick={{ fontSize: 10, fill: "#666666", fontWeight: 600 }}
-                                width={46}
-                                tickFormatter={(v) => `${Math.round(Number(v) / 1_000_000)}M`}
-                                axisLine={false}
-                                tickLine={false}
-                            />
-                            <Tooltip
-                                content={<TooltipCard mode={mode} />}
-                                cursor={{ stroke: "#333", strokeWidth: 1, strokeDasharray: "4 4" }}
-                            />
+    return partial.length >= 2 ? partial : series.slice(0, 2);
+  }, [isFinished, marker, series]);
 
-                            <Line
-                                type="monotone"
-                                dataKey="bank"
-                                stroke="#444"
-                                strokeWidth={2}
-                                dot={false}
-                                isAnimationActive={true}
-                                animationDuration={RACE_DURATION_MS}
-                                animationEasing="ease-in-out"
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="asset"
-                                stroke={themeColor}
-                                fillOpacity={1}
-                                fill="url(#colorAsset)"
-                                strokeWidth={3}
-                                dot={false}
-                                style={{ filter: dropShadow }}
-                                isAnimationActive={true}
-                                animationDuration={RACE_DURATION_MS}
-                                animationEasing="ease-in-out"
-                            />
+  const maxValue = visibleSeries.reduce((max, point) => {
+    return Math.max(max, point.asset, point.bank);
+  }, 1);
 
-                            {/* Current Price Reference Line */}
-                            {isFinished && !isSingularity && (
-                                <ReferenceLine x={CURRENT_YEAR} stroke={themeColor} strokeDasharray="3 3" strokeWidth={2}>
-                                    <Label
-                                        value="CURRENT (2026)"
-                                        position="top"
-                                        fill={themeColor}
-                                        fontSize={11}
-                                        fontWeight="bold"
-                                    />
-                                </ReferenceLine>
-                            )}
+  const accent = mode === "SINGULARITY" ? "#FFD700" : "#E31937";
+  const eventLines = events.filter((event) => {
+    const maxYear = visibleSeries[visibleSeries.length - 1]?.year ?? marker.year;
+    return event.year >= series[0]?.year && event.year <= maxYear;
+  });
+  const firstPoint = series[0];
+  const lastPoint = series[series.length - 1];
+  const minYear = visibleSeries[0]?.year ?? marker.year;
+  const maxYear = visibleSeries[visibleSeries.length - 1]?.year ?? marker.year;
+  const midYear = (minYear + maxYear) / 2;
+  const xRatioRaw = maxYear > minYear ? (marker.year - minYear) / (maxYear - minYear) : 0;
+  const xRatio = Math.min(1 - labelSafePadding, Math.max(labelSafePadding, xRatioRaw));
+  const yTop = Math.max(maxValue * 1.08, 1);
+  const yRatioRaw = 1 - marker.asset / yTop;
+  const yRatio = Math.min(0.88, Math.max(0.12, yRatioRaw));
+  const movingPriceKrw = assetPriceKrw && Number.isFinite(assetPriceKrw) ? KRW.format(assetPriceKrw) : null;
+  const movingPriceUsd = assetPriceUsd && Number.isFinite(assetPriceUsd) ? `$${assetPriceUsd.toFixed(2)}` : null;
 
-                            {/* Singularity Milestones */}
-                            {isSingularity && (
-                                <>
-                                    <ReferenceLine x={2029} stroke="#8B5CF6" strokeDasharray="3 3" strokeWidth={1}>
-                                        <Label value="AGI" position="insideTopLeft" fill="#8B5CF6" fontSize={10} />
-                                    </ReferenceLine>
-                                    <ReferenceLine x={2035} stroke="#3B82F6" strokeDasharray="3 3" strokeWidth={1}>
-                                        <Label value="ROBOTICS" position="insideTopLeft" fill="#3B82F6" fontSize={10} />
-                                    </ReferenceLine>
-                                    <ReferenceLine x={2045} stroke="#00FFDD" strokeDasharray="3 3" strokeWidth={2}>
-                                        <Label value="SINGULARITY" position="top" fill="#00FFDD" fontSize={11} fontWeight="bold" />
-                                    </ReferenceLine>
-                                </>
-                            )}
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#050505] px-3 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+      <div className="mb-3 flex items-center justify-between px-1">
+        <div className="flex items-center gap-3 text-[10px] font-bold text-zinc-400">
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#8B93A7]" />
+            {compact ? benchmarkLabel : `안전자산 ${benchmarkLabel}`}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
+            {compact ? "자산" : "선택 자산"}
+          </span>
+        </div>
+        <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-zinc-400">
+          {isFinished ? "레이스 종료" : "레이스 진행중"}
+        </div>
+      </div>
 
-                            <ReferenceDot
-                                x={marker.year}
-                                y={marker.bank}
-                                r={4}
-                                fill="#555555"
-                                stroke="#000000"
-                                strokeWidth={2}
-                            />
+      {mounted ? (
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={visibleSeries} margin={{ top: 10, right: 12, left: -20, bottom: 8 }}>
+            <defs>
+              <linearGradient id="assetAreaFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={accent} stopOpacity={0.38} />
+                <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
 
-                            {/* Pulsing indicator dot */}
-                            <ReferenceDot
-                                x={marker.year}
-                                y={marker.asset}
-                                r={isFinished ? 8 : 6}
-                                fill={themeColor}
-                                stroke="#ffffff"
-                                strokeWidth={2}
-                                style={{
-                                    filter: dropShadow,
-                                    transition: "r 0.3s ease-in-out",
-                                }}
-                            />
-                        </ComposedChart>
-                    </ResponsiveContainer>
-                </div>
-            );
-        },
-    {
-        ssr: false,
-        loading: () => (
-            <div className="h-full w-full animate-pulse rounded-3xl border border-[#1A1A1A] bg-[#0A0A0A]" />
-        ),
-    },
-);
+            <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <XAxis
+              dataKey="year"
+              tickFormatter={formatYear}
+              tick={{ fill: "#71717A", fontSize: 10, fontWeight: 700 }}
+              axisLine={false}
+              tickLine={false}
+              minTickGap={8}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              domain={[0, Math.max(maxValue * 1.08, 1)]}
+              tickFormatter={formatAxisLabel}
+              tick={{ fill: "#71717A", fontSize: 11, fontWeight: 700 }}
+              axisLine={false}
+              tickLine={false}
+              width={50}
+            />
+            <Tooltip
+              cursor={{ stroke: "rgba(255,255,255,0.12)", strokeDasharray: "3 3" }}
+              contentStyle={{
+                background: "rgba(10,10,10,0.96)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 16,
+                color: "#fff",
+              }}
+              formatter={(value, name) => {
+                const numericValue = typeof value === "number" ? value : Number(value ?? 0);
+                return [KRW.format(numericValue), name === "asset" ? "선택 자산" : benchmarkLabel];
+              }}
+              labelFormatter={(label) => {
+                const numericLabel = typeof label === "number" ? label : Number(label ?? 0);
+                return `${Math.floor(numericLabel)}년`;
+              }}
+            />
 
-export default RaceChart;
+            <ReferenceLine
+              x={marker.year}
+              stroke="rgba(255,255,255,0.14)"
+              strokeDasharray="4 4"
+            />
+
+            {firstPoint ? (
+              <ReferenceDot
+                x={firstPoint.year}
+                y={firstPoint.asset}
+                r={4}
+                fill={accent}
+                stroke="#050505"
+                strokeWidth={2}
+              />
+            ) : null}
+
+            {eventLines.map((event) => (
+              <ReferenceLine
+                key={`${event.year}-${event.label}`}
+                x={event.year}
+                stroke="rgba(255,215,0,0.22)"
+                strokeDasharray="2 4"
+              />
+            ))}
+
+            <Area
+              type="monotone"
+              dataKey="asset"
+              stroke={accent}
+              strokeWidth={4}
+              fill="url(#assetAreaFill)"
+              activeDot={false}
+              animationDuration={0}
+              isAnimationActive={false}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="bank"
+              stroke="#8B93A7"
+              strokeWidth={3}
+              dot={false}
+              activeDot={false}
+              animationDuration={0}
+              isAnimationActive={false}
+            />
+
+            <ReferenceDot
+              x={marker.year}
+              y={marker.asset}
+              r={6}
+              fill={accent}
+              stroke="#050505"
+              strokeWidth={3}
+            />
+
+            <ReferenceDot
+              x={marker.year}
+              y={marker.bank}
+              r={5}
+              fill="#8B93A7"
+              stroke="#050505"
+              strokeWidth={3}
+            />
+
+            {isFinished && lastPoint ? (
+              <ReferenceDot
+                x={lastPoint.year}
+                y={lastPoint.asset}
+                r={5}
+                fill={accent}
+                stroke="#050505"
+                strokeWidth={2}
+              />
+            ) : null}
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-full w-full animate-pulse rounded-2xl bg-white/5" />
+      )}
+
+      {!compact && (movingPriceKrw || movingPriceUsd) ? (
+        <div
+          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[120%]"
+          style={{ left: `${xRatio * 100}%`, top: `${yRatio * 100}%` }}
+        >
+          <div className="rounded-xl border border-[#E31937]/45 bg-[#16070B]/92 px-2 py-1 shadow-[0_8px_24px_rgba(227,25,55,0.3)] backdrop-blur">
+            {movingPriceKrw ? <p className="text-[10px] font-black text-[#FFD7DF]">{movingPriceKrw}</p> : null}
+            {movingPriceUsd ? <p className="text-[9px] font-bold text-zinc-300">{movingPriceUsd}</p> : null}
+          </div>
+        </div>
+      ) : null}
+
+      {!compact ? (
+        <div className="pointer-events-none absolute bottom-2 left-10 right-4 z-10 flex items-center justify-between text-[10px] font-bold text-zinc-500">
+          <span>{Math.floor(minYear)}</span>
+          <span>{Math.floor(midYear)}</span>
+          <span>{Math.floor(maxYear)}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
