@@ -1,0 +1,1721 @@
+[
+  {
+    "Category": "Stock",
+    "Name": "Apple",
+    "Ticker": "AAPL",
+    "One-liner": "아이폰과 서비스 생태계를 함께 쥔 기업이라 현금 흐름이 오래 붙을 가능성이 큽니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 1
+  },
+  {
+    "Category": "Stock",
+    "Name": "Microsoft",
+    "Ticker": "MSFT",
+    "One-liner": "기업용 소프트웨어와 클라우드를 함께 쥔 회사라 AI 시대에도 중심에 설 가능성이 큽니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 2
+  },
+  {
+    "Category": "Stock",
+    "Name": "Amazon",
+    "Ticker": "AMZN",
+    "One-liner": "쇼핑과 클라우드를 동시에 가진 회사라 소비와 인프라 흐름을 함께 잡을 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 3
+  },
+  {
+    "Category": "Stock",
+    "Name": "Alphabet",
+    "Ticker": "GOOGL",
+    "One-liner": "검색과 광고, AI 서비스를 함께 키우는 회사라 디지털 주도권이 쉽게 흔들리지 않을 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 4
+  },
+  {
+    "Category": "Stock",
+    "Name": "Meta Platforms",
+    "Ticker": "META",
+    "One-liner": "광고 플랫폼과 AI 추천 엔진을 동시에 키우는 회사라 사용자 시간이 몰릴수록 강해질 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 5
+  },
+  {
+    "Category": "Stock",
+    "Name": "Netflix",
+    "Ticker": "NFLX",
+    "One-liner": "Netflix은 생활과 업무에 깊게 들어와 있어 한 번 자리 잡으면 쉽게 밀리기 어려운 빅테크입니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 6
+  },
+  {
+    "Category": "Stock",
+    "Name": "Oracle",
+    "Ticker": "ORCL",
+    "One-liner": "Oracle은 플랫폼과 서비스 힘을 함께 보는 미국 대표 빅테크 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "빅테크",
+    "Priority": 7
+  },
+  {
+    "Category": "Stock",
+    "Name": "NVIDIA",
+    "Ticker": "NVDA",
+    "One-liner": "AI 시대의 핵심 칩을 파는 회사라 수요가 몰릴 때 가장 먼저 주목받기 쉽습니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 8
+  },
+  {
+    "Category": "Stock",
+    "Name": "Broadcom",
+    "Ticker": "AVGO",
+    "One-liner": "칩과 인프라 소프트웨어를 함께 가진 회사라 AI 투자 확대의 수혜를 넓게 받을 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 9
+  },
+  {
+    "Category": "Stock",
+    "Name": "AMD",
+    "Ticker": "AMD",
+    "One-liner": "AI와 서버용 반도체 경쟁이 커질수록 대안 공급자로 다시 주목받기 쉬운 기업입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 10
+  },
+  {
+    "Category": "Stock",
+    "Name": "Taiwan Semiconductor",
+    "Ticker": "TSM",
+    "One-liner": "첨단 반도체 생산을 맡는 핵심 기업이라 AI 시대의 병목을 쥔 회사로 볼 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 11
+  },
+  {
+    "Category": "Stock",
+    "Name": "ASML Holding",
+    "Ticker": "ASML",
+    "One-liner": "최첨단 반도체 장비를 사실상 독점에 가깝게 공급해 대체가 쉽지 않은 기업입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 12
+  },
+  {
+    "Category": "Stock",
+    "Name": "Applied Materials",
+    "Ticker": "AMAT",
+    "One-liner": "Applied Materials은 AI와 데이터센터 확대 흐름에서 빠지기 어려운 반도체 핵심 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 13
+  },
+  {
+    "Category": "Stock",
+    "Name": "Lam Research",
+    "Ticker": "LRCX",
+    "One-liner": "Lam Research은 반도체 투자 확대의 수혜를 직접 받기 쉬운 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 14
+  },
+  {
+    "Category": "Stock",
+    "Name": "KLA",
+    "Ticker": "KLAC",
+    "One-liner": "KLA은 반도체 투자 확대의 수혜를 직접 받기 쉬운 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 15
+  },
+  {
+    "Category": "Stock",
+    "Name": "Micron Technology",
+    "Ticker": "MU",
+    "One-liner": "Micron Technology은 AI와 데이터센터 확대 흐름에서 빠지기 어려운 반도체 핵심 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 16
+  },
+  {
+    "Category": "Stock",
+    "Name": "Qualcomm",
+    "Ticker": "QCOM",
+    "One-liner": "Qualcomm은 반도체 투자 확대의 수혜를 직접 받기 쉬운 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "반도체",
+    "Priority": 17
+  },
+  {
+    "Category": "Stock",
+    "Name": "Salesforce",
+    "Ticker": "CRM",
+    "One-liner": "Salesforce은 한 번 시스템에 들어가면 오래 쓰는 성격이 강한 기업용 소프트웨어 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 18
+  },
+  {
+    "Category": "Stock",
+    "Name": "ServiceNow",
+    "Ticker": "NOW",
+    "One-liner": "ServiceNow은 한 번 시스템에 들어가면 오래 쓰는 성격이 강한 기업용 소프트웨어 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 19
+  },
+  {
+    "Category": "Stock",
+    "Name": "Adobe",
+    "Ticker": "ADBE",
+    "One-liner": "Adobe은 한 번 시스템에 들어가면 오래 쓰는 성격이 강한 기업용 소프트웨어 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 20
+  },
+  {
+    "Category": "Stock",
+    "Name": "Intuit",
+    "Ticker": "INTU",
+    "One-liner": "Intuit은 AI보다 실제 업무 효율화 수요와 함께 보는 소프트웨어 대표주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 21
+  },
+  {
+    "Category": "Stock",
+    "Name": "Palo Alto Networks",
+    "Ticker": "PANW",
+    "One-liner": "AI와 클라우드가 커질수록 보안은 필수가 되어 같이 성장 기대를 받기 쉬운 기업입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 22
+  },
+  {
+    "Category": "Stock",
+    "Name": "CrowdStrike",
+    "Ticker": "CRWD",
+    "One-liner": "사이버 보안 위협이 늘수록 꾸준히 수요가 붙기 쉬운 클라우드 보안 대표 기업입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 23
+  },
+  {
+    "Category": "Stock",
+    "Name": "Palantir",
+    "Ticker": "PLTR",
+    "One-liner": "기업과 정부가 AI를 실제 업무에 붙일수록 데이터 운영 플랫폼 수요가 커질 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 24
+  },
+  {
+    "Category": "Stock",
+    "Name": "Datadog",
+    "Ticker": "DDOG",
+    "One-liner": "Datadog은 한 번 시스템에 들어가면 오래 쓰는 성격이 강한 기업용 소프트웨어 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 25
+  },
+  {
+    "Category": "Stock",
+    "Name": "Cloudflare",
+    "Ticker": "NET",
+    "One-liner": "Cloudflare은 기업의 디지털 전환이 이어질수록 수요가 붙기 쉬운 소프트웨어 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "클라우드·소프트웨어",
+    "Priority": 26
+  },
+  {
+    "Category": "Stock",
+    "Name": "Berkshire Hathaway",
+    "Ticker": "BRK-B",
+    "One-liner": "Berkshire Hathaway은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 27
+  },
+  {
+    "Category": "Stock",
+    "Name": "JPMorgan Chase",
+    "Ticker": "JPM",
+    "One-liner": "JPMorgan Chase은 돈이 움직일 때마다 수수료나 금융 흐름을 기대할 수 있는 대표 금융주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 28
+  },
+  {
+    "Category": "Stock",
+    "Name": "Visa",
+    "Ticker": "V",
+    "One-liner": "Visa은 시장이 불안할수록 자본력과 현금창출력을 같이 보게 되는 금융 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 29
+  },
+  {
+    "Category": "Stock",
+    "Name": "Mastercard",
+    "Ticker": "MA",
+    "One-liner": "Mastercard은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 30
+  },
+  {
+    "Category": "Stock",
+    "Name": "Goldman Sachs",
+    "Ticker": "GS",
+    "One-liner": "Goldman Sachs은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 31
+  },
+  {
+    "Category": "Stock",
+    "Name": "Morgan Stanley",
+    "Ticker": "MS",
+    "One-liner": "Morgan Stanley은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 32
+  },
+  {
+    "Category": "Stock",
+    "Name": "BlackRock",
+    "Ticker": "BLK",
+    "One-liner": "BlackRock은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 33
+  },
+  {
+    "Category": "Stock",
+    "Name": "Charles Schwab",
+    "Ticker": "SCHW",
+    "One-liner": "Charles Schwab은 돈이 움직일 때마다 수수료나 금융 흐름을 기대할 수 있는 대표 금융주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 34
+  },
+  {
+    "Category": "Stock",
+    "Name": "S&P Global",
+    "Ticker": "SPGI",
+    "One-liner": "S&P Global은 금리와 자금 이동 흐름을 같이 참고할 때 보는 금융 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "금융",
+    "Priority": 35
+  },
+  {
+    "Category": "Stock",
+    "Name": "Eli Lilly",
+    "Ticker": "LLY",
+    "One-liner": "Eli Lilly은 경기와 무관하게 수요가 유지되기 쉬운 헬스케어 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 36
+  },
+  {
+    "Category": "Stock",
+    "Name": "UnitedHealth Group",
+    "Ticker": "UNH",
+    "One-liner": "UnitedHealth Group은 경기와 무관하게 수요가 유지되기 쉬운 헬스케어 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 37
+  },
+  {
+    "Category": "Stock",
+    "Name": "Johnson & Johnson",
+    "Ticker": "JNJ",
+    "One-liner": "Johnson & Johnson은 경기와 무관하게 수요가 유지되기 쉬운 헬스케어 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 38
+  },
+  {
+    "Category": "Stock",
+    "Name": "AbbVie",
+    "Ticker": "ABBV",
+    "One-liner": "AbbVie은 경기와 무관하게 수요가 유지되기 쉬운 헬스케어 대표 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 39
+  },
+  {
+    "Category": "Stock",
+    "Name": "Merck",
+    "Ticker": "MRK",
+    "One-liner": "Merck은 고령화와 의료 지출 확대 흐름이 이어질수록 다시 주목받기 쉬운 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 40
+  },
+  {
+    "Category": "Stock",
+    "Name": "Thermo Fisher Scientific",
+    "Ticker": "TMO",
+    "One-liner": "Thermo Fisher Scientific은 고령화와 의료 지출 확대 흐름이 이어질수록 다시 주목받기 쉬운 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 41
+  },
+  {
+    "Category": "Stock",
+    "Name": "Danaher",
+    "Ticker": "DHR",
+    "One-liner": "Danaher은 고령화와 의료 지출 확대 흐름이 이어질수록 다시 주목받기 쉬운 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 42
+  },
+  {
+    "Category": "Stock",
+    "Name": "Intuitive Surgical",
+    "Ticker": "ISRG",
+    "One-liner": "Intuitive Surgical은 고령화와 의료 지출 확대 흐름이 이어질수록 다시 주목받기 쉬운 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 43
+  },
+  {
+    "Category": "Stock",
+    "Name": "Novo Nordisk",
+    "Ticker": "NVO",
+    "One-liner": "Novo Nordisk은 고령화와 의료 지출 확대 흐름이 이어질수록 다시 주목받기 쉬운 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "헬스케어",
+    "Priority": 44
+  },
+  {
+    "Category": "Stock",
+    "Name": "Walmart",
+    "Ticker": "WMT",
+    "One-liner": "Walmart은 장기적으로 현금 흐름이 안정적인 소비 대형주로 자주 거론됩니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 45
+  },
+  {
+    "Category": "Stock",
+    "Name": "Costco",
+    "Ticker": "COST",
+    "One-liner": "Costco은 사람들이 계속 쓰는 소비 패턴 위에 올라탄 대표 소비재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 46
+  },
+  {
+    "Category": "Stock",
+    "Name": "Home Depot",
+    "Ticker": "HD",
+    "One-liner": "Home Depot은 장기적으로 현금 흐름이 안정적인 소비 대형주로 자주 거론됩니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 47
+  },
+  {
+    "Category": "Stock",
+    "Name": "Procter & Gamble",
+    "Ticker": "PG",
+    "One-liner": "Procter & Gamble은 사람들이 계속 쓰는 소비 패턴 위에 올라탄 대표 소비재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 48
+  },
+  {
+    "Category": "Stock",
+    "Name": "Coca-Cola",
+    "Ticker": "KO",
+    "One-liner": "Coca-Cola은 사람들이 계속 쓰는 소비 패턴 위에 올라탄 대표 소비재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 49
+  },
+  {
+    "Category": "Stock",
+    "Name": "PepsiCo",
+    "Ticker": "PEP",
+    "One-liner": "PepsiCo은 사람들이 계속 쓰는 소비 패턴 위에 올라탄 대표 소비재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 50
+  },
+  {
+    "Category": "Stock",
+    "Name": "McDonald's",
+    "Ticker": "MCD",
+    "One-liner": "McDonald's은 장기적으로 현금 흐름이 안정적인 소비 대형주로 자주 거론됩니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 51
+  },
+  {
+    "Category": "Stock",
+    "Name": "Starbucks",
+    "Ticker": "SBUX",
+    "One-liner": "Starbucks은 사람들이 계속 쓰는 소비 패턴 위에 올라탄 대표 소비재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 52
+  },
+  {
+    "Category": "Stock",
+    "Name": "Nike",
+    "Ticker": "NKE",
+    "One-liner": "Nike은 브랜드와 소비 습관을 쥐고 있어 경기 변화 속에서도 버티는 힘을 기대할 수 있습니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 53
+  },
+  {
+    "Category": "Stock",
+    "Name": "Disney",
+    "Ticker": "DIS",
+    "One-liner": "Disney은 장기적으로 현금 흐름이 안정적인 소비 대형주로 자주 거론됩니다.",
+    "Market": "US_STOCK",
+    "Theme": "소비재",
+    "Priority": 54
+  },
+  {
+    "Category": "Stock",
+    "Name": "Exxon Mobil",
+    "Ticker": "XOM",
+    "One-liner": "Exxon Mobil은 경기 회복과 설비 투자 국면에서 함께 보는 대표 산업재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 55
+  },
+  {
+    "Category": "Stock",
+    "Name": "Chevron",
+    "Ticker": "CVX",
+    "One-liner": "Chevron은 경기 회복과 설비 투자 국면에서 함께 보는 대표 산업재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 56
+  },
+  {
+    "Category": "Stock",
+    "Name": "Caterpillar",
+    "Ticker": "CAT",
+    "One-liner": "Caterpillar은 전력과 산업 투자 흐름이 커질수록 다시 평가받을 수 있는 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 57
+  },
+  {
+    "Category": "Stock",
+    "Name": "General Electric",
+    "Ticker": "GE",
+    "One-liner": "General Electric은 에너지와 인프라 수요가 커질 때 같이 주목받기 쉬운 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 58
+  },
+  {
+    "Category": "Stock",
+    "Name": "RTX",
+    "Ticker": "RTX",
+    "One-liner": "RTX은 에너지와 인프라 수요가 커질 때 같이 주목받기 쉬운 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 59
+  },
+  {
+    "Category": "Stock",
+    "Name": "Deere & Company",
+    "Ticker": "DE",
+    "One-liner": "Deere & Company은 에너지와 인프라 수요가 커질 때 같이 주목받기 쉬운 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 60
+  },
+  {
+    "Category": "Stock",
+    "Name": "Linde",
+    "Ticker": "LIN",
+    "One-liner": "Linde은 에너지와 인프라 수요가 커질 때 같이 주목받기 쉬운 대형주입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 61
+  },
+  {
+    "Category": "Stock",
+    "Name": "NextEra Energy",
+    "Ticker": "NEE",
+    "One-liner": "NextEra Energy은 전력과 산업 투자 흐름이 커질수록 다시 평가받을 수 있는 자산입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 62
+  },
+  {
+    "Category": "Stock",
+    "Name": "Honeywell",
+    "Ticker": "HON",
+    "One-liner": "Honeywell은 경기 회복과 설비 투자 국면에서 함께 보는 대표 산업재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 63
+  },
+  {
+    "Category": "Stock",
+    "Name": "ConocoPhillips",
+    "Ticker": "COP",
+    "One-liner": "ConocoPhillips은 경기 회복과 설비 투자 국면에서 함께 보는 대표 산업재 종목입니다.",
+    "Market": "US_STOCK",
+    "Theme": "에너지·산업재",
+    "Priority": 64
+  },
+  {
+    "Category": "Stock",
+    "Name": "????",
+    "Ticker": "005930.KS",
+    "One-liner": "메모리와 파운드리, 스마트기기까지 연결돼 한국 대표 기술주로 가장 먼저 보는 종목입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "대형 반도체",
+    "Priority": 65
+  },
+  {
+    "Category": "Stock",
+    "Name": "SK????",
+    "Ticker": "000660.KS",
+    "One-liner": "AI 서버에 들어가는 고대역폭 메모리 수요가 커질수록 같이 주목받기 쉬운 반도체 핵심주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "대형 반도체",
+    "Priority": 66
+  },
+  {
+    "Category": "Stock",
+    "Name": "한미반도체",
+    "Ticker": "042700.KS",
+    "One-liner": "HBM 장비 수요가 커질수록 함께 주목받기 쉬운 한국 반도체 장비 핵심주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "대형 반도체",
+    "Priority": 67
+  },
+  {
+    "Category": "Stock",
+    "Name": "삼성전기",
+    "Ticker": "009150.KS",
+    "One-liner": "AI 기기와 전장 부품 수요가 늘수록 같이 관심을 받기 쉬운 전자부품 대표주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "대형 반도체",
+    "Priority": 68
+  },
+  {
+    "Category": "Stock",
+    "Name": "LG??",
+    "Ticker": "066570.KS",
+    "One-liner": "가전과 전장 사업을 함께 키우며 한국 대표 하드웨어 대형주로 꾸준히 거론됩니다.",
+    "Market": "KR_STOCK",
+    "Theme": "대형 반도체",
+    "Priority": 69
+  },
+  {
+    "Category": "Stock",
+    "Name": "NAVER",
+    "Ticker": "035420.KS",
+    "One-liner": "검색과 커머스, 콘텐츠를 함께 가진 한국 대표 인터넷 플랫폼 주식입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "인터넷·플랫폼",
+    "Priority": 70
+  },
+  {
+    "Category": "Stock",
+    "Name": "???",
+    "Ticker": "035720.KS",
+    "One-liner": "메신저와 콘텐츠, 플랫폼 생태계를 함께 보는 한국 인터넷 대표주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "인터넷·플랫폼",
+    "Priority": 71
+  },
+  {
+    "Category": "Stock",
+    "Name": "???",
+    "Ticker": "005380.KS",
+    "One-liner": "전기차와 하이브리드 경쟁력을 함께 보는 한국 대표 자동차 대형주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 72
+  },
+  {
+    "Category": "Stock",
+    "Name": "??",
+    "Ticker": "000270.KS",
+    "One-liner": "글로벌 판매와 전동화 경쟁력을 함께 보는 한국 대표 완성차 주식입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 73
+  },
+  {
+    "Category": "Stock",
+    "Name": "현대모비스",
+    "Ticker": "012330.KS",
+    "One-liner": "현대차그룹의 전동화와 부품 경쟁력을 함께 보는 데 중요한 자동차 핵심주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 74
+  },
+  {
+    "Category": "Stock",
+    "Name": "LG??????",
+    "Ticker": "373220.KS",
+    "One-liner": "전기차 배터리 수요 확대 흐름을 직접적으로 반영하는 한국 대표 배터리주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 75
+  },
+  {
+    "Category": "Stock",
+    "Name": "LG화학",
+    "Ticker": "051910.KS",
+    "One-liner": "배터리 소재와 화학 사업을 함께 봐야 하는 한국 대표 소재주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 76
+  },
+  {
+    "Category": "Stock",
+    "Name": "삼성SDI",
+    "Ticker": "006400.KS",
+    "One-liner": "전기차 배터리와 에너지저장장치 수요가 커질수록 같이 보는 배터리 대표주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 77
+  },
+  {
+    "Category": "Stock",
+    "Name": "포스코퓨처엠",
+    "Ticker": "003670.KS",
+    "One-liner": "양극재와 음극재 공급망을 볼 때 빠지기 어려운 한국 배터리 소재 대표주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 78
+  },
+  {
+    "Category": "Stock",
+    "Name": "POSCO홀딩스",
+    "Ticker": "005490.KS",
+    "One-liner": "철강을 넘어 배터리 소재까지 같이 보는 한국 대표 산업 대형주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "자동차·배터리",
+    "Priority": 79
+  },
+  {
+    "Category": "Stock",
+    "Name": "KB금융",
+    "Ticker": "105560.KS",
+    "One-liner": "한국 금융 대장주 흐름을 볼 때 가장 먼저 참고하는 대표 은행주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "금융",
+    "Priority": 80
+  },
+  {
+    "Category": "Stock",
+    "Name": "신한지주",
+    "Ticker": "055550.KS",
+    "One-liner": "은행과 비은행 이익 흐름을 함께 볼 수 있는 한국 대표 금융주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "금융",
+    "Priority": 81
+  },
+  {
+    "Category": "Stock",
+    "Name": "하나금융지주",
+    "Ticker": "086790.KS",
+    "One-liner": "금리와 배당 흐름을 함께 참고할 때 자주 보는 한국 금융 대형주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "금융",
+    "Priority": 82
+  },
+  {
+    "Category": "Stock",
+    "Name": "메리츠금융지주",
+    "Ticker": "138040.KS",
+    "One-liner": "자본 효율과 주주환원 기대가 붙을 때 빠르게 주목받는 한국 금융주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "금융",
+    "Priority": 83
+  },
+  {
+    "Category": "Stock",
+    "Name": "한화에어로스페이스",
+    "Ticker": "012450.KS",
+    "One-liner": "방산 수출과 우주·항공 기대가 겹치며 최근 한국 성장주 관심을 끄는 대표 종목입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "방산·조선",
+    "Priority": 84
+  },
+  {
+    "Category": "Stock",
+    "Name": "한국항공우주",
+    "Ticker": "047810.KS",
+    "One-liner": "국내 항공·방산 수주 흐름을 직접적으로 반영하는 대표 방산주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "방산·조선",
+    "Priority": 85
+  },
+  {
+    "Category": "Stock",
+    "Name": "두산에너빌리티",
+    "Ticker": "034020.KS",
+    "One-liner": "원전과 발전설비 투자 기대가 붙을 때 다시 강하게 주목받는 에너지 장비주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "방산·조선",
+    "Priority": 86
+  },
+  {
+    "Category": "Stock",
+    "Name": "HD현대중공업",
+    "Ticker": "329180.KS",
+    "One-liner": "조선·엔진·해양 수요를 함께 보는 한국 대표 중공업 대형주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "방산·조선",
+    "Priority": 87
+  },
+  {
+    "Category": "Stock",
+    "Name": "셀트리온",
+    "Ticker": "068270.KS",
+    "One-liner": "바이오시밀러와 글로벌 판매 확대 기대를 함께 보는 한국 대표 바이오주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "바이오",
+    "Priority": 88
+  },
+  {
+    "Category": "Stock",
+    "Name": "삼성바이오로직스",
+    "Ticker": "207940.KS",
+    "One-liner": "글로벌 바이오 위탁생산 수요가 커질수록 같이 커질 가능성이 큰 대표 바이오주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "바이오",
+    "Priority": 89
+  },
+  {
+    "Category": "Stock",
+    "Name": "유한양행",
+    "Ticker": "000100.KS",
+    "One-liner": "신약 파이프라인 기대가 붙을 때 한국 제약 대표주로 다시 주목받기 쉽습니다.",
+    "Market": "KR_STOCK",
+    "Theme": "바이오",
+    "Priority": 90
+  },
+  {
+    "Category": "Stock",
+    "Name": "SK스퀘어",
+    "Ticker": "402340.KS",
+    "One-liner": "반도체와 ICT 투자자산 가치를 함께 보는 한국 지주형 성장주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "지주·대표 대형주",
+    "Priority": 91
+  },
+  {
+    "Category": "Stock",
+    "Name": "삼성물산",
+    "Ticker": "028260.KS",
+    "One-liner": "지배구조와 자산가치를 함께 볼 때 빠지지 않는 한국 대표 지주주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "지주·대표 대형주",
+    "Priority": 92
+  },
+  {
+    "Category": "Stock",
+    "Name": "KT&G",
+    "Ticker": "033780.KS",
+    "One-liner": "현금흐름과 배당 안정성을 함께 보려는 투자자들이 자주 찾는 대표 소비주입니다.",
+    "Market": "KR_STOCK",
+    "Theme": "지주·대표 대형주",
+    "Priority": 93
+  },
+  {
+    "Category": "Stock",
+    "Name": "SK",
+    "Ticker": "034730.KS",
+    "One-liner": "반도체와 에너지, 투자자산을 함께 담고 있어 한국 대표 지주주로 자주 거론됩니다.",
+    "Market": "KR_STOCK",
+    "Theme": "지주·대표 대형주",
+    "Priority": 94
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR S&P 500 ETF",
+    "Ticker": "SPY",
+    "One-liner": "미국 대표 기업 전체에 한 번에 분산 투자하는 가장 쉬운 출발점입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 95
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard S&P 500 ETF",
+    "Ticker": "VOO",
+    "One-liner": "Vanguard S&P 500 ETF은 초보자가 장기 투자 습관을 만들 때 가장 먼저 보기 쉬운 지수 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 96
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core S&P 500 ETF",
+    "Ticker": "IVV",
+    "One-liner": "iShares Core S&P 500 ETF은 한 종목보다 시장 전체를 오래 들고 갈 때 자주 선택되는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 97
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total Stock Market ETF",
+    "Ticker": "VTI",
+    "One-liner": "미국 주식시장 전체를 넓게 담아 장기 투자 습관을 만들기 좋은 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 98
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco QQQ Trust",
+    "Ticker": "QQQ",
+    "One-liner": "미국 대형 기술주 흐름을 한 번에 따라가고 싶을 때 가장 직관적인 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 99
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR Dow Jones Industrial Average ETF",
+    "Ticker": "DIA",
+    "One-liner": "SPDR Dow Jones Industrial Average ETF은 한 종목보다 시장 전체를 오래 들고 갈 때 자주 선택되는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "미국지수",
+    "Priority": 100
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Semiconductor ETF",
+    "Ticker": "SOXX",
+    "One-liner": "반도체 업황 전체에 올라타고 싶을 때 개별 종목보다 쉽게 접근할 수 있는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 101
+  },
+  {
+    "Category": "ETF",
+    "Name": "VanEck Semiconductor ETF",
+    "Ticker": "SMH",
+    "One-liner": "VanEck Semiconductor ETF은 기술 투자 확대의 수혜를 분산해서 담는 데 적합한 테마 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 102
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Expanded Tech-Software Sector ETF",
+    "Ticker": "IGV",
+    "One-liner": "iShares Expanded Tech-Software Sector ETF은 반도체·AI 대세를 한 번에 따라가고 싶을 때 선택하기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 103
+  },
+  {
+    "Category": "ETF",
+    "Name": "Technology Select Sector SPDR Fund",
+    "Ticker": "XLK",
+    "One-liner": "Technology Select Sector SPDR Fund은 반도체·AI 대세를 한 번에 따라가고 싶을 때 선택하기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 104
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Robotics & Artificial Intelligence ETF",
+    "Ticker": "BOTZ",
+    "One-liner": "로봇과 자동화 흐름에 한 번에 올라타고 싶을 때 보기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 105
+  },
+  {
+    "Category": "ETF",
+    "Name": "ROBO Global Robotics and Automation ETF",
+    "Ticker": "ROBO",
+    "One-liner": "자동화 산업 전반에 분산 투자해 로봇 테마를 길게 보는 데 유리한 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 106
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Artificial Intelligence & Technology ETF",
+    "Ticker": "AIQ",
+    "One-liner": "Global X Artificial Intelligence & Technology ETF은 AI와 반도체 흐름을 개별 종목보다 넓게 담고 싶을 때 보기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 107
+  },
+  {
+    "Category": "ETF",
+    "Name": "Global X Cloud Computing ETF",
+    "Ticker": "CLOU",
+    "One-liner": "Global X Cloud Computing ETF은 기술 투자 확대의 수혜를 분산해서 담는 데 적합한 테마 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "반도체·AI",
+    "Priority": 108
+  },
+  {
+    "Category": "ETF",
+    "Name": "Schwab U.S. Dividend Equity ETF",
+    "Ticker": "SCHD",
+    "One-liner": "Schwab U.S. Dividend Equity ETF은 장기 투자에서 흔들림을 줄이는 용도로 자주 활용되는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 109
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core Dividend Growth ETF",
+    "Ticker": "DGRO",
+    "One-liner": "iShares Core Dividend Growth ETF은 큰 수익보다 안정성과 현금흐름을 함께 보고 싶을 때 고르기 쉬운 자산입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 110
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Core U.S. Aggregate Bond ETF",
+    "Ticker": "AGG",
+    "One-liner": "iShares Core U.S. Aggregate Bond ETF은 큰 수익보다 안정성과 현금흐름을 함께 보고 싶을 때 고르기 쉬운 자산입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 111
+  },
+  {
+    "Category": "ETF",
+    "Name": "Vanguard Total Bond Market ETF",
+    "Ticker": "BND",
+    "One-liner": "Vanguard Total Bond Market ETF은 장기 투자에서 흔들림을 줄이는 용도로 자주 활용되는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 112
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 20+ Year Treasury Bond ETF",
+    "Ticker": "TLT",
+    "One-liner": "iShares 20+ Year Treasury Bond ETF은 변동성이 커질 때 방어력과 분산 효과를 기대하는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 113
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 7-10 Year Treasury Bond ETF",
+    "Ticker": "IEF",
+    "One-liner": "iShares 7-10 Year Treasury Bond ETF은 장기 투자에서 흔들림을 줄이는 용도로 자주 활용되는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 114
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares 0-3 Month Treasury Bond ETF",
+    "Ticker": "SGOV",
+    "One-liner": "iShares 0-3 Month Treasury Bond ETF은 변동성이 커질 때 방어력과 분산 효과를 기대하는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "배당·채권",
+    "Priority": 115
+  },
+  {
+    "Category": "ETF",
+    "Name": "SPDR Gold Shares",
+    "Ticker": "GLD",
+    "One-liner": "불안한 시기에 돈이 피신하는 대표 자산인 금을 가장 쉽게 추적하는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 116
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Gold Trust",
+    "Ticker": "IAU",
+    "One-liner": "iShares Gold Trust은 금속과 원자재 가격 흐름을 주식보다 쉽게 담는 자산입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 117
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Silver Trust",
+    "Ticker": "SLV",
+    "One-liner": "iShares Silver Trust은 실물 자산 수요와 공급 변화에 올라타고 싶을 때 쓰기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 118
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco DB Commodity Index Tracking Fund",
+    "Ticker": "DBC",
+    "One-liner": "Invesco DB Commodity Index Tracking Fund은 인플레이션과 실물자산 흐름을 함께 보고 싶을 때 참고하기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 119
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco Optimum Yield Diversified Commodity Strategy ETF",
+    "Ticker": "PDBC",
+    "One-liner": "Invesco Optimum Yield Diversified Commodity Strategy ETF은 실물 자산 수요와 공급 변화에 올라타고 싶을 때 쓰기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 120
+  },
+  {
+    "Category": "ETF",
+    "Name": "Invesco DB Agriculture Fund",
+    "Ticker": "DBA",
+    "One-liner": "Invesco DB Agriculture Fund은 금속과 원자재 가격 흐름을 주식보다 쉽게 담는 자산입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 121
+  },
+  {
+    "Category": "ETF",
+    "Name": "United States Oil Fund",
+    "Ticker": "USO",
+    "One-liner": "United States Oil Fund은 금속과 원자재 가격 흐름을 주식보다 쉽게 담는 자산입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 122
+  },
+  {
+    "Category": "ETF",
+    "Name": "United States Natural Gas Fund",
+    "Ticker": "UNG",
+    "One-liner": "United States Natural Gas Fund은 인플레이션과 실물자산 흐름을 함께 보고 싶을 때 참고하기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "원자재·금",
+    "Priority": 123
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Bitcoin Trust ETF",
+    "Ticker": "IBIT",
+    "One-liner": "비트코인을 직접 사지 않고도 증권 계좌에서 쉽게 담을 수 있는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 124
+  },
+  {
+    "Category": "ETF",
+    "Name": "Fidelity Wise Origin Bitcoin Fund",
+    "Ticker": "FBTC",
+    "One-liner": "Fidelity Wise Origin Bitcoin Fund은 디지털 자산을 ETF 형태로 담아 진입 장벽을 낮춘 자산입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 125
+  },
+  {
+    "Category": "ETF",
+    "Name": "Bitwise Bitcoin ETF",
+    "Ticker": "BITB",
+    "One-liner": "Bitwise Bitcoin ETF은 비트코인이나 이더리움 흐름을 제도권 상품으로 따라가고 싶을 때 보기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 126
+  },
+  {
+    "Category": "ETF",
+    "Name": "ARK 21Shares Bitcoin ETF",
+    "Ticker": "ARKB",
+    "One-liner": "ARK 21Shares Bitcoin ETF은 코인을 직접 사지 않고도 증권 계좌에서 쉽게 접근할 수 있는 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 127
+  },
+  {
+    "Category": "ETF",
+    "Name": "VanEck Bitcoin ETF",
+    "Ticker": "HODL",
+    "One-liner": "VanEck Bitcoin ETF은 비트코인이나 이더리움 흐름을 제도권 상품으로 따라가고 싶을 때 보기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 128
+  },
+  {
+    "Category": "ETF",
+    "Name": "ProShares Bitcoin Strategy ETF",
+    "Ticker": "BITO",
+    "One-liner": "ProShares Bitcoin Strategy ETF은 디지털 자산을 ETF 형태로 담아 진입 장벽을 낮춘 자산입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 129
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares Ethereum Trust ETF",
+    "Ticker": "ETHA",
+    "One-liner": "iShares Ethereum Trust ETF은 디지털 자산을 ETF 형태로 담아 진입 장벽을 낮춘 자산입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 130
+  },
+  {
+    "Category": "ETF",
+    "Name": "Fidelity Ethereum Fund",
+    "Ticker": "FETH",
+    "One-liner": "Fidelity Ethereum Fund은 비트코인이나 이더리움 흐름을 제도권 상품으로 따라가고 싶을 때 보기 쉬운 ETF입니다.",
+    "Market": "ETF",
+    "Theme": "비트코인·이더리움 ETF",
+    "Priority": 131
+  },
+  {
+    "Category": "ETF",
+    "Name": "iShares MSCI South Korea ETF",
+    "Ticker": "EWY",
+    "One-liner": "iShares MSCI South Korea ETF은 한국 시장 흐름을 미국 상장 ETF로 한 번에 보고 싶을 때 참고하기 쉽습니다.",
+    "Market": "ETF",
+    "Theme": "한국 ETF",
+    "Priority": 132
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bitcoin",
+    "Ticker": "BTC",
+    "One-liner": "정부나 기업이 마음대로 늘릴 수 없는 희소성에 투자하는 대표 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 133
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Ethereum",
+    "Ticker": "ETH",
+    "One-liner": "디지털 금융과 스마트계약 생태계가 커질수록 같이 주목받기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 134
+  },
+  {
+    "Category": "Crypto",
+    "Name": "BNB",
+    "Ticker": "BNB",
+    "One-liner": "BNB은 디지털 자산 시장 방향성을 볼 때 가장 먼저 참고하는 메이저 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 135
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Solana",
+    "Ticker": "SOL",
+    "One-liner": "Solana은 위험은 크지만 시장 관심이 몰릴 때 가장 먼저 반응하기 쉬운 메이저 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 136
+  },
+  {
+    "Category": "Crypto",
+    "Name": "XRP",
+    "Ticker": "XRP",
+    "One-liner": "XRP은 위험은 크지만 시장 관심이 몰릴 때 가장 먼저 반응하기 쉬운 메이저 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 137
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Cardano",
+    "Ticker": "ADA",
+    "One-liner": "Cardano은 디지털 자산 시장 방향성을 볼 때 가장 먼저 참고하는 메이저 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 138
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Dogecoin",
+    "Ticker": "DOGE",
+    "One-liner": "Dogecoin은 코인 시장의 대표 심리를 가장 잘 보여주는 핵심 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 139
+  },
+  {
+    "Category": "Crypto",
+    "Name": "TRON",
+    "Ticker": "TRX",
+    "One-liner": "TRON은 코인 시장의 대표 심리를 가장 잘 보여주는 핵심 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 140
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Toncoin",
+    "Ticker": "TON",
+    "One-liner": "Toncoin은 위험은 크지만 시장 관심이 몰릴 때 가장 먼저 반응하기 쉬운 메이저 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 141
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Avalanche",
+    "Ticker": "AVAX",
+    "One-liner": "Avalanche은 위험은 크지만 시장 관심이 몰릴 때 가장 먼저 반응하기 쉬운 메이저 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "메이저",
+    "Priority": 142
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Polkadot",
+    "Ticker": "DOT",
+    "One-liner": "Polkadot은 블록체인 생태계 확장과 개발자 활동을 함께 보는 대표 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 143
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Polygon",
+    "Ticker": "POL",
+    "One-liner": "Polygon은 스마트계약과 네트워크 성장 기대가 가격에 반영되기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 144
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Cosmos",
+    "Ticker": "ATOM",
+    "One-liner": "Cosmos은 메이저 이후 다음 레이어를 볼 때 자주 거론되는 코인 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 145
+  },
+  {
+    "Category": "Crypto",
+    "Name": "NEAR Protocol",
+    "Ticker": "NEAR",
+    "One-liner": "NEAR Protocol은 블록체인 생태계 확장과 개발자 활동을 함께 보는 대표 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 146
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Internet Computer",
+    "Ticker": "ICP",
+    "One-liner": "Internet Computer은 스마트계약과 네트워크 성장 기대가 가격에 반영되기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 147
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Algorand",
+    "Ticker": "ALGO",
+    "One-liner": "Algorand은 블록체인 생태계 확장과 개발자 활동을 함께 보는 대표 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 148
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Sui",
+    "Ticker": "SUI",
+    "One-liner": "Sui은 스마트계약과 네트워크 성장 기대가 가격에 반영되기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 149
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Aptos",
+    "Ticker": "APT",
+    "One-liner": "Aptos은 스마트계약과 네트워크 성장 기대가 가격에 반영되기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 150
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Sei",
+    "Ticker": "SEI",
+    "One-liner": "Sei은 블록체인 생태계 확장과 개발자 활동을 함께 보는 대표 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 151
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Celestia",
+    "Ticker": "TIA",
+    "One-liner": "Celestia은 블록체인 생태계 확장과 개발자 활동을 함께 보는 대표 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "스마트계약",
+    "Priority": 152
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Chainlink",
+    "Ticker": "LINK",
+    "One-liner": "Chainlink은 거래보다 네트워크 기반 역할을 볼 때 의미가 큰 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "인프라·오라클",
+    "Priority": 153
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Filecoin",
+    "Ticker": "FIL",
+    "One-liner": "Filecoin은 블록체인 인프라와 데이터 연결 수요가 커질 때 같이 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "인프라·오라클",
+    "Priority": 154
+  },
+  {
+    "Category": "Crypto",
+    "Name": "The Graph",
+    "Ticker": "GRT",
+    "One-liner": "The Graph은 블록체인 인프라와 데이터 연결 수요가 커질 때 같이 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "인프라·오라클",
+    "Priority": 155
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Hedera",
+    "Ticker": "HBAR",
+    "One-liner": "Hedera은 블록체인 인프라와 데이터 연결 수요가 커질 때 같이 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "인프라·오라클",
+    "Priority": 156
+  },
+  {
+    "Category": "Crypto",
+    "Name": "VeChain",
+    "Ticker": "VET",
+    "One-liner": "VeChain은 거래보다 네트워크 기반 역할을 볼 때 의미가 큰 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "인프라·오라클",
+    "Priority": 157
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bittensor",
+    "Ticker": "TAO",
+    "One-liner": "Bittensor은 AI 연산과 네트워크 수요가 코인 시장과 결합될 때 주목받기 쉬운 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "AI·연산",
+    "Priority": 158
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Render",
+    "Ticker": "RNDR",
+    "One-liner": "Render은 AI 테마와 연결돼 다른 코인보다 이야기거리가 강한 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "AI·연산",
+    "Priority": 159
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Uniswap",
+    "Ticker": "UNI",
+    "One-liner": "Uniswap은 시장 유동성이 커질수록 다시 거래량과 함께 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 160
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Aave",
+    "Ticker": "AAVE",
+    "One-liner": "Aave은 거래와 유동성 흐름이 살아날 때 같이 주목받기 쉬운 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 161
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Maker",
+    "Ticker": "MKR",
+    "One-liner": "Maker은 거래와 유동성 흐름이 살아날 때 같이 주목받기 쉬운 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 162
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Injective",
+    "Ticker": "INJ",
+    "One-liner": "Injective은 거래와 유동성 흐름이 살아날 때 같이 주목받기 쉬운 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 163
+  },
+  {
+    "Category": "Crypto",
+    "Name": "THORChain",
+    "Ticker": "RUNE",
+    "One-liner": "THORChain은 시장 유동성이 커질수록 다시 거래량과 함께 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 164
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Optimism",
+    "Ticker": "OP",
+    "One-liner": "Optimism은 거래와 유동성 흐름이 살아날 때 같이 주목받기 쉬운 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 165
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Arbitrum",
+    "Ticker": "ARB",
+    "One-liner": "Arbitrum은 거래와 유동성 흐름이 살아날 때 같이 주목받기 쉬운 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 166
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Litecoin",
+    "Ticker": "LTC",
+    "One-liner": "Litecoin은 시장 유동성이 커질수록 다시 거래량과 함께 보는 코인입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 167
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Bitcoin Cash",
+    "Ticker": "BCH",
+    "One-liner": "Bitcoin Cash은 디파이와 거래 인프라 수요를 함께 보는 대표 코인 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 168
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Stellar",
+    "Ticker": "XLM",
+    "One-liner": "Stellar은 디파이와 거래 인프라 수요를 함께 보는 대표 코인 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 169
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Ethereum Classic",
+    "Ticker": "ETC",
+    "One-liner": "Ethereum Classic은 디파이와 거래 인프라 수요를 함께 보는 대표 코인 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 170
+  },
+  {
+    "Category": "Crypto",
+    "Name": "Monero",
+    "Ticker": "XMR",
+    "One-liner": "Monero은 디파이와 거래 인프라 수요를 함께 보는 대표 코인 자산입니다.",
+    "Market": "CRYPTO",
+    "Theme": "거래·유동성",
+    "Priority": 171
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Gold Futures",
+    "Ticker": "GC=F",
+    "One-liner": "위기 때 자금이 몰리는 금 가격 자체를 가장 직접적으로 따라가는 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "귀금속",
+    "Priority": 172
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Silver Futures",
+    "Ticker": "SI=F",
+    "One-liner": "Silver Futures은 실물 희소성과 인플레이션 방어 성격을 같이 보는 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "귀금속",
+    "Priority": 173
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Platinum Futures",
+    "Ticker": "PL=F",
+    "One-liner": "Platinum Futures은 실물 희소성과 인플레이션 방어 성격을 같이 보는 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "귀금속",
+    "Priority": 174
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Palladium Futures",
+    "Ticker": "PA=F",
+    "One-liner": "Palladium Futures은 안전자산 수요와 희소성을 함께 보는 대표 귀금속 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "귀금속",
+    "Priority": 175
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Copper Futures",
+    "Ticker": "HG=F",
+    "One-liner": "전기차와 데이터센터, 전력망이 늘수록 함께 주목받는 핵심 산업 금속입니다.",
+    "Market": "COMMODITY",
+    "Theme": "산업금속",
+    "Priority": 176
+  },
+  {
+    "Category": "Commodity",
+    "Name": "WTI Crude Oil Futures",
+    "Ticker": "CL=F",
+    "One-liner": "경기와 지정학 이슈가 겹칠 때 가격 변동이 커지며 주목받는 대표 에너지 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "에너지",
+    "Priority": 177
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Brent Crude Oil Futures",
+    "Ticker": "BZ=F",
+    "One-liner": "Brent Crude Oil Futures은 공급 차질이나 경기 반등 때 빠르게 반응하는 원자재 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "에너지",
+    "Priority": 178
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Natural Gas Futures",
+    "Ticker": "NG=F",
+    "One-liner": "전력과 난방 수요, 공급 이슈에 따라 급격히 움직여 에너지 흐름을 보여주는 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "에너지",
+    "Priority": 179
+  },
+  {
+    "Category": "Commodity",
+    "Name": "RBOB Gasoline Futures",
+    "Ticker": "RB=F",
+    "One-liner": "RBOB Gasoline Futures은 경기와 지정학 이슈가 겹칠 때 가격이 크게 움직이는 대표 에너지 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "에너지",
+    "Priority": 180
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Heating Oil Futures",
+    "Ticker": "HO=F",
+    "One-liner": "Heating Oil Futures은 경기와 지정학 이슈가 겹칠 때 가격이 크게 움직이는 대표 에너지 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "에너지",
+    "Priority": 181
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Corn Futures",
+    "Ticker": "ZC=F",
+    "One-liner": "Corn Futures은 날씨와 공급 이슈에 따라 가격이 흔들리는 대표 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 182
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Wheat Futures",
+    "Ticker": "ZW=F",
+    "One-liner": "Wheat Futures은 공급 충격이 올 때 예상보다 크게 움직일 수 있는 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 183
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Soybean Futures",
+    "Ticker": "ZS=F",
+    "One-liner": "Soybean Futures은 식량과 원재료 수급 변화를 바로 보여주는 실물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 184
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Coffee Futures",
+    "Ticker": "KC=F",
+    "One-liner": "Coffee Futures은 날씨와 공급 이슈에 따라 가격이 흔들리는 대표 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 185
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Cocoa Futures",
+    "Ticker": "CC=F",
+    "One-liner": "Cocoa Futures은 식량과 원재료 수급 변화를 바로 보여주는 실물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 186
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Sugar Futures",
+    "Ticker": "SB=F",
+    "One-liner": "Sugar Futures은 식량과 원재료 수급 변화를 바로 보여주는 실물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 187
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Cotton Futures",
+    "Ticker": "CT=F",
+    "One-liner": "Cotton Futures은 날씨와 공급 이슈에 따라 가격이 흔들리는 대표 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 188
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Live Cattle Futures",
+    "Ticker": "LE=F",
+    "One-liner": "Live Cattle Futures은 날씨와 공급 이슈에 따라 가격이 흔들리는 대표 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 189
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Lean Hogs Futures",
+    "Ticker": "HE=F",
+    "One-liner": "Lean Hogs Futures은 공급 충격이 올 때 예상보다 크게 움직일 수 있는 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 190
+  },
+  {
+    "Category": "Commodity",
+    "Name": "Lumber Futures",
+    "Ticker": "LBS=F",
+    "One-liner": "Lumber Futures은 공급 충격이 올 때 예상보다 크게 움직일 수 있는 농산물 자산입니다.",
+    "Market": "COMMODITY",
+    "Theme": "농산물",
+    "Priority": 191
+  }
+]
