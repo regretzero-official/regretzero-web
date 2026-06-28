@@ -200,8 +200,13 @@ export default async function Home(props: PageProps<"/">) {
                 대표 레이스 보기
               </Link>
               <a href="#direct-compare" className="hero-secondary">
-                내 종목 바로 넣기
+                내 종목 찾아보기
               </a>
+            </div>
+
+            <div className="hero-search-prompt">
+              <span>이미 궁금한 종목이 있나요?</span>
+              <a href="#direct-compare">전체 자산에서 바로 검색</a>
             </div>
           </div>
 
@@ -269,7 +274,12 @@ export default async function Home(props: PageProps<"/">) {
               <p className="section-kicker">편집 추천</p>
               <h2 className="section-title">처음엔 이 셋이면 충분합니다.</h2>
             </div>
+            <div className="strip-actions">
             <p className="section-note">클릭하면 바로 금과 같은 돈으로 붙습니다.</p>
+              <a href="#direct-compare" className="section-action">
+                전체 자산 보기
+              </a>
+            </div>
           </div>
 
           <div className="featured-grid">
@@ -452,6 +462,18 @@ export default async function Home(props: PageProps<"/">) {
           </div>
         </section>
       </div>
+
+      <nav className="bottom-quick-nav" aria-label="빠른 이동">
+        <a href="#" className="bottom-quick-link">
+          <span>홈</span>
+        </a>
+        <a href="#direct-compare" className="bottom-quick-link is-primary">
+          <span>자산찾기</span>
+        </a>
+        <a href="#direct-compare" className="bottom-quick-link">
+          <span>전체보기</span>
+        </a>
+      </nav>
     </main>
   );
 }

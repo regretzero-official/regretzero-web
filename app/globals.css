@@ -65,6 +65,7 @@ a {
 .page-shell {
   position: relative;
   overflow: clip;
+  padding-bottom: 6rem;
 }
 
 .page-bg {
@@ -189,6 +190,29 @@ a {
   margin-top: 1.4rem;
 }
 
+.hero-search-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.75rem;
+  align-items: center;
+  margin-top: 0.9rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(23, 32, 25, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  color: rgba(23, 32, 25, 0.68);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.hero-search-prompt a {
+  font-weight: 900;
+  color: #172019;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 .hero-primary,
 .hero-secondary,
 .submit-button {
@@ -252,6 +276,31 @@ a {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.strip-actions {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: flex-start;
+}
+
+.section-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(23, 32, 25, 0.14);
+  background: #172019;
+  color: #fffaf2;
+  padding: 0 1rem;
+  font-size: 0.92rem;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(23, 32, 25, 0.14);
+}
+
+#direct-compare {
+  scroll-margin-top: 1.2rem;
 }
 
 .stage-caption {
@@ -661,6 +710,41 @@ a {
   to {
     background-position: -20% 0, 0 0;
   }
+}
+
+.bottom-quick-nav {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(0.8rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0.5rem;
+  border: 1px solid rgba(23, 32, 25, 0.12);
+  border-radius: 28px;
+  background: rgba(255, 250, 242, 0.88);
+  box-shadow: 0 18px 50px rgba(22, 28, 24, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.bottom-quick-link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  color: rgba(23, 32, 25, 0.62);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.bottom-quick-link.is-primary {
+  background: #172019;
+  color: #fffaf2;
 }
 
 @media (min-width: 900px) {
