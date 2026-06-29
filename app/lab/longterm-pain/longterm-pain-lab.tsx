@@ -1902,6 +1902,7 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
     analysis.emotionMonths.find((month, index) => index <= lastReplayablePosition) ??
     analysis.emotionMonths[0]!;
   const [selectedDate, setSelectedDate] = useState(defaultMonth.date);
+  const [selectedDetailOpen, setSelectedDetailOpen] = useState(false);
 
   const selectedMonth =
     analysis.emotionMonths.find((month) => month.date === selectedDate) ?? defaultMonth;
@@ -1942,27 +1943,27 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         한 달씩 보여줍니다.
       </p>
 
-      <div className="mt-4 rounded-[24px] bg-slate-950 px-4 py-4 text-[#f8fafc]">
+      <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 px-3 py-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
               계좌 멀미 지수
             </div>
-            <div className="mt-1 text-2xl font-black tracking-[-0.06em]">{motionLabel}</div>
+            <div className="mt-1 text-2xl font-black tracking-[-0.06em] text-slate-950">{motionLabel}</div>
           </div>
-          <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-black text-cyan-100">
+          <div className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500 shadow-sm">
             {formatMonth(worstMonth.date)} - {formatPct(Math.abs(worstMonth.monthlyReturnPct))}
           </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-bold">
-          <div className="rounded-[18px] bg-white px-3 py-3 text-slate-950 shadow-[0_10px_22px_rgba(15,23,42,0.18)]">
+          <div className="rounded-[18px] bg-white px-3 py-2 text-slate-950 shadow-sm">
             <div className="text-[11px] font-black text-slate-500">최악의 한 달</div>
             <div className="mt-1 text-lg font-black text-rose-600">
               {formatPct(worstMonth.monthlyReturnPct)}
             </div>
             <div className="mt-1 text-[10px] font-bold text-slate-400">{formatMonth(worstMonth.date)}</div>
           </div>
-          <div className="rounded-[18px] bg-white px-3 py-3 text-slate-950 shadow-[0_10px_22px_rgba(15,23,42,0.18)]">
+          <div className="rounded-[18px] bg-white px-3 py-2 text-slate-950 shadow-sm">
             <div className="text-[11px] font-black text-slate-500">최고의 한 달</div>
             <div className="mt-1 text-lg font-black text-emerald-600">
               {formatPct(bestMonth.monthlyReturnPct)}
@@ -1972,10 +1973,10 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {(["panic", "underwater", "temptation", "recovery", "sideways"] as EmotionTone[]).map(
           (tone) => (
-            <div className="flex items-center gap-2 rounded-[18px] bg-slate-50 px-3 py-2" key={tone}>
+            <div className="flex min-w-[132px] items-center gap-2 rounded-[18px] bg-slate-50 px-3 py-2" key={tone}>
               <span className={`h-3 w-3 rounded-full ${getEmotionToneClasses(tone).split(" ").slice(1, 2).join(" ")}`} />
               <span>
                 <span className="block text-[11px] font-black text-slate-600">
@@ -1989,8 +1990,6 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
           ),
         )}
       </div>
-
-      <SelectedEmotionMonthCard futureMaskCount={futureMaskCount} selectedMonth={selectedMonth} />
 
       <div className="mt-5 space-y-4">
         {years.map(([year, months]) => (
@@ -2013,7 +2012,10 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
                       isSelected ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/25` : toneClass
                     } ${month.criticalZone ? "outline outline-2 outline-offset-1 outline-rose-300/70" : ""}`}
                     key={month.date}
-                    onClick={() => setSelectedDate(month.date)}
+                    onClick={() => {
+                      setSelectedDate(month.date);
+                      setSelectedDetailOpen(false);
+                    }}
                     type="button"
                   >
                     <span>{isFutureMasked && !isSelected ? "?" : month.date.slice(5, 7)}</span>
@@ -2026,6 +2028,14 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
                 );
               })}
             </div>
+            {months.some((month) => month.date === selectedMonth.date) ? (
+              <SelectedEmotionMonthCard
+                futureMaskCount={futureMaskCount}
+                isOpen={selectedDetailOpen}
+                onToggle={() => setSelectedDetailOpen((open) => !open)}
+                selectedMonth={selectedMonth}
+              />
+            ) : null}
           </div>
         ))}
       </div>
@@ -2035,19 +2045,21 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
 
 function SelectedEmotionMonthCard({
   futureMaskCount,
+  isOpen,
+  onToggle,
   selectedMonth,
 }: {
   futureMaskCount: number;
+  isOpen: boolean;
+  onToggle: () => void;
   selectedMonth: EmotionMonth;
 }) {
   return (
-    <div className="sticky top-3 z-20 mt-5 rounded-[28px] border border-slate-200 bg-white/95 px-4 py-3 shadow-[0_18px_60px_rgba(15,23,42,0.18)] backdrop-blur">
+    <div className="mt-4 rounded-[26px] border border-slate-200 bg-white px-3.5 py-3.5 shadow-[0_12px_34px_rgba(15,23,42,0.08)]">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
-            선택한 달의 매도 충동
-          </div>
-          <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">선택한 달</div>
+          <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
             {formatMonth(selectedMonth.date)} · {selectedMonth.label}
           </div>
         </div>
@@ -2055,64 +2067,78 @@ function SelectedEmotionMonthCard({
           {selectedMonth.marker || getEmotionLegendLabel(selectedMonth.tone)}
         </div>
       </div>
-      <div className="mt-2 inline-flex rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white">
-        {selectedMonth.impulseLabel}
-      </div>
-      {selectedMonth.peakBreakout ? (
-        <div className="ml-2 mt-2 inline-flex rounded-full border border-cyan-100 bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-700">
-          ↗ 전고점 돌파까지 {selectedMonth.peakWaitMonths}개월
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-800">
+          {selectedMonth.impulseLabel}
         </div>
-      ) : null}
-      {selectedMonth.chainLabel ? (
-        <div className="mt-2 rounded-[18px] border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-black leading-5 text-rose-700">
-          ⚡ 멘탈 크리티컬 존: {selectedMonth.chainLabel}
-        </div>
-      ) : null}
-      <div className="mt-2 rounded-[18px] bg-slate-950 px-3 py-2 text-xs font-bold leading-5 text-slate-200">
-        {futureMaskCount > 0
-          ? `미래 암전: 이 달을 누른 순간, 이후 ${futureMaskCount}개월은 일부러 가렸습니다. 그때의 당신도 다음 장면을 몰랐습니다.`
-          : "미래 암전: 이 달은 현재에 가까운 구간입니다. 직전의 흔들림만 보고 판단해야 했던 상태로 읽어보세요."}
+        {selectedMonth.peakBreakout ? (
+          <div className="inline-flex rounded-full border border-cyan-100 bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-700">
+            ↗ 전고점까지 {selectedMonth.peakWaitMonths}개월
+          </div>
+        ) : null}
+        {selectedMonth.chainLabel ? (
+          <div className="inline-flex rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-black text-rose-700">
+            ⚡ {selectedMonth.chainLabel}
+          </div>
+        ) : null}
       </div>
-      <div className="mt-3 grid grid-cols-4 gap-1.5">
-        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+      <div className="mt-3 grid grid-cols-4 gap-1">
+        <div className="rounded-[15px] bg-slate-50 px-1.5 py-1.5">
           <div className="text-[9px] font-black text-slate-400">평가액</div>
           <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
             {formatKrw(selectedMonth.value)}
           </div>
         </div>
-        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+        <div className="rounded-[15px] bg-slate-50 px-1.5 py-1.5">
           <div className="text-[9px] font-black text-slate-400">한 달</div>
           <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
             {formatPct(selectedMonth.monthlyReturnPct)}
           </div>
         </div>
-        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+        <div className="rounded-[15px] bg-slate-50 px-1.5 py-1.5">
           <div className="text-[9px] font-black text-slate-400">원금</div>
           <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
             {formatPct(selectedMonth.totalReturnPct)}
           </div>
         </div>
-        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+        <div className="rounded-[15px] bg-slate-50 px-1.5 py-1.5">
           <div className="text-[9px] font-black text-slate-400">고점</div>
           <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
             {formatPct(selectedMonth.drawdownPct)}
           </div>
         </div>
       </div>
-      <p className="mt-2 rounded-[18px] bg-amber-50 px-3 py-2.5 text-sm font-black leading-5 text-slate-900">
-        “{selectedMonth.mindLine}”
-      </p>
-      <p className="mt-2 rounded-[18px] bg-rose-50 px-3 py-2 text-xs font-bold leading-5 text-rose-700">
-        {selectedMonth.tangibleLine}
-      </p>
-      <p className="mt-2 rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-slate-600">
-        <span className="font-black text-slate-900">주변 소음 </span>
-        {selectedMonth.noiseLine}
-      </p>
-      <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
-        <span className="font-black text-slate-900">판정 </span>
-        {selectedMonth.verdict}
-      </p>
+      <div className="mt-2 rounded-[18px] bg-amber-50 px-3 py-2">
+        <p className="text-sm font-black leading-5 text-slate-900">“{selectedMonth.mindLine}”</p>
+      </div>
+      <button
+        className="mt-2 w-full rounded-[18px] border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-black text-slate-600"
+        onClick={onToggle}
+        type="button"
+      >
+        {isOpen ? "자세히 닫기" : "그 달의 진짜 압박 보기"}
+      </button>
+      {isOpen ? (
+        <div className="mt-3 space-y-2">
+          <div className="rounded-[18px] bg-rose-50 px-3 py-2 text-xs font-bold leading-5 text-rose-700">
+            {selectedMonth.tangibleLine}
+          </div>
+          <div className="rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-bold leading-5 text-slate-600">
+            <span className="font-black text-slate-950">미래 암전 </span>
+            {futureMaskCount > 0
+              ? `이 달을 누른 순간, 이후 ${futureMaskCount}개월은 일부러 가렸습니다. 그때의 당신도 다음 장면을 몰랐습니다.`
+              : "이 달은 현재에 가까운 구간입니다. 직전의 흔들림만 보고 판단해야 했던 상태로 읽어보세요."}
+          </div>
+          <div className="rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-slate-600">
+            <span className="font-black text-slate-950">주변 소음 </span>
+            {selectedMonth.noiseLine}
+          </div>
+          <div className="rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-slate-600">
+            <span className="font-black text-slate-950">판정 </span>
+            {selectedMonth.verdict}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
