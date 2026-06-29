@@ -42,10 +42,3 @@ next-env.d.ts
 
 # local android tools
 .tools/
-
-# android signing
-android/key.properties
-android/keystore/
-android/.gradle/
-android/app/build/
-android/build/
