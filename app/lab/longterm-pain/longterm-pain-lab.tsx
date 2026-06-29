@@ -4,1166 +4,1737 @@ import {
   Bookmark,
   ChevronRight,
   Clock3,
-  Flame,
   Home,
   LineChart,
   Radio,
   Search,
   ShieldAlert,
-  Sparkles,
   TrendingDown,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { RaceChart, type RaceChartAsset } from "@/components/home/race-chart";
 import {
-  BEAR_MARKET_PAIN_COPY,
-  BRAND_SLOGANS,
-  BULL_MARKET_TEMPTATION_COPY,
-  CRITICAL_MOMENTS_COPY,
-  EMOTION_MAP_LABELS,
-  NOISE_NOTE_COPY,
-  USER_DIAGNOSIS_COPY,
-  fillRegretCopyTemplate,
-  type EmotionMapLabelKey,
-  type RealityDiagnosisOptionKey,
-} from "@/lib/regret-copy";
+  DEFAULT_AMOUNT,
+  assetCatalog,
+  assetOrder,
+  type ComparisonAssetId,
+} from "@/lib/home-content";
+import {
+  buildRaceData,
+  getRequestedDateRange,
+  type MarketBundle,
+  type RaceBuildResult,
+  type RacePoint,
+} from "@/lib/race-engine";
+import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-data";
 
-type BottomTab = "home" | "live" | "saved" | "search";
-type AssetTab = "all" | "coin" | "etf" | "kospi" | "nasdaq100" | "sp500";
-type CoverageType = "listed_since" | "ten_year";
+type AssetTab = "all" | "kospi" | "nasdaq100" | "sp500" | "etf" | "coin";
+type BottomTab = "home" | "search" | "live" | "saved";
+type RaceStatus = "complete" | "idle" | "loading" | "racing";
+type RealityAnswer = "buyMore" | "hold" | "sellEarly" | "sellFear";
 
-interface LabAsset {
-  accent: string;
-  coverage: CoverageType;
-  description: string;
-  firstAvailableDate: string;
-  finalMultiple: number;
+interface LabAssetMeta {
   groups: string[];
-  id: string;
-  maxDrawdown: number;
   name: string;
-  ticker: string;
+  oneLiner: string;
+  searchTerms: string[];
   theme: string;
+  ticker: string;
+}
+
+interface PainMilestone {
+  date: string;
+  missedAmount: number;
+  multiple: number;
+  value: number;
 }
 
 interface EmotionMonth {
   date: string;
-  label: EmotionMapLabelKey;
-  monthlyReturn: number;
+  label: string;
   note: string;
-  totalReturn: number;
+  tone: "danger" | "neutral" | "success" | "warning";
 }
 
-const INITIAL_PRINCIPAL = 10_000_000;
+interface PainAnalysis {
+  assetReturnPct: number;
+  bankGap: number;
+  bearMoments: Array<{ date: string; dropPct: number; value: number }>;
+  emotionMonths: EmotionMonth[];
+  finalValue: number;
+  goldGap: number;
+  longestRecoveryMonths: number;
+  maxDrawdownDate: string;
+  maxDrawdownPct: number;
+  milestones: PainMilestone[];
+  resolvedEndDate: string;
+  resolvedStartDate: string;
+  startValue: number;
+  underATHMonths: number;
+  underATHPercent: number;
+  underPrincipalMonths: number;
+}
 
-const LAB_ASSETS: LabAsset[] = [
-  {
-    accent: "#ef4444",
-    coverage: "ten_year",
-    description:
-      "AI 데이터센터가 커질수록 가장 먼저 이름이 나오는 반도체 대표주입니다. 문제는, 그 사이 하락도 사람을 꽤 세게 흔들었다는 겁니다.",
-    finalMultiple: 84.2,
-    firstAvailableDate: "1999-01-22",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "nvda",
-    maxDrawdown: -66,
-    name: "엔비디아",
-    theme: "AI 반도체",
-    ticker: "NVDA",
-  },
-  {
-    accent: "#2563eb",
-    coverage: "ten_year",
-    description:
-      "아이폰과 서비스 생태계를 가진 세계 대표 소비자 기술 기업입니다. 너무 익숙해서 오히려 오래 들고 가기 어려운 종목이기도 합니다.",
-    finalMultiple: 8.1,
-    firstAvailableDate: "1980-12-12",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "aapl",
-    maxDrawdown: -39,
-    name: "애플",
-    theme: "빅테크",
-    ticker: "AAPL",
-  },
-  {
-    accent: "#0ea5e9",
-    coverage: "ten_year",
-    description:
-      "클라우드와 소프트웨어, AI를 모두 잡은 대표 기업입니다. 지루하게 강한 종목도 중간에는 사람을 의심하게 만듭니다.",
-    finalMultiple: 11.7,
-    firstAvailableDate: "1986-03-13",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "msft",
-    maxDrawdown: -37,
-    name: "마이크로소프트",
-    theme: "클라우드/AI",
-    ticker: "MSFT",
-  },
-  {
-    accent: "#dc2626",
-    coverage: "ten_year",
-    description:
-      "전기차 시대를 상징하는 종목입니다. 크게 오른 만큼, 실제 계좌에서는 멀미가 날 정도로 흔들렸을 가능성이 큽니다.",
-    finalMultiple: 22.5,
-    firstAvailableDate: "2010-06-29",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "tsla",
-    maxDrawdown: -73,
-    name: "테슬라",
-    theme: "전기차",
-    ticker: "TSLA",
-  },
-  {
-    accent: "#f97316",
-    coverage: "ten_year",
-    description:
-      "광고와 소셜 네트워크, AI 추천 시스템을 가진 플랫폼 기업입니다. 모두가 끝났다고 말한 시간이 지나고 나서야 반전이 보였습니다.",
-    finalMultiple: 7.6,
-    firstAvailableDate: "2012-05-18",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "meta",
-    maxDrawdown: -76,
-    name: "메타",
-    theme: "플랫폼/AI",
-    ticker: "META",
-  },
-  {
-    accent: "#f59e0b",
-    coverage: "ten_year",
-    description:
-      "AI 서버와 네트워크 반도체 수요가 커질수록 같이 언급되는 기업입니다. 조용히 강한 종목도 견디는 시간은 조용하지 않습니다.",
-    finalMultiple: 24.8,
-    firstAvailableDate: "2009-08-06",
-    groups: ["Nasdaq100", "S&P500"],
-    id: "avgo",
-    maxDrawdown: -48,
-    name: "브로드컴",
-    theme: "반도체 인프라",
-    ticker: "AVGO",
-  },
-  {
-    accent: "#1d4ed8",
-    coverage: "ten_year",
-    description:
-      "한국 주식시장에서 가장 먼저 떠올리는 대표 기술주입니다. 익숙한 이름이라도 오래 들고 가는 건 전혀 다른 문제입니다.",
-    finalMultiple: 2.2,
-    firstAvailableDate: "1975-06-11",
+const PRINCIPAL_KRW = DEFAULT_AMOUNT;
+const RACE_DURATION_MS = 12_000;
+
+const RACE_ASSET_IDS: ComparisonAssetId[] = ["deposit", "gold"];
+const CURATED_ASSET_IDS: ComparisonAssetId[] = [
+  "nvda",
+  "aapl",
+  "msft",
+  "tsla",
+  "googl",
+  "meta",
+  "amzn",
+  "avgo",
+  "amd",
+  "soxx",
+  "qqq",
+  "spy",
+  "voo",
+  "btc",
+  "eth",
+  "005930",
+  "000660",
+  "005380",
+  "000270",
+  "012450",
+  "034020",
+  "035420",
+  "035720",
+  "068270",
+  "207940",
+  "005490",
+  "105560",
+  "055550",
+  "033780",
+  "028260",
+  "003550",
+  "069500",
+  "360750",
+  "brkb",
+  "jpm",
+  "jnj",
+  "v",
+  "ma",
+  "cost",
+  "pg",
+  "ko",
+  "xom",
+];
+
+const RACE_SHORT_LABELS: Record<string, string> = {
+  "000270": "기아",
+  "000660": "하이닉스",
+  "003550": "LG",
+  "005380": "현대차",
+  "005490": "POSCO",
+  "005930": "삼전",
+  "012450": "한화",
+  "028260": "물산",
+  "033780": "KT&G",
+  "034020": "두산",
+  "035420": "NAVER",
+  "035720": "카카오",
+  "055550": "신한",
+  "068270": "셀트리온",
+  "069500": "KODEX",
+  "105560": "KB",
+  "207940": "삼바",
+  "360750": "TIGER",
+};
+
+const ASSET_META: Record<string, LabAssetMeta> = {
+  "000270": {
     groups: ["KOSPI"],
-    id: "samsung-electronics",
-    maxDrawdown: -46,
-    name: "삼성전자",
-    theme: "한국 반도체",
-    ticker: "005930",
+    name: "기아",
+    oneLiner:
+      "전기차와 SUV 흐름을 타며 한국 자동차 산업의 체력이 어떻게 평가받는지 보여주는 대표주입니다.",
+    searchTerms: ["기아", "kia", "000270", "자동차"],
+    theme: "자동차",
+    ticker: "000270",
   },
-  {
-    accent: "#7c3aed",
-    coverage: "ten_year",
-    description:
-      "AI 서버에 들어가는 고대역폭 메모리 수요가 커질수록 같이 주목받는 한국 반도체 핵심주입니다.",
-    finalMultiple: 5.4,
-    firstAvailableDate: "1996-12-26",
+  "000660": {
     groups: ["KOSPI"],
-    id: "sk-hynix",
-    maxDrawdown: -59,
     name: "SK하이닉스",
-    theme: "메모리/HBM",
+    oneLiner:
+      "AI 서버에 필요한 고대역폭 메모리 수요가 커질수록 투자자의 시선이 먼저 몰리는 반도체 핵심주입니다.",
+    searchTerms: ["sk하이닉스", "하이닉스", "000660", "반도체"],
+    theme: "반도체",
     ticker: "000660",
   },
-  {
-    accent: "#16a34a",
-    coverage: "listed_since",
-    description:
-      "전기차 배터리 시장을 대표하는 한국 대형 배터리 기업입니다. 10년 데이터가 없어 상장일부터 계산해야 합니다.",
-    finalMultiple: 0.72,
-    firstAvailableDate: "2022-01-27",
+  "003550": {
     groups: ["KOSPI"],
-    id: "lg-energy-solution",
-    maxDrawdown: -54,
-    name: "LG에너지솔루션",
-    theme: "배터리",
-    ticker: "373220",
+    name: "LG",
+    oneLiner:
+      "전자, 화학, 배터리 계열사를 묶어 보는 한국 대표 지주사라 시장 분위기를 넓게 읽기 좋습니다.",
+    searchTerms: ["lg", "003550", "지주"],
+    theme: "지주",
+    ticker: "003550",
   },
-  {
-    accent: "#0891b2",
-    coverage: "ten_year",
-    description:
-      "한국 자동차 산업의 대표 기업입니다. 좋은 기업이어도 시장이 인정해주기까지 기다리는 시간은 길 수 있습니다.",
-    finalMultiple: 2.9,
-    firstAvailableDate: "1974-06-28",
+  "005380": {
     groups: ["KOSPI"],
-    id: "hyundai-motor",
-    maxDrawdown: -44,
     name: "현대차",
+    oneLiner:
+      "전기차, 하이브리드, 글로벌 판매 사이클이 한꺼번에 반영되는 한국 자동차 대표주입니다.",
+    searchTerms: ["현대차", "현대자동차", "005380", "자동차"],
     theme: "자동차",
     ticker: "005380",
   },
-  {
-    accent: "#10b981",
-    coverage: "ten_year",
-    description:
-      "한국 인터넷 플랫폼 대표 기업입니다. 성장주라는 말이 뜨거울 때와 차가울 때의 온도 차이를 그대로 맞는 종목입니다.",
-    finalMultiple: 3.1,
-    firstAvailableDate: "2002-10-29",
+  "005490": {
     groups: ["KOSPI"],
-    id: "naver",
-    maxDrawdown: -67,
+    name: "POSCO홀딩스",
+    oneLiner:
+      "철강의 현금창출력과 2차전지 소재 기대가 함께 섞인 한국 소재 대표주입니다.",
+    searchTerms: ["posco", "포스코", "005490", "소재"],
+    theme: "소재",
+    ticker: "005490",
+  },
+  "005930": {
+    groups: ["KOSPI"],
+    name: "삼성전자",
+    oneLiner:
+      "메모리, 파운드리, 스마트기기까지 연결된 한국 주식시장의 가장 익숙한 기준점입니다.",
+    searchTerms: ["삼성전자", "삼성", "005930", "반도체"],
+    theme: "반도체",
+    ticker: "005930",
+  },
+  "012450": {
+    groups: ["KOSPI"],
+    name: "한화에어로스페이스",
+    oneLiner:
+      "방산 수출과 우주항공 기대가 겹치며 최근 한국 성장주 관심을 강하게 끄는 종목입니다.",
+    searchTerms: ["한화에어로스페이스", "한화에어로", "012450", "방산"],
+    theme: "방산",
+    ticker: "012450",
+  },
+  "028260": {
+    groups: ["KOSPI"],
+    name: "삼성물산",
+    oneLiner:
+      "건설, 상사, 바이오 지분 가치가 함께 움직이는 삼성그룹 대표 지주 성격의 종목입니다.",
+    searchTerms: ["삼성물산", "028260", "지주"],
+    theme: "지주",
+    ticker: "028260",
+  },
+  "033780": {
+    groups: ["KOSPI"],
+    name: "KT&G",
+    oneLiner:
+      "큰 폭의 성장보다 꾸준한 현금흐름과 배당 매력을 보고 접근하는 한국 소비재 대표주입니다.",
+    searchTerms: ["kt&g", "케이티앤지", "033780", "배당"],
+    theme: "소비재",
+    ticker: "033780",
+  },
+  "034020": {
+    groups: ["KOSPI"],
+    name: "두산에너빌리티",
+    oneLiner:
+      "원전과 에너지 설비 기대가 커질 때 한국 산업재에서 가장 먼저 언급되는 종목 중 하나입니다.",
+    searchTerms: ["두산에너빌리티", "두산", "034020", "원전"],
+    theme: "에너지",
+    ticker: "034020",
+  },
+  "035420": {
+    groups: ["KOSPI"],
     name: "NAVER",
-    theme: "인터넷/플랫폼",
+    oneLiner:
+      "검색, 커머스, 콘텐츠, AI가 한 회사 안에 묶인 한국 인터넷 플랫폼의 대표 선수입니다.",
+    searchTerms: ["네이버", "naver", "035420", "플랫폼"],
+    theme: "플랫폼",
     ticker: "035420",
   },
-  {
-    accent: "#3b82f6",
-    coverage: "ten_year",
-    description:
-      "미국 대표 기업 500개를 한 번에 담는 가장 쉬운 출발점입니다. 개별 종목보다 덜 흔들려도, 버티는 시간은 여전히 필요합니다.",
-    finalMultiple: 3.2,
-    firstAvailableDate: "1993-01-29",
-    groups: ["ETF", "S&P500"],
-    id: "spy",
-    maxDrawdown: -34,
-    name: "S&P500 ETF",
+  "035720": {
+    groups: ["KOSPI"],
+    name: "카카오",
+    oneLiner:
+      "국민 메신저에서 금융, 콘텐츠까지 확장한 플랫폼 기업이 기대와 실망을 어떻게 오가는지 보여줍니다.",
+    searchTerms: ["카카오", "kakao", "035720", "플랫폼"],
+    theme: "플랫폼",
+    ticker: "035720",
+  },
+  "055550": {
+    groups: ["KOSPI"],
+    name: "신한지주",
+    oneLiner:
+      "금리와 경기 흐름에 따라 은행주의 안정성과 한계를 함께 보여주는 금융 대표주입니다.",
+    searchTerms: ["신한지주", "신한", "055550", "금융"],
+    theme: "금융",
+    ticker: "055550",
+  },
+  "068270": {
+    groups: ["KOSPI"],
+    name: "셀트리온",
+    oneLiner:
+      "바이오시밀러 기대가 커질 때 한국 바이오 투자심리가 얼마나 뜨겁고 차가워지는지 보여줍니다.",
+    searchTerms: ["셀트리온", "068270", "바이오"],
+    theme: "바이오",
+    ticker: "068270",
+  },
+  "069500": {
+    groups: ["ETF", "KOSPI"],
+    name: "KODEX 200",
+    oneLiner:
+      "한국 대표 기업 묶음을 한 번에 사는 ETF라 코스피 장기투자의 체감을 보기 좋습니다.",
+    searchTerms: ["kodex 200", "코덱스200", "069500", "코스피 etf"],
+    theme: "한국지수 ETF",
+    ticker: "069500",
+  },
+  "105560": {
+    groups: ["KOSPI"],
+    name: "KB금융",
+    oneLiner:
+      "은행, 카드, 증권, 보험을 묶어 금리와 배당 기대를 함께 보는 한국 금융 대표주입니다.",
+    searchTerms: ["kb금융", "국민은행", "105560", "금융"],
+    theme: "금융",
+    ticker: "105560",
+  },
+  "207940": {
+    groups: ["KOSPI"],
+    name: "삼성바이오로직스",
+    oneLiner:
+      "글로벌 의약품 생산 수요가 커질수록 한국 바이오 대형주의 프리미엄을 대표하는 종목입니다.",
+    searchTerms: ["삼성바이오로직스", "삼바", "207940", "바이오"],
+    theme: "바이오",
+    ticker: "207940",
+  },
+  "360750": {
+    groups: ["ETF", "KOSPI", "S&P500"],
+    name: "TIGER 미국S&P500",
+    oneLiner:
+      "원화로 미국 대표 기업에 접근하는 ETF라 한국 투자자가 가장 쉽게 미국 장기투자를 체감할 수 있습니다.",
+    searchTerms: ["tiger 미국s&p500", "360750", "미국 etf", "s&p500"],
     theme: "미국지수 ETF",
-    ticker: "SPY",
+    ticker: "360750",
   },
-  {
-    accent: "#06b6d4",
-    coverage: "ten_year",
-    description:
-      "나스닥100 대표 ETF입니다. 기술주가 강할 때는 달리지만, 금리와 버블 논란 앞에서는 꽤 거칠게 흔들립니다.",
-    finalMultiple: 5.1,
-    firstAvailableDate: "1999-03-10",
-    groups: ["ETF", "Nasdaq100"],
-    id: "qqq",
-    maxDrawdown: -36,
-    name: "나스닥100 ETF",
-    theme: "미국기술 ETF",
-    ticker: "QQQ",
+  aapl: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "애플",
+    oneLiner:
+      "아이폰이라는 일상적 제품이 거대한 현금흐름과 브랜드 충성도로 바뀌는 힘을 보여줍니다.",
+    searchTerms: ["애플", "apple", "aapl"],
+    theme: "빅테크",
+    ticker: "AAPL",
   },
-  {
-    accent: "#f7931a",
-    coverage: "ten_year",
-    description:
-      "정부나 기업이 찍어낼 수 없는 희소성에 투자하는 디지털 자산입니다. 수익률보다 먼저, 변동성을 견딜 수 있는지가 문제입니다.",
-    finalMultiple: 96.4,
-    firstAvailableDate: "2014-09-17",
+  amd: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "AMD",
+    oneLiner:
+      "반도체 경쟁 구도가 바뀔 때 후발주자가 얼마나 극적으로 재평가될 수 있는지 보여줍니다.",
+    searchTerms: ["amd", "반도체"],
+    theme: "반도체",
+    ticker: "AMD",
+  },
+  amzn: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "아마존",
+    oneLiner:
+      "쇼핑 회사처럼 보이지만 클라우드와 물류 체계가 결합된 거대한 현금흐름 기업입니다.",
+    searchTerms: ["아마존", "amazon", "amzn", "aws"],
+    theme: "클라우드",
+    ticker: "AMZN",
+  },
+  avgo: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "브로드컴",
+    oneLiner:
+      "AI 인프라와 네트워크 반도체가 커질수록 조용히 같이 언급되는 고수익 반도체 기업입니다.",
+    searchTerms: ["브로드컴", "broadcom", "avgo"],
+    theme: "반도체",
+    ticker: "AVGO",
+  },
+  brkb: {
+    groups: ["S&P500"],
+    name: "버크셔 해서웨이",
+    oneLiner:
+      "화려한 기술주가 아니어도 긴 시간 자본 배분이 얼마나 강한 결과를 만들 수 있는지 보여줍니다.",
+    searchTerms: ["버크셔", "berkshire", "brkb", "버핏"],
+    theme: "복합 지주",
+    ticker: "BRK.B",
+  },
+  btc: {
     groups: ["Coin"],
-    id: "btc",
-    maxDrawdown: -83,
     name: "비트코인",
-    theme: "디지털 희소자산",
+    oneLiner:
+      "누구도 마음대로 찍어낼 수 없는 희소성에 투자한다는 아이디어가 시장에서 어떻게 가격이 되는지 보여줍니다.",
+    searchTerms: ["비트코인", "bitcoin", "btc"],
+    theme: "희소 자산",
     ticker: "BTC",
   },
-  {
-    accent: "#627eea",
-    coverage: "listed_since",
-    description:
-      "스마트계약과 온체인 생태계의 대표 자산입니다. 10년이 부족한 구간은 상장 이후 기준으로 공시하고 계산해야 합니다.",
-    finalMultiple: 48.5,
-    firstAvailableDate: "2015-08-07",
+  cost: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "코스트코",
+    oneLiner:
+      "화려한 기술보다 멤버십과 가격 신뢰가 얼마나 강한 사업 모델이 되는지 보여주는 소비재 대표주입니다.",
+    searchTerms: ["코스트코", "costco", "cost"],
+    theme: "소비재",
+    ticker: "COST",
+  },
+  eth: {
     groups: ["Coin"],
-    id: "eth",
-    maxDrawdown: -82,
     name: "이더리움",
+    oneLiner:
+      "디지털 자산이 단순 보관 수단을 넘어 앱과 금융 인프라의 바닥이 될 수 있다는 실험입니다.",
+    searchTerms: ["이더리움", "ethereum", "eth"],
     theme: "스마트계약",
     ticker: "ETH",
   },
-];
+  googl: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "알파벳",
+    oneLiner:
+      "검색 광고라는 강력한 현금흐름 위에 유튜브, 클라우드, AI 기대가 얹힌 기업입니다.",
+    searchTerms: ["알파벳", "구글", "google", "googl"],
+    theme: "빅테크",
+    ticker: "GOOGL",
+  },
+  jnj: {
+    groups: ["S&P500"],
+    name: "존슨앤드존슨",
+    oneLiner:
+      "경기와 유행이 바뀌어도 헬스케어 수요가 쉽게 사라지지 않는다는 방어적 성격을 보여줍니다.",
+    searchTerms: ["존슨앤드존슨", "jnj", "헬스케어"],
+    theme: "헬스케어",
+    ticker: "JNJ",
+  },
+  jpm: {
+    groups: ["S&P500"],
+    name: "JP모건",
+    oneLiner:
+      "금리, 경기, 금융 시스템에 대한 시장의 믿음이 대형 은행 주가에 어떻게 녹아드는지 보여줍니다.",
+    searchTerms: ["jp모건", "jpmorgan", "jpm", "은행"],
+    theme: "금융",
+    ticker: "JPM",
+  },
+  ko: {
+    groups: ["S&P500"],
+    name: "코카콜라",
+    oneLiner:
+      "성장이 느려 보여도 브랜드와 유통망이 긴 시간 얼마나 질긴 현금흐름을 만드는지 보여줍니다.",
+    searchTerms: ["코카콜라", "coca cola", "ko"],
+    theme: "소비재",
+    ticker: "KO",
+  },
+  ma: {
+    groups: ["S&P500"],
+    name: "마스터카드",
+    oneLiner:
+      "사람들이 돈을 쓸 때마다 결제망이 수수료를 얻는 구조가 얼마나 강한지 보여주는 기업입니다.",
+    searchTerms: ["마스터카드", "mastercard", "ma"],
+    theme: "결제",
+    ticker: "MA",
+  },
+  meta: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "메타",
+    oneLiner:
+      "사람들의 시간을 붙잡는 플랫폼이 광고와 AI 투자로 다시 평가받는 과정을 보여줍니다.",
+    searchTerms: ["메타", "meta", "facebook", "instagram"],
+    theme: "플랫폼",
+    ticker: "META",
+  },
+  msft: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "마이크로소프트",
+    oneLiner:
+      "오래된 소프트웨어 회사가 클라우드와 AI를 만나 다시 성장주로 평가받은 사례입니다.",
+    searchTerms: ["마이크로소프트", "microsoft", "msft"],
+    theme: "클라우드",
+    ticker: "MSFT",
+  },
+  nvda: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "엔비디아",
+    oneLiner:
+      "AI 시대에 모두가 필요한 장비를 파는 회사가 되면서 시장의 상상력을 가장 세게 자극한 종목입니다.",
+    searchTerms: ["엔비디아", "nvidia", "nvda", "ai"],
+    theme: "AI 반도체",
+    ticker: "NVDA",
+  },
+  pg: {
+    groups: ["S&P500"],
+    name: "P&G",
+    oneLiner:
+      "매일 쓰는 생활용품이 얼마나 안정적인 장기 현금흐름이 될 수 있는지 보여주는 방어주입니다.",
+    searchTerms: ["p&g", "피앤지", "pg", "생활용품"],
+    theme: "소비재",
+    ticker: "PG",
+  },
+  qqq: {
+    groups: ["ETF", "Nasdaq100"],
+    name: "QQQ",
+    oneLiner:
+      "나스닥 대표 기업들을 한 번에 담아 기술주 장기투자의 기복과 보상을 동시에 보여주는 ETF입니다.",
+    searchTerms: ["qqq", "나스닥", "나스닥100", "etf"],
+    theme: "미국지수 ETF",
+    ticker: "QQQ",
+  },
+  soxx: {
+    groups: ["ETF", "Nasdaq100"],
+    name: "SOXX",
+    oneLiner:
+      "AI, 서버, 스마트기기 수요가 반도체 산업 전체를 어떻게 흔드는지 한 번에 볼 수 있는 ETF입니다.",
+    searchTerms: ["soxx", "반도체 etf", "미국 반도체"],
+    theme: "반도체 ETF",
+    ticker: "SOXX",
+  },
+  spy: {
+    groups: ["ETF", "S&P500"],
+    name: "SPY",
+    oneLiner:
+      "미국 대표 기업 전체에 분산 투자하는 가장 익숙한 출발점입니다.",
+    searchTerms: ["spy", "s&p500", "미국지수", "etf"],
+    theme: "미국지수 ETF",
+    ticker: "SPY",
+  },
+  tsla: {
+    groups: ["Nasdaq100", "S&P500"],
+    name: "테슬라",
+    oneLiner:
+      "전기차 회사인지, 에너지 회사인지, AI 회사인지에 따라 기대와 실망이 크게 흔들리는 종목입니다.",
+    searchTerms: ["테슬라", "tesla", "tsla", "전기차"],
+    theme: "전기차",
+    ticker: "TSLA",
+  },
+  v: {
+    groups: ["S&P500"],
+    name: "비자",
+    oneLiner:
+      "현금을 덜 쓰고 카드와 디지털 결제가 늘수록 조용히 수수료를 쌓는 결제 네트워크입니다.",
+    searchTerms: ["비자", "visa", "v", "결제"],
+    theme: "결제",
+    ticker: "V",
+  },
+  voo: {
+    groups: ["ETF", "S&P500"],
+    name: "VOO",
+    oneLiner:
+      "낮은 비용으로 S&P500에 장기투자하는 가장 단순한 방법 중 하나입니다.",
+    searchTerms: ["voo", "s&p500", "미국 etf"],
+    theme: "미국지수 ETF",
+    ticker: "VOO",
+  },
+  xom: {
+    groups: ["S&P500"],
+    name: "엑슨모빌",
+    oneLiner:
+      "유가와 에너지 사이클이 오래된 산업 기업의 주가를 얼마나 크게 흔드는지 보여줍니다.",
+    searchTerms: ["엑슨모빌", "exxon", "xom", "에너지"],
+    theme: "에너지",
+    ticker: "XOM",
+  },
+};
 
-const ASSET_TABS: Array<{ id: AssetTab; label: string }> = [
+const TAB_OPTIONS: Array<{ id: AssetTab; label: string }> = [
   { id: "all", label: "전체" },
   { id: "kospi", label: "코스피" },
-  { id: "nasdaq100", label: "Nasdaq100" },
+  { id: "nasdaq100", label: "나스닥100" },
   { id: "sp500", label: "S&P500" },
   { id: "etf", label: "ETF" },
   { id: "coin", label: "코인" },
 ];
 
-const THEME_FILTERS = ["전체", "AI", "반도체", "자동차", "배터리", "플랫폼", "ETF", "10년 가능", "상장일부터"];
-
-const LIVE_MATCHUPS = [
-  {
-    id: "ai-memory",
-    title: "엔비디아 vs SK하이닉스",
-    description: "AI 반도체의 미국 대표와 한국 대표가 같은 10년을 어떻게 지나왔는지 봅니다.",
-    assetId: "nvda",
-  },
-  {
-    id: "battery-pain",
-    title: "LG에너지솔루션 상장일부터",
-    description: "10년 데이터가 없는 종목은 숨기지 않습니다. 상장일부터의 시간을 따로 봅니다.",
-    assetId: "lg-energy-solution",
-  },
-  {
-    id: "btc-gold",
-    title: "비트코인의 공포 구간",
-    description: "큰 수익률 뒤에 숨어 있던 -80%대 하락을 견딜 수 있었는지 묻습니다.",
-    assetId: "btc",
-  },
+const BOTTOM_TABS: Array<{ icon: typeof Home; id: BottomTab; label: string }> = [
+  { icon: Home, id: "home", label: "홈" },
+  { icon: Search, id: "search", label: "검색" },
+  { icon: Radio, id: "live", label: "라이브" },
+  { icon: Bookmark, id: "saved", label: "보관함" },
 ];
 
-function formatKrw(value: number) {
-  const absValue = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
+const REALITY_FEEDBACK: Record<RealityAnswer, string> = {
+  buyMore:
+    "그 답을 실제 계좌에서 해냈다면 이미 상위권입니다. 다만 하락의 끝이 보이지 않을 때 더 사는 일은 지식보다 고독을 견디는 일에 가깝습니다.",
+  hold:
+    "말은 쉽지만, 실제 계좌에서 수천만 원이 사라질 때는 손가락이 먼저 매도 버튼으로 갑니다. 그래서 의지가 아니라 구조가 필요합니다.",
+  sellEarly:
+    "핵심을 짚었습니다. 많은 사람은 폭락보다 작은 성공을 못 견딥니다. 눈앞의 수익을 확정하려다 더 큰 시간을 팔아버립니다.",
+  sellFear:
+    "정직한 답입니다. 인간은 손실을 피하도록 설계되어 있습니다. 장기투자가 어려운 건 의지가 약해서가 아니라 본능을 거스르기 때문입니다.",
+};
 
-  if (absValue >= 100_000_000) {
-    const eok = Math.floor(absValue / 100_000_000);
-    const man = Math.round((absValue % 100_000_000) / 10_000);
-    return man > 0 ? `${sign}${eok}억 ${man.toLocaleString("ko-KR")}만원` : `${sign}${eok}억원`;
-  }
+function getMeta(assetId: ComparisonAssetId): LabAssetMeta {
+  const asset = assetCatalog[assetId];
+  const fallbackName = asset?.label ?? assetId.toUpperCase();
 
-  return `${sign}${Math.round(absValue / 10_000).toLocaleString("ko-KR")}만원`;
+  return (
+    ASSET_META[assetId] ?? {
+      groups: ["기타"],
+      name: fallbackName,
+      oneLiner:
+        "실제 과거 데이터를 먼저 달려보고, 그 시간이 어떤 감정으로 버텨졌을지 확인해 볼 자산입니다.",
+      searchTerms: [assetId, fallbackName],
+      theme: "기타",
+      ticker: asset?.marketTicker ?? assetId.toUpperCase(),
+    }
+  );
 }
 
-function formatSignedPercent(value: number) {
-  return `${value > 0 ? "+" : ""}${value.toLocaleString("ko-KR")}%`;
+function getRaceShortLabel(assetId: ComparisonAssetId, meta: LabAssetMeta) {
+  return RACE_SHORT_LABELS[assetId] ?? meta.ticker;
 }
 
-function getAssetTabMatch(asset: LabAsset, tab: AssetTab) {
-  if (tab === "all") return true;
-  if (tab === "kospi") return asset.groups.includes("KOSPI");
-  if (tab === "nasdaq100") return asset.groups.includes("Nasdaq100");
-  if (tab === "sp500") return asset.groups.includes("S&P500");
-  if (tab === "etf") return asset.groups.includes("ETF");
-  return asset.groups.includes("Coin");
-}
+function getLabAssetIds() {
+  const curated = CURATED_ASSET_IDS.filter((assetId) => ASSET_META[assetId]);
+  const extra = assetOrder.filter((assetId) => {
+    if (curated.includes(assetId)) {
+      return false;
+    }
 
-function getCoverageLabel(asset: LabAsset) {
-  return asset.coverage === "ten_year" ? "10년 데이터 가능" : "상장일부터 계산";
-}
-
-function getObjectParticle(value: string) {
-  const lastChar = value.trim().at(-1);
-  if (!lastChar) return "를";
-
-  const code = lastChar.charCodeAt(0);
-  const hangulStart = 0xac00;
-  const hangulEnd = 0xd7a3;
-
-  if (code < hangulStart || code > hangulEnd) {
-    return "를";
-  }
-
-  return (code - hangulStart) % 28 === 0 ? "를" : "을";
-}
-
-function getScenario(asset: LabAsset) {
-  const finalValue = Math.round(INITIAL_PRINCIPAL * asset.finalMultiple);
-  const underATHPercent = Math.min(78, Math.max(28, Math.round(Math.abs(asset.maxDrawdown) * 0.86)));
-  const underATHMonths = Math.round((underATHPercent / 100) * (asset.coverage === "ten_year" ? 120 : 42));
-  const underPrincipalMonths = Math.max(0, Math.round(Math.abs(asset.maxDrawdown) / 9));
-  const longestRecoveryMonths = Math.max(6, Math.round(Math.abs(asset.maxDrawdown) / 2.1));
-  const coverageYears = asset.coverage === "ten_year" ? "10년" : `${asset.firstAvailableDate.slice(0, 4)}년 상장일부터`;
-  const milestoneMultiples = [2, 5, 10].filter((multiple) => asset.finalMultiple >= multiple);
-  const milestones = milestoneMultiples.map((multiple, index) => {
-    const valueAtMilestone = INITIAL_PRINCIPAL * multiple;
-    const missedAmount = Math.max(0, finalValue - valueAtMilestone);
-
-    return {
-      date:
-        asset.coverage === "ten_year"
-          ? [`2017.08`, `2020.11`, `2023.05`][index] ?? "2024.01"
-          : [`2022.09`, `2023.12`, `2024.05`][index] ?? "상장 이후",
-      missedAmount,
-      multiple,
-      valueAtMilestone,
-    };
+    const asset = assetCatalog[assetId];
+    return Boolean(asset?.isAvailable && asset.marketTicker);
   });
 
+  return [...curated, ...extra];
+}
+
+function isSyntheticAsset(assetId: ComparisonAssetId) {
+  return assetId === "deposit";
+}
+
+async function requestHistoricalSeries(
+  ticker: MarketDataTicker,
+  startDate: string,
+  endDate: string,
+) {
+  const url = new URL("/api/historical", window.location.origin);
+  url.searchParams.set("ticker", ticker);
+  url.searchParams.set("start", startDate);
+  url.searchParams.set("end", endDate);
+
+  const response = await fetch(url.toString(), { cache: "no-store" });
+  const payload = (await response.json()) as HistoricalSeriesResponse | { error?: string };
+
+  if (!response.ok) {
+    throw new Error("error" in payload && payload.error ? payload.error : "과거 데이터를 불러오지 못했습니다.");
+  }
+
+  return payload as HistoricalSeriesResponse;
+}
+
+async function loadRaceBuild(assetId: ComparisonAssetId) {
+  const selectedAsset = assetCatalog[assetId];
+
+  if (!selectedAsset?.isAvailable || !selectedAsset.marketTicker) {
+    throw new Error("아직 실제 데이터 레이스를 지원하지 않는 자산입니다.");
+  }
+
+  const dateRange = getRequestedDateRange();
+  const assetIds = [assetId, ...RACE_ASSET_IDS];
+  const seriesByAsset: MarketBundle["seriesByAsset"] = {};
+  const fetchableAssetIds = assetIds.filter((item) => !isSyntheticAsset(item));
+
+  const seriesEntries = await Promise.all(
+    fetchableAssetIds.map(async (item) => {
+      const ticker = assetCatalog[item]?.marketTicker;
+      if (!ticker) {
+        return null;
+      }
+
+      return [item, await requestHistoricalSeries(ticker, dateRange.start, dateRange.end)] as const;
+    }),
+  );
+
+  for (const entry of seriesEntries) {
+    if (entry) {
+      seriesByAsset[entry[0]] = entry[1];
+    }
+  }
+
+  const needsUsdFx = assetIds.some((item) => assetCatalog[item]?.usesUsdFx);
+  const usdkrw = needsUsdFx
+    ? await requestHistoricalSeries("USDKRW", dateRange.start, dateRange.end)
+    : null;
+
+  const bundle: MarketBundle = {
+    seriesByAsset,
+    source: "live",
+    usdkrw,
+  };
+
+  return buildRaceData(assetIds, bundle, PRINCIPAL_KRW, dateRange.start, dateRange.end, "monthly");
+}
+
+function formatKrw(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0원";
+  }
+
+  const sign = value < 0 ? "-" : "";
+  const absolute = Math.abs(Math.round(value));
+
+  if (absolute >= 100_000_000) {
+    const eok = Math.floor(absolute / 100_000_000);
+    const man = Math.floor((absolute % 100_000_000) / 10_000);
+    return `${sign}${eok}억${man > 0 ? ` ${man.toLocaleString("ko-KR")}만원` : ""}`;
+  }
+
+  if (absolute >= 10_000) {
+    return `${sign}${Math.floor(absolute / 10_000).toLocaleString("ko-KR")}만원`;
+  }
+
+  return `${sign}${absolute.toLocaleString("ko-KR")}원`;
+}
+
+function formatPct(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0.0%";
+  }
+
+  return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function formatMonth(date: string) {
+  return date.slice(0, 7).replace("-", ".");
+}
+
+function formatDateRange(start: string, end: string) {
+  return `${formatMonth(start)} - ${formatMonth(end)}`;
+}
+
+function getValue(point: RacePoint, assetId: ComparisonAssetId) {
+  return Number(point[assetId] ?? 0);
+}
+
+function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): PainAnalysis | null {
+  if (build.points.length < 2) {
+    return null;
+  }
+
+  const points = build.points;
+  const startPoint = points[0]!;
+  const finalPoint = points[points.length - 1]!;
+  const startValue = getValue(startPoint, assetId);
+  const finalValue = getValue(finalPoint, assetId);
+  let peak = startValue;
+  let maxDrawdownPct = 0;
+  let maxDrawdownDate = startPoint.date;
+  let underATHMonths = 0;
+  let underPrincipalMonths = 0;
+  let currentUnderATHStreak = 0;
+  let longestRecoveryMonths = 0;
+  const monthlyDrops: Array<{ date: string; dropPct: number; value: number }> = [];
+
+  points.forEach((point, index) => {
+    const value = getValue(point, assetId);
+
+    if (value >= peak) {
+      peak = value;
+      longestRecoveryMonths = Math.max(longestRecoveryMonths, currentUnderATHStreak);
+      currentUnderATHStreak = 0;
+    } else {
+      underATHMonths += 1;
+      currentUnderATHStreak += 1;
+    }
+
+    if (value < startValue) {
+      underPrincipalMonths += 1;
+    }
+
+    const drawdownPct = peak > 0 ? (value / peak - 1) * 100 : 0;
+    if (drawdownPct < maxDrawdownPct) {
+      maxDrawdownPct = drawdownPct;
+      maxDrawdownDate = point.date;
+    }
+
+    if (index > 0) {
+      const previous = getValue(points[index - 1]!, assetId);
+      const dropPct = previous > 0 ? (value / previous - 1) * 100 : 0;
+      monthlyDrops.push({ date: point.date, dropPct, value });
+    }
+  });
+
+  longestRecoveryMonths = Math.max(longestRecoveryMonths, currentUnderATHStreak);
+
+  const milestones = [2, 5, 10, 20]
+    .map((multiple): PainMilestone | null => {
+      const point = points.find((item) => getValue(item, assetId) >= startValue * multiple);
+      if (!point) {
+        return null;
+      }
+
+      const value = getValue(point, assetId);
+      return {
+        date: point.date,
+        missedAmount: Math.max(0, finalValue - value),
+        multiple,
+        value,
+      };
+    })
+    .filter((item): item is PainMilestone => Boolean(item));
+
+  const worstDrops = [...monthlyDrops].sort((left, right) => left.dropPct - right.dropPct).slice(0, 3);
+  const firstProfitPoint = points.find((point) => getValue(point, assetId) >= startValue * 1.1);
+  const first2xPoint = milestones.find((item) => item.multiple === 2);
+  const finalReturnPct = startValue > 0 ? (finalValue / startValue - 1) * 100 : 0;
   const emotionMonths: EmotionMonth[] = [
-    {
-      date: asset.coverage === "ten_year" ? "2016.03" : "상장 2개월",
-      label: "FIRST_PROFIT",
-      monthlyReturn: 8,
-      note: "처음으로 계좌가 웃어줬습니다. 여기까지는 누구나 장기투자자가 됩니다.",
-      totalReturn: 12,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2018.10" : "상장 7개월",
-      label: "SHARP_DROP",
-      monthlyReturn: -18,
-      note: "계좌를 자주 열어보게 되는 달입니다. 좋은 기업이라는 말이 갑자기 멀어집니다.",
-      totalReturn: -9,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2019.06" : "상장 13개월",
-      label: "SIDEWAYS",
-      monthlyReturn: 1,
-      note: "오르지도 끝나지도 않습니다. 사람을 지치게 만드는 건 폭락보다 이런 시간일 수 있습니다.",
-      totalReturn: 4,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2020.03" : "상장 18개월",
-      label: "HELL",
-      monthlyReturn: Math.min(-22, Math.round(asset.maxDrawdown / 3)),
-      note: "던지고 싶은 달입니다. 차트가 아니라 내 돈이었다면 손이 먼저 움직였을 가능성이 큽니다.",
-      totalReturn: -21,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2021.02" : "상장 24개월",
-      label: asset.finalMultiple >= 2 ? "MILESTONE_2X" : "RECOVERING",
-      monthlyReturn: 19,
-      note: "돈이 불어나기 시작합니다. 그런데 여기서부터는 팔고 싶은 유혹도 같이 커집니다.",
-      totalReturn: asset.finalMultiple >= 2 ? 100 : 38,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2022.06" : "상장 30개월",
-      label: "UNDER_PRINCIPAL",
-      monthlyReturn: -24,
-      note: "내가 넣은 돈보다 작아져 있던 시간입니다. 장기투자라는 말이 갑자기 무겁게 느껴집니다.",
-      totalReturn: -13,
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2023.07" : "상장 36개월",
-      label: "TEMPTATION",
-      monthlyReturn: 27,
-      note: "이 정도면 됐다는 말이 가장 그럴듯하게 들립니다. 작은 성공이 더 큰 시간을 팔게 만듭니다.",
-      totalReturn: Math.round((asset.finalMultiple * 100) / 3),
-    },
-    {
-      date: asset.coverage === "ten_year" ? "2024.11" : "최근",
-      label: "ATH",
-      monthlyReturn: 14,
-      note: "다시 신고가입니다. 끝까지 남아 있던 사람만 이 장면을 봅니다.",
-      totalReturn: Math.round((asset.finalMultiple - 1) * 100),
-    },
+    ...worstDrops.slice(0, 2).map((item) => ({
+      date: item.date,
+      label: item.dropPct <= -20 ? "패닉" : "급락",
+      note: `한 달 수익률이 ${formatPct(item.dropPct)}까지 밀렸습니다. 지나고 보면 점 하나지만, 당시에는 계좌 앱을 여는 것 자체가 고통이었을 달입니다.`,
+      tone: "danger" as const,
+    })),
   ];
 
+  if (underPrincipalMonths > 0) {
+    const underPrincipalPoint = points.find((point) => getValue(point, assetId) < startValue);
+    if (underPrincipalPoint) {
+      emotionMonths.push({
+        date: underPrincipalPoint.date,
+        label: "원금 침식",
+        note: "처음 넣은 돈보다 평가금액이 작아졌습니다. 이때 장기투자라는 말은 갑자기 멋진 말이 아니라 버거운 숙제가 됩니다.",
+        tone: "warning",
+      });
+    }
+  }
+
+  if (firstProfitPoint) {
+    emotionMonths.push({
+      date: firstProfitPoint.date,
+      label: "첫 수익",
+      note: "처음으로 꽤 오른 것처럼 보이는 구간입니다. 이때부터 매도 버튼은 조용히, 하지만 집요하게 눈에 들어옵니다.",
+      tone: "success",
+    });
+  }
+
+  if (first2xPoint) {
+    emotionMonths.push({
+      date: first2xPoint.date,
+      label: "2배 돌파",
+      note: "원금이 두 배가 된 순간입니다. 많은 사람은 여기서 천재가 된 기분을 느끼고, 더 큰 시간을 팔아버립니다.",
+      tone: "success",
+    });
+  }
+
+  emotionMonths.push({
+    date: finalPoint.date,
+    label: "현재",
+    note: `결국 ${formatPct(finalReturnPct)}의 결과가 남았습니다. 문제는 이 숫자가 아니라, 이 숫자까지 오는 시간을 버틸 수 있었느냐입니다.`,
+    tone: "neutral",
+  });
+
   return {
-    asset,
-    bearMoments: [
-      {
-        date: asset.coverage === "ten_year" ? "2020.03" : "상장 후 첫 급락",
-        dropPct: Math.round(Math.abs(asset.maxDrawdown) * 0.62),
-      },
-      {
-        date: asset.coverage === "ten_year" ? "2022.06" : "상장 후 침체",
-        dropPct: Math.round(Math.abs(asset.maxDrawdown) * 0.88),
-      },
-      {
-        date: asset.coverage === "ten_year" ? "2022.10" : "최근 저점",
-        dropPct: Math.abs(asset.maxDrawdown),
-      },
-    ],
-    bullMoments: milestones.slice(0, 3),
-    coverageYears,
+    assetReturnPct: finalReturnPct,
+    bankGap: finalValue - getValue(finalPoint, "deposit"),
+    bearMoments: worstDrops,
     emotionMonths,
     finalValue,
-    longestRecovery: `${longestRecoveryMonths}개월`,
+    goldGap: finalValue - getValue(finalPoint, "gold"),
+    longestRecoveryMonths,
+    maxDrawdownDate,
+    maxDrawdownPct,
     milestones,
-    noiseSummary:
-      asset.theme.includes("반도체") || asset.theme.includes("AI")
-        ? "AI는 과열이고, 반도체 사이클은 곧 꺾인다는 말이 매일같이 나왔습니다."
-        : asset.groups.includes("Coin")
-          ? "디지털 자산은 끝났고, 이번에는 정말 회복이 어렵다는 말이 시장을 뒤덮었습니다."
-          : "고금리, 경기침체, 성장 둔화 같은 말들이 매일같이 팔아야 할 이유처럼 보였습니다.",
+    resolvedEndDate: build.resolvedEndDate,
+    resolvedStartDate: build.resolvedStartDate,
+    startValue,
     underATHMonths,
-    underATHPercent,
+    underATHPercent: Math.round((underATHMonths / points.length) * 100),
     underPrincipalMonths,
   };
 }
 
-function LabSection({
-  children,
-  eyebrow,
-  title,
-}: {
-  children: React.ReactNode;
-  eyebrow?: string;
-  title: string;
-}) {
-  return (
-    <section className="rounded-[32px] border border-slate-200/80 bg-white/92 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.07)]">
-      {eyebrow ? (
-        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-600">{eyebrow}</div>
-      ) : null}
-      <h2 className="mt-2 text-[24px] font-black leading-[1.15] tracking-[-0.06em] text-slate-950">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
+function filterAssetByTab(meta: LabAssetMeta, activeTab: AssetTab) {
+  if (activeTab === "all") {
+    return true;
+  }
+
+  if (activeTab === "kospi") {
+    return meta.groups.includes("KOSPI");
+  }
+
+  if (activeTab === "nasdaq100") {
+    return meta.groups.includes("Nasdaq100");
+  }
+
+  if (activeTab === "sp500") {
+    return meta.groups.includes("S&P500");
+  }
+
+  if (activeTab === "etf") {
+    return meta.groups.includes("ETF");
+  }
+
+  return meta.groups.includes("Coin");
 }
 
-function Pill({ children, tone = "slate" }: { children: React.ReactNode; tone?: "blue" | "green" | "red" | "slate" | "yellow" }) {
-  const toneClass = {
-    blue: "border-blue-200 bg-blue-50 text-blue-700",
-    green: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    red: "border-rose-200 bg-rose-50 text-rose-700",
-    slate: "border-slate-200 bg-slate-50 text-slate-600",
-    yellow: "border-amber-200 bg-amber-50 text-amber-700",
-  }[tone];
+function normalizeSearch(value: string) {
+  return value.trim().toLowerCase();
+}
 
+function AssetBadge({ children }: { children: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${toneClass}`}>
+    <span className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-500">
       {children}
     </span>
   );
 }
 
-function BottomNav({
-  activeTab,
-  setActiveTab,
+function SectionCard({
+  children,
+  className = "",
 }: {
-  activeTab: BottomTab;
-  setActiveTab: (tab: BottomTab) => void;
+  children: React.ReactNode;
+  className?: string;
 }) {
-  const items = [
-    { Icon: Home, id: "home" as const, label: "홈" },
-    { Icon: Search, id: "search" as const, label: "검색" },
-    { Icon: Radio, id: "live" as const, label: "라이브" },
-    { Icon: Bookmark, id: "saved" as const, label: "보관함" },
-  ];
-
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-      <div className="mx-auto grid max-w-[480px] grid-cols-4 gap-1 rounded-[28px] border border-slate-200/90 bg-white/92 p-1.5 shadow-[0_-18px_44px_rgba(15,23,42,0.12)] backdrop-blur-2xl">
-        {items.map(({ Icon, id, label }) => {
-          const isActive = activeTab === id;
-
-          return (
-            <button
-              key={id}
-              className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[22px] text-[11px] font-black transition ${
-                isActive ? "bg-slate-950 text-[#f8fafc] shadow-[0_12px_24px_rgba(15,23,42,0.18)]" : "text-slate-400"
-              }`}
-              data-testid={`lab-bottom-tab-${id}`}
-              onClick={() => setActiveTab(id)}
-              type="button"
-            >
-              <Icon className="h-4 w-4" strokeWidth={2.2} />
-              {label}
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+    <section className={`rounded-[32px] border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ${className}`}>
+      {children}
+    </section>
   );
 }
 
-function ResultHero({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
-  const startLabel = asset.coverage === "ten_year" ? "10년 전" : `${asset.firstAvailableDate} 상장일`;
-
+function MetricCard({
+  label,
+  value,
+  warning,
+}: {
+  label: string;
+  value: string;
+  warning?: boolean;
+}) {
   return (
-    <div className="overflow-hidden rounded-[36px] border border-slate-200 bg-[#111827] p-5 shadow-[0_24px_60px_rgba(15,23,42,0.24)]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#bfdbfe]">REGRETZERO LAB</div>
-          <h1 className="mt-4 text-[36px] font-black leading-[0.98] tracking-[-0.08em] text-[#f8fafc]">
-            {startLabel}
-            <br />
-            {asset.name}{getObjectParticle(asset.name)} 샀다면
-          </h1>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/12 px-3 py-2 text-right">
-          <div className="text-[10px] text-[#cbd5e1]">실험 자산</div>
-          <div className="mt-1 text-sm font-black text-[#f8fafc]">{asset.ticker}</div>
-        </div>
-      </div>
-
-      <div className="mt-8 rounded-[28px] bg-white p-4 text-slate-950">
-        <div className="text-[12px] font-bold text-slate-500">1,000만 원의 마지막 장면</div>
-        <div className="mt-1 text-[40px] font-black tracking-[-0.08em]">{formatKrw(scenario.finalValue)}</div>
-        <p className="mt-3 text-[15px] font-bold leading-6 text-slate-700">
-          결과만 보면 쉬워 보입니다. 문제는, 당신이 이 길을 끝까지 들고 갈 수 있었냐는 겁니다.
-        </p>
-      </div>
-
-      <div className="mt-4 rounded-[24px] border border-white/10 bg-white/8 p-4">
-        <div className="text-sm font-bold leading-6 text-[#f8fafc]">{BRAND_SLOGANS.sellLowSellHigh}</div>
+    <div className={`rounded-[22px] border px-4 py-4 ${warning ? "border-rose-100 bg-rose-50" : "border-slate-200 bg-slate-50"}`}>
+      <div className="text-xs font-semibold text-slate-500">{label}</div>
+      <div className={`mt-2 text-xl font-black tracking-[-0.05em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
+        {value}
       </div>
     </div>
   );
 }
 
-function PainDashboard({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
-  const metrics = [
-    {
-      Icon: TrendingDown,
-      label: "최대 하락",
-      text: fillRegretCopyTemplate(BEAR_MARKET_PAIN_COPY.metrics.maxDrawdown, {
-        maxDrawdown: scenario.asset.maxDrawdown,
-      }),
-      value: `${scenario.asset.maxDrawdown}%`,
+export function LongtermPainLab() {
+  const raceSectionRef = useRef<HTMLDivElement | null>(null);
+  const [activeBottomTab, setActiveBottomTab] = useState<BottomTab>("home");
+  const [assetTab, setAssetTab] = useState<AssetTab>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedAssetId, setSelectedAssetId] = useState<ComparisonAssetId>("nvda");
+  const [searchSelectedAssetId, setSearchSelectedAssetId] = useState<ComparisonAssetId>("nvda");
+  const [raceBuild, setRaceBuild] = useState<RaceBuildResult | null>(null);
+  const [raceError, setRaceError] = useState("");
+  const [raceStatus, setRaceStatus] = useState<RaceStatus>("idle");
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [realityAnswer, setRealityAnswer] = useState<RealityAnswer | null>(null);
+  const [lastCompletedAssetId, setLastCompletedAssetId] = useState<ComparisonAssetId | null>(null);
+
+  const selectedMeta = getMeta(selectedAssetId);
+  const currentPoint = raceBuild?.points[Math.max(0, visibleCount - 1)] ?? null;
+  const visibleData = raceBuild ? raceBuild.points.slice(0, Math.max(1, visibleCount)) : [];
+  const raceAssets = useMemo<RaceChartAsset[]>(
+    () => [
+      {
+        id: selectedAssetId,
+        label: selectedMeta.name,
+        shortLabel: getRaceShortLabel(selectedAssetId, selectedMeta),
+      },
+      { id: "deposit", label: "정기예금", shortLabel: "예금" },
+      { id: "gold", label: "금", shortLabel: "금" },
+    ],
+    [selectedAssetId, selectedMeta],
+  );
+  const analysis = useMemo(
+    () => (raceBuild ? buildPainAnalysis(raceBuild, selectedAssetId) : null),
+    [raceBuild, selectedAssetId],
+  );
+
+  const startRace = useCallback(
+    async (assetId?: ComparisonAssetId) => {
+      const nextAssetId = assetId ?? selectedAssetId;
+      setActiveBottomTab("home");
+      setSelectedAssetId(nextAssetId);
+      setSearchSelectedAssetId(nextAssetId);
+      setRaceBuild(null);
+      setRaceError("");
+      setRaceStatus("loading");
+      setVisibleCount(0);
+      setRealityAnswer(null);
+
+      window.requestAnimationFrame(() => {
+        raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      try {
+        const build = await loadRaceBuild(nextAssetId);
+        setRaceBuild(build);
+        setVisibleCount(1);
+        setRaceStatus("racing");
+      } catch (error) {
+        setRaceStatus("idle");
+        setRaceError(error instanceof Error ? error.message : "레이스를 시작하지 못했습니다.");
+      }
     },
-    {
-      Icon: Clock3,
-      label: "전고점 아래",
-      text: fillRegretCopyTemplate(BEAR_MARKET_PAIN_COPY.metrics.underATHMonths, {
-        underATHMonths: scenario.underATHMonths,
-      }),
-      value: `${scenario.underATHMonths}개월`,
-    },
-    {
-      Icon: ShieldAlert,
-      label: "회복 대기",
-      text: fillRegretCopyTemplate(BEAR_MARKET_PAIN_COPY.metrics.longestRecovery, {
-        longestRecovery: scenario.longestRecovery,
-      }),
-      value: scenario.longestRecovery,
-    },
-    {
-      Icon: Flame,
-      label: "원금 침식",
-      text: fillRegretCopyTemplate(BEAR_MARKET_PAIN_COPY.metrics.underPrincipal, {
-        underPrincipal: scenario.underPrincipalMonths,
-      }),
-      value: `${scenario.underPrincipalMonths}개월`,
-    },
-  ];
+    [selectedAssetId],
+  );
+
+  useEffect(() => {
+    if (raceStatus !== "racing" || !raceBuild) {
+      return;
+    }
+
+    let frameId = 0;
+    const startedAt = performance.now();
+
+    const tick = (timestamp: number) => {
+      const progress = Math.min(1, (timestamp - startedAt) / RACE_DURATION_MS);
+      const nextCount = Math.max(1, Math.ceil(raceBuild.points.length * progress));
+      setVisibleCount(nextCount);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+        return;
+      }
+
+      setVisibleCount(raceBuild.points.length);
+      setRaceStatus("complete");
+      setLastCompletedAssetId(selectedAssetId);
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [raceBuild, raceStatus, selectedAssetId]);
+
+  const labAssetIds = useMemo(() => getLabAssetIds(), []);
+  const filteredAssets = useMemo(() => {
+    const query = normalizeSearch(searchQuery);
+
+    return labAssetIds
+      .map((assetId) => ({ assetId, meta: getMeta(assetId) }))
+      .filter(({ meta }) => filterAssetByTab(meta, assetTab))
+      .filter(({ meta }) => {
+        if (!query) {
+          return true;
+        }
+
+        return [meta.name, meta.ticker, meta.theme, ...meta.searchTerms]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      })
+      .slice(0, 80);
+  }, [assetTab, labAssetIds, searchQuery]);
 
   return (
-    <LabSection eyebrow="BEAR MARKET PAIN" title={BEAR_MARKET_PAIN_COPY.title}>
-      <p className="mt-3 text-[15px] font-semibold leading-6 text-slate-600">
-        {fillRegretCopyTemplate(BEAR_MARKET_PAIN_COPY.summary, {
-          underATHPercent: scenario.underATHPercent,
-        })}
-      </p>
-      <div className="mt-5 grid gap-3">
-        {metrics.map(({ Icon, label, text, value }) => (
-          <div key={label} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex min-w-0 gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
-                  <Icon className="h-5 w-5" strokeWidth={2.2} />
-                </div>
-                <div>
-                  <div className="text-[12px] font-black text-slate-500">{label}</div>
-                  <div className="mt-1 text-[14px] font-bold leading-5 text-slate-800">{text}</div>
-                </div>
+    <div className="rz-light-app min-h-screen bg-[#eef5ff] text-slate-950">
+      <main className="mx-auto min-h-screen w-full max-w-[520px] px-4 pb-28 pt-5">
+        {activeBottomTab === "home" ? (
+          <div className="space-y-5">
+            <Header />
+            <Hero
+              onOpenSearch={() => setActiveBottomTab("search")}
+              onStart={() => void startRace()}
+              selectedMeta={selectedMeta}
+            />
+            {raceError ? (
+              <div className="rounded-[24px] border border-rose-200 bg-white px-4 py-4 text-sm font-semibold leading-6 text-rose-600">
+                {raceError}
               </div>
-              <div className="shrink-0 text-right text-[22px] font-black tracking-[-0.06em] text-rose-600">
-                {value}
-              </div>
+            ) : null}
+            <div ref={raceSectionRef}>
+              {raceStatus === "idle" ? (
+                <EmptyRaceGuide onOpenSearch={() => setActiveBottomTab("search")} />
+              ) : (
+                <RaceStage
+                  analysis={analysis}
+                  currentPoint={currentPoint}
+                  onAnswer={setRealityAnswer}
+                  onOpenSearch={() => setActiveBottomTab("search")}
+                  onRestart={() => void startRace(selectedAssetId)}
+                  raceAssets={raceAssets}
+                  raceBuild={raceBuild}
+                  raceStatus={raceStatus}
+                  realityAnswer={realityAnswer}
+                  selectedMeta={selectedMeta}
+                  visibleData={visibleData}
+                />
+              )}
             </div>
           </div>
-        ))}
-      </div>
-      <div className="mt-4 rounded-[22px] bg-slate-950 p-4 text-sm font-bold leading-6 text-[#f8fafc]">
-        전고점 아래와 원금 아래는 다릅니다. 이 화면은 둘을 섞지 않습니다. 전자는 마음의 피로,
-        후자는 진짜 공포에 가깝습니다.
-      </div>
-    </LabSection>
+        ) : null}
+
+        {activeBottomTab === "search" ? (
+          <AssetSearch
+            activeTab={assetTab}
+            assets={filteredAssets}
+            onSelectAsset={setSearchSelectedAssetId}
+            onStartRace={(assetId) => void startRace(assetId)}
+            query={searchQuery}
+            selectedAssetId={searchSelectedAssetId}
+            setActiveTab={setAssetTab}
+            setQuery={setSearchQuery}
+          />
+        ) : null}
+
+        {activeBottomTab === "live" ? <LiveIdeas onStartRace={(assetId) => void startRace(assetId)} /> : null}
+
+        {activeBottomTab === "saved" ? (
+          <SavedView
+            analysis={analysis}
+            lastCompletedAssetId={lastCompletedAssetId}
+            onStartRace={(assetId) => void startRace(assetId)}
+          />
+        ) : null}
+      </main>
+
+      <BottomNavigation activeTab={activeBottomTab} onChange={setActiveBottomTab} />
+    </div>
   );
 }
 
-function TemptationDashboard({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
+function Header() {
+  return (
+    <header className="flex items-center justify-between py-2">
+      <div>
+        <div className="text-sm font-black tracking-[-0.03em] text-slate-950">RegretZero</div>
+        <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
+          Long-term reality lab
+        </div>
+      </div>
+      <div className="rounded-full border border-white bg-white/70 px-3 py-2 text-xs font-bold text-slate-500 shadow-sm">
+        실제 데이터
+      </div>
+    </header>
+  );
+}
+
+function Hero({
+  onOpenSearch,
+  onStart,
+  selectedMeta,
+}: {
+  onOpenSearch: () => void;
+  onStart: () => void;
+  selectedMeta: LabAssetMeta;
+}) {
+  return (
+    <SectionCard className="overflow-hidden">
+      <div className="text-[12px] font-black uppercase tracking-[0.24em] text-blue-500">START</div>
+      <h1 className="mt-3 text-[2.3rem] font-black leading-[1.02] tracking-[-0.09em] text-slate-950">
+        10년 전 샀다면,
+        <br />
+        나는 끝까지 버텼을까요?
+      </h1>
+      <p className="mt-4 text-[15px] font-semibold leading-7 text-slate-600">
+        수익률 숫자만 보면 쉬워 보입니다. 하지만 진짜 문제는 그 돈이 만들어지는
+        시간을 온전히 살아내는 일입니다.
+      </p>
+
+      <div className="mt-6 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">오늘의 첫 레이스</div>
+        <div className="mt-3 flex items-start justify-between gap-3">
+          <div>
+            <div className="text-2xl font-black tracking-[-0.06em] text-slate-950">
+              {selectedMeta.name}
+            </div>
+            <div className="mt-1 text-sm font-bold text-slate-500">
+              {selectedMeta.ticker} · {selectedMeta.theme}
+            </div>
+          </div>
+          <button
+            className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700"
+            onClick={onOpenSearch}
+            type="button"
+          >
+            종목 바꾸기
+          </button>
+        </div>
+        <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
+      </div>
+
+      <button
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-[22px] bg-slate-950 px-5 py-4 text-[15px] font-black text-[#f8fafc] shadow-[0_18px_38px_rgba(15,23,42,0.22)]"
+        onClick={onStart}
+        type="button"
+      >
+        1,000만원으로 차트레이스 시작
+        <ChevronRight size={18} />
+      </button>
+    </SectionCard>
+  );
+}
+
+function EmptyRaceGuide({ onOpenSearch }: { onOpenSearch: () => void }) {
+  return (
+    <SectionCard>
+      <div className="flex items-center gap-2 text-sm font-black text-slate-500">
+        <LineChart size={17} />
+        아직 결과는 없습니다
+      </div>
+      <p className="mt-3 text-lg font-black leading-7 tracking-[-0.05em] text-slate-950">
+        먼저 레이스를 돌려야 숫자가 열립니다.
+      </p>
+      <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+        리스트에서 수익률을 미리 보여주지 않습니다. 이 서비스의 핵심은 결과표가 아니라,
+        그 결과가 만들어지는 시간을 직접 보는 것입니다.
+      </p>
+      <button
+        className="mt-4 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700"
+        onClick={onOpenSearch}
+        type="button"
+      >
+        원하는 종목 먼저 찾기
+      </button>
+    </SectionCard>
+  );
+}
+
+function RaceStage({
+  analysis,
+  currentPoint,
+  onAnswer,
+  onOpenSearch,
+  onRestart,
+  raceAssets,
+  raceBuild,
+  raceStatus,
+  realityAnswer,
+  selectedMeta,
+  visibleData,
+}: {
+  analysis: PainAnalysis | null;
+  currentPoint: RacePoint | null;
+  onAnswer: (answer: RealityAnswer) => void;
+  onOpenSearch: () => void;
+  onRestart: () => void;
+  raceAssets: RaceChartAsset[];
+  raceBuild: RaceBuildResult | null;
+  raceStatus: RaceStatus;
+  realityAnswer: RealityAnswer | null;
+  selectedMeta: LabAssetMeta;
+  visibleData: RacePoint[];
+}) {
+  const isComplete = raceStatus === "complete" && analysis;
 
   return (
-    <LabSection eyebrow="BULL MARKET TEMPTATION" title={BULL_MARKET_TEMPTATION_COPY.title}>
-      <p className="mt-3 text-[15px] font-semibold leading-6 text-slate-600">
-        {BULL_MARKET_TEMPTATION_COPY.subtitle}
+    <div className="space-y-5">
+      <SectionCard className="p-3">
+        <div className="px-2 pb-3 pt-2">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-blue-500">
+            <Clock3 size={15} />
+            {raceStatus === "racing" ? "Racing" : raceStatus === "loading" ? "Loading" : "Complete"}
+          </div>
+          <h2 className="mt-2 text-2xl font-black tracking-[-0.07em] text-slate-950">
+            {selectedMeta.name} vs 예금 vs 금
+          </h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+            자산과 금은 실제 과거 데이터, 예금은 고정 복리 기준입니다.
+            {raceBuild ? ` 비교 구간은 ${formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate)}입니다.` : ""}
+          </p>
+        </div>
+        <RaceChart
+          assets={raceAssets}
+          basisLabel="1.0배 = 1,000만원"
+          currentPoint={currentPoint}
+          data={visibleData}
+          fullData={raceBuild?.points ?? []}
+          headerSubtitle="결과 해석은 레이스가 끝난 뒤에만 열립니다."
+          headerTitle="한 달씩 지나가며 계좌가 흔들립니다"
+          isLoading={raceStatus === "loading" || !raceBuild}
+          principalKrw={PRINCIPAL_KRW}
+        />
+      </SectionCard>
+
+      {!isComplete ? (
+        <SectionCard>
+          <div className="flex items-start gap-3">
+            <div className="rounded-2xl bg-slate-950 p-2 text-[#f8fafc]">
+              <ShieldAlert size={18} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black tracking-[-0.05em] text-slate-950">
+                아직 결론을 보여주지 않습니다
+              </h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+                장기투자는 마지막 숫자만 보면 너무 쉬워 보입니다. 지금은 그 숫자가 만들어지는 중간의
+                흔들림을 먼저 봐야 합니다.
+              </p>
+            </div>
+          </div>
+        </SectionCard>
+      ) : (
+        <>
+          <ResultSummary analysis={analysis} selectedMeta={selectedMeta} />
+          <PainDashboard analysis={analysis} />
+          <TemptationDashboard analysis={analysis} />
+          <EmotionMap analysis={analysis} />
+          <RealityQuestion
+            answer={realityAnswer}
+            onAnswer={onAnswer}
+            onOpenSearch={onOpenSearch}
+            onRestart={onRestart}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+function ResultSummary({
+  analysis,
+  selectedMeta,
+}: {
+  analysis: PainAnalysis;
+  selectedMeta: LabAssetMeta;
+}) {
+  return (
+    <SectionCard>
+      <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-500">Race complete</div>
+      <h2 className="mt-3 text-[2rem] font-black leading-[1.08] tracking-[-0.08em] text-slate-950">
+        {selectedMeta.name}에 넣었다면
+        <br />
+        지금 {formatKrw(analysis.finalValue)}입니다
+      </h2>
+      <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+        문제는 이 돈을 벌었느냐가 아닙니다. 당신이 이 흔들림을 보고도 팔지 않을 수 있었느냐입니다.
       </p>
-      {scenario.milestones.length > 0 ? (
-        <div className="mt-5 grid gap-3">
-          {scenario.milestones.map((milestone) => (
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <MetricCard label="예금 대비 차이" value={formatKrw(analysis.bankGap)} />
+        <MetricCard label="금 대비 차이" value={formatKrw(analysis.goldGap)} />
+        <MetricCard label="최종 수익률" value={formatPct(analysis.assetReturnPct)} />
+        <MetricCard label="실제 비교 기간" value={formatDateRange(analysis.resolvedStartDate, analysis.resolvedEndDate)} />
+      </div>
+    </SectionCard>
+  );
+}
+
+function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
+  return (
+    <SectionCard>
+      <div className="flex items-center gap-2 text-sm font-black text-rose-500">
+        <TrendingDown size={18} />
+        이 돈을 벌기까지 견뎠어야 할 고통
+      </div>
+      <div className="mt-4 grid gap-3">
+        <MetricCard
+          label="계좌가 가장 처참하게 부서진 순간"
+          value={formatPct(analysis.maxDrawdownPct)}
+          warning
+        />
+        <MetricCard
+          label="전고점 아래에서 한숨 쉬며 보낸 시간"
+          value={`${analysis.underATHMonths}개월`}
+          warning
+        />
+        <MetricCard
+          label="원금마저 깨져 망했다고 느꼈을 기간"
+          value={`${analysis.underPrincipalMonths}개월`}
+          warning={analysis.underPrincipalMonths > 0}
+        />
+        <MetricCard
+          label="전고점 회복까지 가장 긴 기다림"
+          value={`${analysis.longestRecoveryMonths}개월`}
+          warning
+        />
+      </div>
+      <p className="mt-4 rounded-[22px] bg-slate-950 px-4 py-4 text-sm font-semibold leading-6 text-[#f8fafc]">
+        차트는 지나고 보면 아름답습니다. 하지만 전체 기간의 {analysis.underATHPercent}%는
+        고점보다 낮아진 계좌를 보며 지금이라도 팔아야 하나 고민했을 시간입니다.
+      </p>
+    </SectionCard>
+  );
+}
+
+function TemptationDashboard({ analysis }: { analysis: PainAnalysis }) {
+  const firstMilestone = analysis.milestones[0];
+
+  return (
+    <SectionCard>
+      <div className="text-sm font-black text-amber-600">이 돈을 놓칠 뻔했던 익절의 유혹</div>
+      <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+        떨어질 때만 무서운 게 아닙니다. 조금 벌었을 때 이 정도면 됐다며 내리는 순간도 장기투자를 망칩니다.
+      </p>
+      {analysis.milestones.length ? (
+        <div className="mt-4 space-y-3">
+          {analysis.milestones.slice(0, 3).map((milestone) => (
             <div
-              key={milestone.multiple}
-              className="rounded-[26px] border border-amber-200 bg-[linear-gradient(135deg,#fffbeb_0%,#ffffff_62%)] p-4"
+              className="rounded-[22px] border border-amber-100 bg-amber-50 px-4 py-4"
+              key={`${milestone.multiple}-${milestone.date}`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-[12px] font-black text-amber-700">
-                    처음으로 {milestone.multiple}배가 된 날
-                  </div>
-                  <div className="mt-1 text-[24px] font-black tracking-[-0.06em] text-slate-950">
-                    {milestone.date}
-                  </div>
-                </div>
-                <Pill tone="yellow">{formatKrw(milestone.valueAtMilestone)}</Pill>
+              <div className="text-xs font-black text-amber-700">
+                첫 {milestone.multiple}배 달성 · {formatMonth(milestone.date)}
               </div>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-700">
-                {fillRegretCopyTemplate(BULL_MARKET_TEMPTATION_COPY.metrics.sellPointDetail, {
-                  milestoneAmount: formatKrw(milestone.valueAtMilestone),
-                  missedAmount: formatKrw(milestone.missedAmount),
-                })}
+              <div className="mt-2 text-lg font-black tracking-[-0.05em] text-slate-950">
+                당시 평가금액 {formatKrw(milestone.value)}
+              </div>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+                여기서 줄 때 먹자며 내렸다면 최종 금액 중 {formatKrw(milestone.missedAmount)}을
+                눈앞에서 보내야 했습니다.
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-[24px] border border-slate-200 bg-slate-50 p-4 text-sm font-bold leading-6 text-slate-600">
-          이 종목은 아직 2배 지점에 닿지 못한 설정입니다. 여기서는 익절 유혹보다 버티기 고통이 먼저
-          보입니다.
+        <div className="mt-4 rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm font-semibold leading-6 text-slate-500">
+          이 구간에서는 2배 이상의 익절 유혹보다 버티는 고통이 더 컸습니다. 수익이 크지 않았어도
+          긴 시간 마음이 편했다는 뜻은 아닙니다.
         </div>
       )}
-    </LabSection>
+      {firstMilestone ? (
+        <div className="mt-4 rounded-[22px] bg-slate-950 px-4 py-4 text-sm font-semibold leading-6 text-[#f8fafc]">
+          장기투자는 손실을 버티는 일만이 아닙니다. 작은 성공에 조기 만족하지 않는 일이기도 합니다.
+        </div>
+      ) : null}
+    </SectionCard>
   );
 }
 
-function EmotionMap({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
-  const toneByLabel: Record<EmotionMapLabelKey, string> = {
-    ATH: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    FIRST_PROFIT: "border-blue-200 bg-blue-50 text-blue-700",
-    HELL: "border-rose-200 bg-rose-50 text-rose-700",
-    HYPER: "border-orange-200 bg-orange-50 text-orange-700",
-    MILESTONE_2X: "border-amber-200 bg-amber-50 text-amber-700",
-    RECOVERING: "border-cyan-200 bg-cyan-50 text-cyan-700",
-    SHARP_DROP: "border-red-200 bg-red-50 text-red-700",
-    SIDEWAYS: "border-slate-200 bg-slate-50 text-slate-600",
-    TEMPTATION: "border-yellow-200 bg-yellow-50 text-yellow-700",
-    UNDER_PRINCIPAL: "border-zinc-300 bg-zinc-100 text-zinc-800",
-  };
-
+function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
   return (
-    <LabSection eyebrow="MONTHLY EMOTION MAP" title="3. 한 달 한 달, 당신을 흔들었을 감정 지도">
-      <p className="mt-3 text-[15px] font-semibold leading-6 text-slate-600">
-        월별 데이터는 표가 아니라 감정 지도로 봅니다. 최종 수익률보다 어려운 건, 이 달들을 실제로
-        지나가는 일이니까요.
+    <SectionCard>
+      <div className="text-sm font-black text-slate-950">월별 감정 지도</div>
+      <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+        10년은 한 문장이 아니라 수십 번의 흔들림입니다. 아래는 계좌를 열 때마다 마음이 흔들렸을 순간들입니다.
       </p>
-      <div className="mt-5 grid gap-3">
-        {scenario.emotionMonths.map((month) => (
-          <article key={`${month.date}-${month.label}`} className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-[12px] font-black text-slate-400">{month.date}</div>
-                <div className="mt-1 text-lg font-black tracking-[-0.04em] text-slate-950">
-                  {EMOTION_MAP_LABELS[month.label]}
-                </div>
-              </div>
-              <span className={`rounded-full border px-3 py-1 text-[12px] font-black ${toneByLabel[month.label]}`}>
-                {formatSignedPercent(month.monthlyReturn)}
-              </span>
+      <div className="mt-4 space-y-3">
+        {analysis.emotionMonths.slice(0, 6).map((month) => (
+          <div
+            className="rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-4"
+            key={`${month.date}-${month.label}`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-black text-slate-950">{month.label}</div>
+              <div className="text-xs font-black text-slate-400">{formatMonth(month.date)}</div>
             </div>
-            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{month.note}</p>
-          </article>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{month.note}</p>
+          </div>
         ))}
       </div>
-    </LabSection>
+    </SectionCard>
   );
 }
 
-function CriticalMoments({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
+function RealityQuestion({
+  answer,
+  onAnswer,
+  onOpenSearch,
+  onRestart,
+}: {
+  answer: RealityAnswer | null;
+  onAnswer: (answer: RealityAnswer) => void;
+  onOpenSearch: () => void;
+  onRestart: () => void;
+}) {
+  const options: Array<{ id: RealityAnswer; label: string }> = [
+    { id: "sellFear", label: "하락할 때 무서워서 중간에 던졌을 것 같다" },
+    { id: "sellEarly", label: "오를 때 아까워서 적당히 먹고 팔았을 것 같다" },
+    { id: "hold", label: "흔들렸겠지만 끝까지 들고 갔을 것 같다" },
+    { id: "buyMore", label: "기회라 생각하고 오히려 더 샀을 것 같다" },
+  ];
 
   return (
-    <div className="grid gap-4">
-      <LabSection eyebrow="DARK MOMENTS" title={CRITICAL_MOMENTS_COPY.bearTop3Title}>
-        <div className="mt-4 grid gap-3">
-          {scenario.bearMoments.map((moment, index) => (
-            <div key={`${moment.date}-${moment.dropPct}`} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
-              <div className="text-[12px] font-black text-slate-500">{index + 1}위</div>
-              <div className="mt-1 text-lg font-black tracking-[-0.04em] text-slate-950">{moment.date}</div>
-              <p className="mt-2 text-sm font-bold leading-6 text-slate-600">
-                {fillRegretCopyTemplate(CRITICAL_MOMENTS_COPY.bearDetail, {
-                  date: moment.date,
-                  dropPct: `-${moment.dropPct}%`,
-                  rank: index + 1,
-                })}
-              </p>
-            </div>
-          ))}
-        </div>
-      </LabSection>
-
-      <LabSection eyebrow="SELL TOO EARLY" title={CRITICAL_MOMENTS_COPY.bullTop3Title}>
-        <div className="mt-4 grid gap-3">
-          {scenario.bullMoments.length > 0 ? (
-            scenario.bullMoments.map((moment, index) => (
-              <div key={`${moment.date}-${moment.multiple}`} className="rounded-[22px] border border-amber-200 bg-amber-50 p-4">
-                <div className="text-[12px] font-black text-amber-700">{index + 1}위</div>
-                <div className="mt-1 text-lg font-black tracking-[-0.04em] text-slate-950">
-                  {moment.multiple}배 달성 · {moment.date}
-                </div>
-                <p className="mt-2 text-sm font-bold leading-6 text-slate-700">
-                  {fillRegretCopyTemplate(CRITICAL_MOMENTS_COPY.bullDetail, {
-                    currentValue: formatKrw(moment.valueAtMilestone),
-                    date: moment.date,
-                    multiple: moment.multiple,
-                    principal: formatKrw(INITIAL_PRINCIPAL),
-                    rank: index + 1,
-                  })}
-                </p>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-[22px] border border-slate-200 bg-slate-50 p-4 text-sm font-bold leading-6 text-slate-600">
-              아직 익절 유혹보다 손실 공포가 더 큰 종목입니다. 이런 종목도 숨기지 않고 그대로 보여줘야
-              합니다.
-            </div>
-          )}
-        </div>
-      </LabSection>
-    </div>
-  );
-}
-
-function NoiseNote({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
-  const year = asset.coverage === "ten_year" ? "2022" : asset.firstAvailableDate.slice(0, 4);
-
-  return (
-    <LabSection eyebrow="THE NOISE" title={NOISE_NOTE_COPY.title}>
-      <p className="mt-3 text-[15px] font-semibold leading-6 text-slate-600">
-        {fillRegretCopyTemplate(NOISE_NOTE_COPY.subtitle, { year })}
-      </p>
-      <div className="mt-5 rounded-[26px] border border-slate-200 bg-slate-950 p-5 text-[#f8fafc]">
-        <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#94a3b8]">시장 분위기</div>
-        <blockquote className="mt-3 text-[21px] font-black leading-8 tracking-[-0.05em]">
-          “{scenario.noiseSummary}”
-        </blockquote>
-      </div>
-      <p className="mt-4 text-sm font-bold leading-6 text-slate-700">{NOISE_NOTE_COPY.conclusion}</p>
-    </LabSection>
-  );
-}
-
-function Diagnosis() {
-  const [answer, setAnswer] = useState<RealityDiagnosisOptionKey | null>(null);
-
-  return (
-    <LabSection eyebrow="REALITY CHECK" title="마지막 질문">
-      <p className="mt-3 text-[18px] font-black leading-7 tracking-[-0.04em] text-slate-950">
-        {USER_DIAGNOSIS_COPY.question}
-      </p>
-      <div className="mt-5 grid gap-2">
-        {(Object.keys(USER_DIAGNOSIS_COPY.options) as RealityDiagnosisOptionKey[]).map((key) => (
+    <SectionCard>
+      <div className="text-sm font-black text-slate-950">솔직히 고백해 봅시다</div>
+      <h3 className="mt-2 text-2xl font-black leading-tight tracking-[-0.06em] text-slate-950">
+        당신이라면 폭락의 공포와 익절의 유혹을 모두 이겨내고 이 계좌를 지켜낼 수 있었을까요?
+      </h3>
+      <div className="mt-5 space-y-2">
+        {options.map((option) => (
           <button
-            key={key}
-            className={`rounded-[24px] border p-4 text-left text-sm font-black leading-6 transition ${
-              answer === key
-                ? "border-slate-950 bg-slate-950 text-[#f8fafc] shadow-[0_16px_30px_rgba(15,23,42,0.16)]"
+            className={`w-full rounded-[20px] border px-4 py-4 text-left text-sm font-black leading-6 transition ${
+              answer === option.id
+                ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
                 : "border-slate-200 bg-white text-slate-700"
             }`}
-            onClick={() => setAnswer(key)}
+            key={option.id}
+            onClick={() => onAnswer(option.id)}
             type="button"
           >
-            {USER_DIAGNOSIS_COPY.options[key]}
+            {option.label}
           </button>
         ))}
       </div>
       {answer ? (
-        <div className="mt-4 rounded-[26px] border border-blue-200 bg-blue-50 p-4">
-          <div className="text-[12px] font-black text-blue-700">진단</div>
-          <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{USER_DIAGNOSIS_COPY.feedback[answer]}</p>
-          <button className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 text-sm font-black text-[#f8fafc]" type="button">
-            {USER_DIAGNOSIS_COPY.nextActionTitle}
-            <ChevronRight className="h-4 w-4" />
-          </button>
+        <div className="mt-4 rounded-[22px] border border-blue-100 bg-blue-50 px-4 py-4 text-sm font-semibold leading-6 text-slate-700">
+          {REALITY_FEEDBACK[answer]}
         </div>
       ) : null}
-    </LabSection>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <button
+          className="rounded-[20px] border border-slate-200 bg-white px-4 py-4 text-sm font-black text-slate-700"
+          onClick={onRestart}
+          type="button"
+        >
+          다시 보기
+        </button>
+        <button
+          className="rounded-[20px] bg-slate-950 px-4 py-4 text-sm font-black text-[#f8fafc]"
+          onClick={onOpenSearch}
+          type="button"
+        >
+          다른 종목 찾기
+        </button>
+      </div>
+    </SectionCard>
   );
 }
 
-function SearchTab({
-  onRunAsset,
-  selectedAsset,
+function AssetSearch({
+  activeTab,
+  assets,
+  onSelectAsset,
+  onStartRace,
+  query,
+  selectedAssetId,
+  setActiveTab,
+  setQuery,
 }: {
-  onRunAsset: (asset: LabAsset) => void;
-  selectedAsset: LabAsset;
+  activeTab: AssetTab;
+  assets: Array<{ assetId: ComparisonAssetId; meta: LabAssetMeta }>;
+  onSelectAsset: (assetId: ComparisonAssetId) => void;
+  onStartRace: (assetId: ComparisonAssetId) => void;
+  query: string;
+  selectedAssetId: ComparisonAssetId;
+  setActiveTab: (tab: AssetTab) => void;
+  setQuery: (query: string) => void;
 }) {
-  const [assetTab, setAssetTab] = useState<AssetTab>("all");
-  const [query, setQuery] = useState("");
-  const [themeFilter, setThemeFilter] = useState("전체");
-  const [focusedAsset, setFocusedAsset] = useState<LabAsset | null>(selectedAsset);
-
-  const filteredAssets = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return LAB_ASSETS.filter((asset) => {
-      if (!getAssetTabMatch(asset, assetTab)) return false;
-      if (themeFilter === "10년 가능" && asset.coverage !== "ten_year") return false;
-      if (themeFilter === "상장일부터" && asset.coverage !== "listed_since") return false;
-      if (
-        themeFilter !== "전체" &&
-        themeFilter !== "10년 가능" &&
-        themeFilter !== "상장일부터" &&
-        !asset.theme.toLowerCase().includes(themeFilter.toLowerCase()) &&
-        !asset.groups.some((group) => group.toLowerCase().includes(themeFilter.toLowerCase()))
-      ) {
-        return false;
-      }
-
-      if (!normalizedQuery) return true;
-
-      return [
-        asset.name,
-        asset.ticker,
-        asset.theme,
-        ...asset.groups,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery);
-    });
-  }, [assetTab, query, themeFilter]);
-
-  const activeDetail = focusedAsset ?? filteredAssets[0] ?? selectedAsset;
+  const selectedMeta = getMeta(selectedAssetId);
 
   return (
-    <main className="px-4 pb-32 pt-5">
-      <div className="mx-auto max-w-[520px]">
-        <div className="rounded-[34px] border border-slate-200 bg-white p-5 shadow-[0_18px_44px_rgba(15,23,42,0.07)]">
-          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-blue-600">SEARCH</div>
-          <h1 className="mt-2 text-[32px] font-black leading-[1.02] tracking-[-0.08em] text-slate-950">
-            원하는 종목을 찾고,
-            <br />
-            직접 레이스를 돌립니다.
-          </h1>
-          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
-            코스피, Nasdaq100, S&P500은 결과표가 아닙니다. 여기서는 수익률을 미리 까지 않고,
-            레이스할 후보만 고릅니다.
-          </p>
-          <div className="mt-5 flex items-center gap-3 rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-3">
-            <Search className="h-5 w-5 text-slate-400" />
-            <input
-              className="min-w-0 flex-1 bg-transparent text-base font-bold text-slate-950 outline-none placeholder:text-slate-400"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="삼성전자, NVDA, 005930 검색"
-              type="search"
-              value={query}
-            />
-          </div>
-        </div>
+    <div className="space-y-4">
+      <Header />
+      <SectionCard>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">Search</div>
+        <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
+          원하는 종목을 고르고,
+          <br />
+          직접 레이스를 돌려보세요
+        </h1>
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+          목록에서는 결과를 숨깁니다. 종목을 고른 뒤 레이스를 봐야 10년의 흔들림이 열립니다.
+        </p>
+        <label className="mt-5 flex items-center gap-3 rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-3">
+          <Search className="text-slate-400" size={18} />
+          <input
+            className="w-full bg-transparent text-sm font-bold text-slate-950 outline-none placeholder:text-slate-400"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="엔비디아, 삼성전자, SPY, 비트코인"
+            value={query}
+          />
+        </label>
+      </SectionCard>
 
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {ASSET_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              className={`min-h-10 shrink-0 rounded-full border px-4 text-sm font-black transition ${
-                assetTab === tab.id ? "border-slate-950 bg-slate-950 text-[#f8fafc]" : "border-slate-200 bg-white text-slate-500"
-              }`}
-              onClick={() => setAssetTab(tab.id)}
-              type="button"
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+        {TAB_OPTIONS.map((tab) => (
+          <button
+            className={`shrink-0 rounded-full px-4 py-3 text-sm font-black ${
+              activeTab === tab.id
+                ? "bg-slate-950 text-[#f8fafc]"
+                : "border border-slate-200 bg-white text-slate-500"
+            }`}
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            type="button"
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-        <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {THEME_FILTERS.map((filter) => (
+      <div className="space-y-3 pb-40">
+        {assets.map(({ assetId, meta }) => {
+          const isSelected = selectedAssetId === assetId;
+          return (
             <button
-              key={filter}
-              className={`min-h-9 shrink-0 rounded-full border px-3 text-[12px] font-black transition ${
-                themeFilter === filter ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-500"
+              className={`w-full rounded-[24px] border bg-white px-4 py-4 text-left shadow-sm transition ${
+                isSelected ? "border-slate-950" : "border-slate-200"
               }`}
-              onClick={() => setThemeFilter(filter)}
-              type="button"
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 grid gap-3">
-          {filteredAssets.map((asset) => (
-            <button
-              key={asset.id}
-              className={`rounded-[26px] border bg-white p-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.04)] transition ${
-                activeDetail.id === asset.id ? "border-slate-950" : "border-slate-200"
-              }`}
-              onClick={() => setFocusedAsset(asset)}
+              key={assetId}
+              onClick={() => onSelectAsset(assetId)}
               type="button"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: asset.accent }} />
-                    <span className="text-lg font-black tracking-[-0.05em] text-slate-950">{asset.name}</span>
-                  </div>
+                <div>
+                  <div className="text-lg font-black tracking-[-0.05em] text-slate-950">{meta.name}</div>
                   <div className="mt-1 text-sm font-bold text-slate-500">
-                    {asset.ticker} · {asset.theme}
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {asset.groups.map((group) => (
-                      <Pill key={group}>{group}</Pill>
-                    ))}
-                    <Pill tone={asset.coverage === "ten_year" ? "green" : "yellow"}>{getCoverageLabel(asset)}</Pill>
+                    {meta.ticker} · {meta.theme}
                   </div>
                 </div>
-                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-slate-300" />
+                {isSelected ? (
+                  <span className="rounded-full bg-slate-950 px-3 py-1 text-[11px] font-black text-[#f8fafc]">
+                    선택됨
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {meta.groups.slice(0, 3).map((group) => (
+                  <AssetBadge key={group}>{group}</AssetBadge>
+                ))}
               </div>
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        <div className="sticky bottom-[92px] mt-4 rounded-[30px] border border-slate-200 bg-white/95 p-4 shadow-[0_-16px_44px_rgba(15,23,42,0.10)] backdrop-blur-xl">
-          <div className="flex items-start justify-between gap-3">
+      <div className="fixed bottom-20 left-1/2 z-30 w-full max-w-[520px] -translate-x-1/2 px-4">
+        <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_18px_60px_rgba(15,23,42,0.2)]">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">선택한 종목</div>
+          <div className="mt-2 flex items-start justify-between gap-3">
             <div>
-              <div className="text-[12px] font-black text-blue-600">선택한 종목</div>
-              <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
-                {activeDetail.name} <span className="text-slate-400">{activeDetail.ticker}</span>
+              <div className="text-xl font-black tracking-[-0.05em] text-slate-950">
+                {selectedMeta.name}
+              </div>
+              <div className="mt-1 text-sm font-bold text-slate-500">
+                {selectedMeta.ticker} · {selectedMeta.theme}
               </div>
             </div>
-            <Pill tone={activeDetail.coverage === "ten_year" ? "green" : "yellow"}>{getCoverageLabel(activeDetail)}</Pill>
+            <button
+              className="shrink-0 rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-[#f8fafc]"
+              onClick={() => onStartRace(selectedAssetId)}
+              type="button"
+            >
+              레이스
+            </button>
           </div>
-          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{activeDetail.description}</p>
-          <button
-            className="mt-4 min-h-12 w-full rounded-full bg-slate-950 px-5 text-sm font-black text-[#f8fafc]"
-            onClick={() => onRunAsset(activeDetail)}
-            type="button"
-          >
-            {activeDetail.coverage === "ten_year" ? "이 종목으로 레이스 보기" : "상장일부터 레이스 보기"}
-          </button>
+          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
         </div>
       </div>
-    </main>
-  );
-}
-
-function HomeTab({ asset, onOpenSearch }: { asset: LabAsset; onOpenSearch: () => void }) {
-  return (
-    <main className="px-4 pb-32 pt-5">
-      <div className="mx-auto grid max-w-[520px] gap-4">
-        <ResultHero asset={asset} />
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            className="rounded-[26px] border border-blue-200 bg-blue-50 p-4 text-left"
-            onClick={onOpenSearch}
-            type="button"
-          >
-            <Search className="h-5 w-5 text-blue-600" />
-            <div className="mt-3 text-lg font-black tracking-[-0.05em] text-slate-950">전체 종목 검색</div>
-            <p className="mt-1 text-xs font-bold leading-5 text-slate-600">
-              코스피 · Nasdaq100 · S&P500 방향의 공식 입구
-            </p>
-          </button>
-          <div className="rounded-[26px] border border-slate-200 bg-white p-4">
-            <Sparkles className="h-5 w-5 text-amber-500" />
-            <div className="mt-3 text-lg font-black tracking-[-0.05em] text-slate-950">오늘의 질문</div>
-            <p className="mt-1 text-xs font-bold leading-5 text-slate-600">
-              당신은 무서워서 팔았을까, 아까워서 팔았을까?
-            </p>
-          </div>
-        </div>
-        <PainDashboard asset={asset} />
-        <TemptationDashboard asset={asset} />
-        <EmotionMap asset={asset} />
-        <CriticalMoments asset={asset} />
-        <NoiseNote asset={asset} />
-        <Diagnosis />
-      </div>
-    </main>
-  );
-}
-
-function LiveTab({ onRunAsset }: { onRunAsset: (asset: LabAsset) => void }) {
-  return (
-    <main className="px-4 pb-32 pt-5">
-      <div className="mx-auto max-w-[520px]">
-        <div className="rounded-[34px] border border-slate-200 bg-white p-5 shadow-[0_18px_44px_rgba(15,23,42,0.07)]">
-          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-blue-600">LIVE</div>
-          <h1 className="mt-2 text-[32px] font-black leading-[1.02] tracking-[-0.08em] text-slate-950">
-            지금 사람들이
-            <br />
-            돌려보는 후회 레이스
-          </h1>
-          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
-            라이브 탭은 읽는 곳이 아닙니다. 남들이 궁금해한 조합을 눌러 바로 레이스로 들어가는
-            입구입니다.
-          </p>
-        </div>
-        <div className="mt-4 grid gap-3">
-          {LIVE_MATCHUPS.map((matchup, index) => {
-            const asset = LAB_ASSETS.find((item) => item.id === matchup.assetId) ?? LAB_ASSETS[0]!;
-
-            return (
-              <button
-                key={matchup.id}
-                className="rounded-[28px] border border-slate-200 bg-white p-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.04)]"
-                onClick={() => onRunAsset(asset)}
-                type="button"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[12px] font-black text-blue-600">방금 전 #{index + 1}</div>
-                    <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
-                      {matchup.title}
-                    </div>
-                  </div>
-                  <LineChart className="h-5 w-5 text-slate-300" />
-                </div>
-                <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{matchup.description}</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <Pill tone={asset.coverage === "ten_year" ? "green" : "yellow"}>{getCoverageLabel(asset)}</Pill>
-                  <span className="text-sm font-black text-slate-950">나도 보기</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function SavedTab({ asset }: { asset: LabAsset }) {
-  const scenario = getScenario(asset);
-
-  return (
-    <main className="px-4 pb-32 pt-5">
-      <div className="mx-auto max-w-[520px]">
-        <div className="rounded-[34px] border border-slate-200 bg-white p-5 shadow-[0_18px_44px_rgba(15,23,42,0.07)]">
-          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-blue-600">ARCHIVE</div>
-          <h1 className="mt-2 text-[32px] font-black leading-[1.02] tracking-[-0.08em] text-slate-950">
-            내가 본 고통을
-            <br />
-            다시 꺼내보는 곳
-          </h1>
-          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
-            보관함은 단순 저장소가 아닙니다. 내가 언제 무너질 사람인지, 언제 너무 빨리 팔 사람인지
-            다시 확인하는 기록장입니다.
-          </p>
-        </div>
-        <div className="mt-4 rounded-[28px] border border-slate-200 bg-white p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[12px] font-black text-slate-400">최근 저장한 레이스</div>
-              <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
-                {asset.name} · {scenario.coverageYears}
-              </div>
-            </div>
-            <Bookmark className="h-5 w-5 text-blue-600" />
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-[20px] bg-slate-50 p-3">
-              <div className="text-[11px] font-black text-slate-400">최종 금액</div>
-              <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
-                {formatKrw(scenario.finalValue)}
-              </div>
-            </div>
-            <div className="rounded-[20px] bg-rose-50 p-3">
-              <div className="text-[11px] font-black text-rose-500">최대 하락</div>
-              <div className="mt-1 text-lg font-black tracking-[-0.05em] text-rose-600">
-                {asset.maxDrawdown}%
-              </div>
-            </div>
-          </div>
-          <button className="mt-4 min-h-12 w-full rounded-full bg-slate-950 px-5 text-sm font-black text-[#f8fafc]" type="button">
-            저장 기능은 여기서 확장
-          </button>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-export function LongtermPainLab() {
-  const [activeTab, setActiveTab] = useState<BottomTab>("home");
-  const [selectedAssetId, setSelectedAssetId] = useState("nvda");
-  const selectedAsset = LAB_ASSETS.find((asset) => asset.id === selectedAssetId) ?? LAB_ASSETS[0]!;
-
-  function runAsset(asset: LabAsset) {
-    setSelectedAssetId(asset.id);
-    setActiveTab("home");
-    window.scrollTo({ behavior: "smooth", top: 0 });
-  }
-
-  return (
-    <div className="rz-light-app min-h-screen bg-[#eef4fb] text-slate-950">
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.18),transparent_58%)]" />
-      <div className="relative">
-        {activeTab === "home" ? <HomeTab asset={selectedAsset} onOpenSearch={() => setActiveTab("search")} /> : null}
-        {activeTab === "search" ? <SearchTab onRunAsset={runAsset} selectedAsset={selectedAsset} /> : null}
-        {activeTab === "live" ? <LiveTab onRunAsset={runAsset} /> : null}
-        {activeTab === "saved" ? <SavedTab asset={selectedAsset} /> : null}
-      </div>
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
+  );
+}
+
+function LiveIdeas({ onStartRace }: { onStartRace: (assetId: ComparisonAssetId) => void }) {
+  const ideas: Array<{ assetId: ComparisonAssetId; line: string; title: string }> = [
+    {
+      assetId: "nvda",
+      line: "모두가 AI를 말하지만, 실제로 10년을 들고 가는 일은 전혀 다른 문제입니다.",
+      title: "AI 반도체의 환호와 공포",
+    },
+    {
+      assetId: "005930",
+      line: "가장 익숙한 국민주도 긴 시간은 생각보다 편안하지 않았습니다.",
+      title: "삼성전자를 오래 들고 있었다면",
+    },
+    {
+      assetId: "spy",
+      line: "분산투자도 하락장을 없애주지는 않습니다. 다만 살아남는 방식을 바꿉니다.",
+      title: "시장 전체를 샀을 때의 시간",
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <Header />
+      <SectionCard>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-emerald-500">Live</div>
+        <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
+          오늘 다시 볼 만한
+          <br />
+          장기투자 실험
+        </h1>
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+          매일 바뀌는 추천처럼 보이되, 핵심은 같습니다. 숫자보다 시간을 보게 만드는 레이스입니다.
+        </p>
+      </SectionCard>
+      <div className="space-y-3">
+        {ideas.map((idea) => {
+          const meta = getMeta(idea.assetId);
+          return (
+            <button
+              className="w-full rounded-[28px] border border-slate-200 bg-white p-5 text-left shadow-sm"
+              key={idea.assetId}
+              onClick={() => onStartRace(idea.assetId)}
+              type="button"
+            >
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+                {meta.ticker} · {meta.theme}
+              </div>
+              <div className="mt-2 text-xl font-black tracking-[-0.05em] text-slate-950">
+                {idea.title}
+              </div>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{idea.line}</p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SavedView({
+  analysis,
+  lastCompletedAssetId,
+  onStartRace,
+}: {
+  analysis: PainAnalysis | null;
+  lastCompletedAssetId: ComparisonAssetId | null;
+  onStartRace: (assetId: ComparisonAssetId) => void;
+}) {
+  const meta = lastCompletedAssetId ? getMeta(lastCompletedAssetId) : null;
+
+  return (
+    <div className="space-y-4">
+      <Header />
+      <SectionCard>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">Saved</div>
+        <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
+          내가 버틸 수 있었는지
+          <br />
+          기록으로 남기는 곳
+        </h1>
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+          지금은 마지막으로 완료한 레이스만 보여줍니다. 이후에는 종목별 멘탈 기록과 다시 보기 기능으로 확장할 수 있습니다.
+        </p>
+      </SectionCard>
+      {analysis && meta && lastCompletedAssetId ? (
+        <SectionCard>
+          <div className="text-sm font-black text-slate-500">마지막 완료 레이스</div>
+          <div className="mt-2 text-2xl font-black tracking-[-0.06em] text-slate-950">
+            {meta.name} · {formatKrw(analysis.finalValue)}
+          </div>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+            최대 낙폭 {formatPct(analysis.maxDrawdownPct)}, 전고점 아래 {analysis.underATHMonths}개월.
+            이 숫자는 수익률보다 오래 남는 장기투자의 민낯입니다.
+          </p>
+          <button
+            className="mt-4 rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-[#f8fafc]"
+            onClick={() => onStartRace(lastCompletedAssetId)}
+            type="button"
+          >
+            다시 레이스 보기
+          </button>
+        </SectionCard>
+      ) : (
+        <SectionCard>
+          <div className="text-lg font-black tracking-[-0.05em] text-slate-950">
+            아직 저장할 레이스가 없습니다
+          </div>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+            홈에서 레이스를 끝까지 본 뒤, 이곳에서 내가 어떤 구간에 흔들렸을지 다시 확인할 수 있게 만들 예정입니다.
+          </p>
+        </SectionCard>
+      )}
+    </div>
+  );
+}
+
+function BottomNavigation({
+  activeTab,
+  onChange,
+}: {
+  activeTab: BottomTab;
+  onChange: (tab: BottomTab) => void;
+}) {
+  return (
+    <nav className="fixed bottom-4 left-1/2 z-40 w-full max-w-[520px] -translate-x-1/2 px-4">
+      <div className="grid grid-cols-4 rounded-[30px] border border-slate-200 bg-white/95 p-2 shadow-[0_18px_55px_rgba(15,23,42,0.16)] backdrop-blur">
+        {BOTTOM_TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              className={`flex flex-col items-center gap-1 rounded-[22px] px-2 py-2.5 text-[11px] font-black transition ${
+                isActive ? "bg-slate-950 text-[#f8fafc]" : "text-slate-400"
+              }`}
+              data-testid={`lab-bottom-tab-${tab.id}`}
+              key={tab.id}
+              onClick={() => onChange(tab.id)}
+              type="button"
+            >
+              <Icon size={17} />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
