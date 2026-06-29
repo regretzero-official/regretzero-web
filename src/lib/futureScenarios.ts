@@ -47,12 +47,12 @@ export const ASSET_CLASS_LABELS: Record<AssetClassKey, string> = {
 };
 
 export const ASSET_CLASS_REASONS: Record<AssetClassKey, string> = {
-  ai_infra: "AI 확산의 기반 수요가 지속되는 핵심 인프라 축입니다.",
-  semiconductor: "연산 수요 증가의 직접 수혜를 받는 구조적 공급 축입니다.",
-  energy: "전력과 저장 인프라 확충은 AI 시대의 필수 조건입니다.",
-  robotics: "인력 대체와 생산성 향상 수요가 장기적으로 누적됩니다.",
-  bio: "AI 기반 신약·정밀의료 전환으로 효율 개선이 기대됩니다.",
-  digital_asset: "디지털 가치 저장 및 네트워크 자산군으로 분산 역할을 가집니다.",
+  ai_infra: "AI 서비스가 늘어날수록 결국 칩, 서버, 데이터센터 인프라 수요가 같이 커질 수 있습니다.",
+  semiconductor: "연산 수요가 늘 때 가장 직접적으로 실적 개선이 연결될 가능성이 큰 축입니다.",
+  energy: "전력망과 에너지 공급은 데이터센터 확장과 제조 투자에서 빠지기 어려운 기반입니다.",
+  robotics: "인건비와 생산성 압박이 커질수록 자동화 장비와 로봇 관련 수요가 다시 커질 수 있습니다.",
+  bio: "긴 호흡으로 보면 신약, 진단, 의료 기술은 경기와 별개로 꾸준히 기회를 만드는 영역입니다.",
+  digital_asset: "전통 자산과 다른 흐름을 기대할 때 분산 관점에서 일부 편입을 검토할 수 있는 축입니다.",
 };
 
 export const DEFAULT_ALLOCATIONS: Record<RiskProfile, Record<AssetClassKey, number>> = {
@@ -173,7 +173,11 @@ function simulatePath(
     }
   }
 
-  return { path, maxDrawdown, recoveryMonths: recoveryMonth || Math.max(6, Math.round(months * 0.2)) };
+  return {
+    path,
+    maxDrawdown,
+    recoveryMonths: recoveryMonth || Math.max(6, Math.round(months * 0.2)),
+  };
 }
 
 export function simulateFutureScenarios(
@@ -202,7 +206,10 @@ export function simulateFutureScenarios(
       terminalKrw: simulated.path[simulated.path.length - 1],
       maxDrawdown: simulated.maxDrawdown,
       recoveryMonths: simulated.recoveryMonths,
-      cagrRange: [Math.max(0, conf.ret - conf.band) * 100, (conf.ret + conf.band) * 100] as [number, number],
+      cagrRange: [
+        Math.max(0, conf.ret - conf.band) * 100,
+        (conf.ret + conf.band) * 100,
+      ] as [number, number],
     } satisfies FutureScenarioResult;
   });
 
@@ -225,41 +232,45 @@ export function simulateFutureScenarios(
 }
 
 export function buildActionPlan(inputs: FutureInputs, selectedScenario: ScenarioKey): ActionPlan90d {
-  const amountBand = inputs.monthlyKrw >= 1_000_000 ? "상" : inputs.monthlyKrw >= 300_000 ? "중" : "기초";
+  const amountBand =
+    inputs.monthlyKrw >= 1_000_000 ? "넉넉한 적립" : inputs.monthlyKrw >= 300_000 ? "보통 적립" : "가벼운 적립";
   const scenarioLabel =
-    selectedScenario === "conservative" ? "보수" : selectedScenario === "aggressive" ? "공격" : "기준";
+    selectedScenario === "conservative"
+      ? "보수적 기준"
+      : selectedScenario === "aggressive"
+        ? "공격적 기준"
+        : "기준 시나리오";
 
   return {
     scenario: selectedScenario,
     weeks: [
       {
         window: "1~4주",
-        title: `매수 규칙 정착 (${scenarioLabel} 시나리오)`,
+        title: `매수 규칙 정리 (${scenarioLabel})`,
         rules: [
-          `주 1회, 월 적립금(${amountBand}) 기준 정기 매수`,
-          "한 번에 몰빵하지 않고 4회 분할 진입",
-          "매수 전 체크리스트 3개(밸류·추세·리스크) 기록",
+          `${amountBand}으로 월 예산을 먼저 확정합니다.`,
+          "한 번에 몰아넣지 말고 4주로 나눠 같은 요일에 집행합니다.",
+          "매수 전에는 이유 1줄, 리스크 1줄, 철회 조건 1줄을 반드시 적습니다.",
         ],
       },
       {
         window: "5~8주",
-        title: "점검 규칙 실행",
+        title: "흔들릴 때 지킬 기준 만들기",
         rules: [
-          "성과보다 규칙 준수율(%)을 먼저 점검",
-          "최대낙폭 가정치 대비 현재 변동성 점검",
-          "감정 로그 작성: 공포/조급/무감각 신호 기록",
+          "수익률보다 규칙 준수 여부를 먼저 체크합니다.",
+          "변동성이 커지면 비중 확대보다 예정된 적립만 유지합니다.",
+          "공포, 조급함, 무감각 중 어떤 감정이 컸는지 간단히 기록합니다.",
         ],
       },
       {
         window: "9~12주",
-        title: "리밸런싱 규칙 적용",
+        title: "비중 점검과 다음 90일 준비",
         rules: [
-          "목표 비중 대비 ±5% 이상 이탈 시 리밸런싱",
-          "승자 일부 이익실현 후 저비중 축 보강",
-          "다음 90일 자동이체·점검일 캘린더 등록",
+          "목표 비중에서 5% 이상 벗어나면 리밸런싱 여부를 검토합니다.",
+          "한 종목이 너무 커졌다면 새 돈은 부족한 축에 먼저 배분합니다.",
+          "다음 90일 자동이체와 점검 날짜를 미리 캘린더에 넣습니다.",
         ],
       },
     ],
   };
 }
-

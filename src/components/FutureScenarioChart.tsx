@@ -30,55 +30,64 @@ function formatAxisLabel(value: number) {
   return `${Math.round(value)}`;
 }
 
+function formatSeriesLabel(value: string) {
+  if (value === "conservative") return "보수적";
+  if (value === "aggressive") return "공격적";
+  return "기준";
+}
+
 export default function FutureScenarioChart({
   data,
 }: {
   data: ScenarioChartPoint[];
 }) {
   return (
-    <div className="h-[280px] w-full rounded-2xl border border-white/10 bg-[#080808] p-3">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 8, left: -14, bottom: 6 }}>
-          <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
-          <XAxis
-            dataKey="year"
-            tick={{ fill: "#71717A", fontSize: 10, fontWeight: 700 }}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => `${Math.floor(Number(value))}`}
-          />
-          <YAxis
-            tick={{ fill: "#71717A", fontSize: 10, fontWeight: 700 }}
-            tickLine={false}
-            axisLine={false}
-            width={52}
-            tickFormatter={formatAxisLabel}
-          />
-          <Tooltip
-            contentStyle={{
-              background: "rgba(10,10,10,0.95)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 14,
-            }}
-            formatter={(value, name) => {
-              const numeric = typeof value === "number" ? value : Number(value ?? 0);
-              const label = name === "conservative" ? "보수" : name === "aggressive" ? "공격" : "기준";
-              return [KRW.format(numeric), label];
-            }}
-            labelFormatter={(label) => `${Math.floor(Number(label))}년`}
-          />
-          <Legend
-            formatter={(value) => (value === "conservative" ? "보수" : value === "aggressive" ? "공격" : "기준")}
-            wrapperStyle={{ fontSize: 11, color: "#a1a1aa" }}
-          />
-          <Line type="monotone" dataKey="conservative" stroke="#9CA3AF" strokeWidth={2.5} dot={false} />
-          <Line type="monotone" dataKey="base" stroke="#D4AF37" strokeWidth={3} dot={false} />
-          <Line type="monotone" dataKey="aggressive" stroke="#E31937" strokeWidth={2.8} dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
-      <div className="mt-1 grid grid-cols-3 text-center text-[10px] font-bold text-zinc-500">
+    <div className="rounded-[28px] border border-black/8 bg-[linear-gradient(180deg,#fffdf8_0%,#f6f1e6_100%)] p-4 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+      <div className="h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 12, right: 12, left: -16, bottom: 6 }}>
+            <CartesianGrid stroke="rgba(17,17,17,0.08)" vertical={false} />
+            <XAxis
+              dataKey="year"
+              tick={{ fill: "#6b6457", fontSize: 11, fontWeight: 700 }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `${Math.floor(Number(value))}년`}
+            />
+            <YAxis
+              tick={{ fill: "#6b6457", fontSize: 11, fontWeight: 700 }}
+              tickLine={false}
+              axisLine={false}
+              width={56}
+              tickFormatter={formatAxisLabel}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "rgba(255,255,255,0.96)",
+                border: "1px solid rgba(17,17,17,0.08)",
+                borderRadius: 18,
+                boxShadow: "0 18px 40px rgba(15,23,42,0.10)",
+              }}
+              formatter={(value, name) => {
+                const numeric = typeof value === "number" ? value : Number(value ?? 0);
+                return [KRW.format(numeric), formatSeriesLabel(String(name))];
+              }}
+              labelFormatter={(label) => `${Math.floor(Number(label))}년`}
+            />
+            <Legend
+              formatter={(value) => formatSeriesLabel(String(value))}
+              wrapperStyle={{ fontSize: 12, color: "#5d574a", paddingTop: 8 }}
+            />
+            <Line type="monotone" dataKey="conservative" stroke="#8A8F98" strokeWidth={2.5} dot={false} />
+            <Line type="monotone" dataKey="base" stroke="#163B74" strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="aggressive" stroke="#C57C2A" strokeWidth={2.8} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 text-center text-[11px] font-bold text-[#7a705c]">
         <span>시작</span>
-        <span>현재</span>
+        <span>중간 점검</span>
         <span>10년 후</span>
       </div>
     </div>
