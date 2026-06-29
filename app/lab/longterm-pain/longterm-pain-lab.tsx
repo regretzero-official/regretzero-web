@@ -63,18 +63,27 @@ interface PainMilestone {
 }
 
 interface EmotionMonth {
+  chainLabel: string | null;
+  chainMonths: number;
+  criticalZone: boolean;
   date: string;
   drawdownPct: number;
   eventType: EmotionEventType;
+  futureMasked: boolean;
   impulseLabel: string;
   label: string;
   marker: string;
   missedAmount: number;
   mindLine: string;
+  monthIndex: number;
+  monthlyChangeKrw: number;
   monthlyReturnPct: number;
   note: string;
+  noiseLine: string;
   peakBreakout: boolean;
   peakWaitMonths: number;
+  previousValue: number;
+  tangibleLine: string;
   tone: EmotionTone;
   totalReturnPct: number;
   value: number;
@@ -920,13 +929,159 @@ function getEmotionMindLine(month: EmotionMonth) {
   return "아무 일도 없네. 이걸 계속 들고 있는 게 맞나?";
 }
 
+function getTangibleValueLabel(amount: number) {
+  const absoluteAmount = Math.abs(amount);
+
+  if (absoluteAmount >= 1_000_000_000) {
+    return "서울 아파트 전세금급";
+  }
+
+  if (absoluteAmount >= 300_000_000) {
+    return "수도권 전세 보증금급";
+  }
+
+  if (absoluteAmount >= 100_000_000) {
+    return "아파트 계약금급";
+  }
+
+  if (absoluteAmount >= 50_000_000) {
+    return "국산 대형차 한 대 값";
+  }
+
+  if (absoluteAmount >= 20_000_000) {
+    return "중형차 한 대 값";
+  }
+
+  if (absoluteAmount >= 10_000_000) {
+    return "월급 몇 달치";
+  }
+
+  if (absoluteAmount >= 3_000_000) {
+    return "생활비 몇 달치";
+  }
+
+  return "무시하기 어려운 현금";
+}
+
+function getTangibleLine(month: EmotionMonth) {
+  if (month.monthlyChangeKrw < -1_000_000) {
+    return `이번 달에만 ${formatKrw(Math.abs(month.monthlyChangeKrw))}이 사라졌습니다. ${getTangibleValueLabel(month.monthlyChangeKrw)}가 계좌에서 증발한 셈입니다.`;
+  }
+
+  if (
+    (month.eventType === "milestone" || month.eventType === "surge" || month.eventType === "breakout") &&
+    month.missedAmount > 1_000_000
+  ) {
+    return `이 달에 팔았다면 이후 ${formatKrw(month.missedAmount)}을 놓칩니다. ${getTangibleValueLabel(month.missedAmount)}를 눈앞에서 보낸 규모입니다.`;
+  }
+
+  if (month.monthlyChangeKrw > 1_000_000) {
+    return `이번 달에만 ${formatKrw(month.monthlyChangeKrw)}이 불어났습니다. ${getTangibleValueLabel(month.monthlyChangeKrw)}가 갑자기 생긴 듯한 착각을 부르는 달입니다.`;
+  }
+
+  return "숫자는 작아 보여도, 이런 달이 반복되면 사람은 결국 더 자극적인 선택을 찾게 됩니다.";
+}
+
+function getNoiseLine(month: EmotionMonth) {
+  if (month.eventType === "crash" || month.eventType === "underPrincipal") {
+    return "뉴스는 침체를 말하고, 주변 사람은 현금이 답이라고 말합니다. 내 계좌만 틀린 선택처럼 보이는 달입니다.";
+  }
+
+  if (month.eventType === "deepDrawdown" || month.eventType === "pullback") {
+    return "옆 사람은 이미 익절했다며 편하게 예금 넣었다고 말합니다. 남은 사람만 바보가 된 것 같은 달입니다.";
+  }
+
+  if (month.eventType === "milestone" || month.eventType === "surge") {
+    return "주변에서는 줄 때 먹으라는 말이 가장 그럴듯하게 들립니다. 수익을 지키고 싶은 마음이 장기 수익을 밀어냅니다.";
+  }
+
+  if (month.eventType === "sideways" || month.eventType === "quiet") {
+    return "세상은 다른 테마로 축제 분위기인데 내 자산만 제자리입니다. 소외감은 조용하지만 꽤 치명적입니다.";
+  }
+
+  if (month.eventType === "breakout" || month.eventType === "firstProfit") {
+    return "주변에서는 드디어 탈출할 기회라고 말합니다. 오래 물린 사람일수록 이 조언이 가장 달콤하게 들립니다.";
+  }
+
+  return "분위기는 좋아졌지만 확신은 없습니다. 상승장에서도 사람은 계속 팔아야 할 이유를 찾습니다.";
+}
+
+function getCriticalChainKind(month: EmotionMonth) {
+  if (
+    month.eventType === "crash" ||
+    month.eventType === "deepDrawdown" ||
+    month.eventType === "pullback" ||
+    month.eventType === "underPrincipal"
+  ) {
+    return "pain";
+  }
+
+  if (month.eventType === "milestone" || month.eventType === "surge" || month.eventType === "breakout") {
+    return "temptation";
+  }
+
+  if (month.eventType === "quiet" || month.eventType === "sideways") {
+    return "stagnation";
+  }
+
+  return "normal";
+}
+
+function getCriticalChainLabel(kind: string, months: number) {
+  if (kind === "pain") {
+    return `${months}개월 연속 멘탈 타격`;
+  }
+
+  if (kind === "temptation") {
+    return `${months}개월 연속 익절 유혹`;
+  }
+
+  if (kind === "stagnation") {
+    return `${months}개월 연속 소외감`;
+  }
+
+  return null;
+}
+
+function applyCriticalChains(months: EmotionMonth[]) {
+  const enriched = months.map((month) => ({ ...month }));
+  let start = 0;
+
+  while (start < enriched.length) {
+    const kind = getCriticalChainKind(enriched[start]!);
+    let end = start + 1;
+
+    while (end < enriched.length && getCriticalChainKind(enriched[end]!) === kind) {
+      end += 1;
+    }
+
+    const runLength = end - start;
+    const chainLabel = kind !== "normal" && runLength >= 3 ? getCriticalChainLabel(kind, runLength) : null;
+
+    if (chainLabel) {
+      for (let index = start; index < end; index += 1) {
+        enriched[index] = {
+          ...enriched[index]!,
+          chainLabel,
+          chainMonths: runLength,
+          criticalZone: true,
+        };
+      }
+    }
+
+    start = end;
+  }
+
+  return enriched;
+}
+
 function getEmotionVerdict(month: EmotionMonth) {
   if (month.eventType === "breakout") {
     return `전고점 회복까지 ${month.peakWaitMonths}개월이 걸렸습니다. 많은 사람은 이 순간을 승리로 착각하고, 진짜 장기 수익이 시작되기 전에 계좌를 닫습니다.`;
   }
 
   if (month.eventType === "crash") {
-    return `한 달 만에 계좌가 ${formatPct(Math.abs(month.monthlyReturnPct))} 녹아내렸습니다. 지나고 보면 작은 점 하나지만, 당시에는 온 세상 뉴스가 이 자산은 끝났다고 속삭였을 달입니다.`;
+    return `계좌에 찍힌 손실액이 커질수록 이성은 마비됩니다. 이 구간을 버티는 건 의지가 아니라 앱을 지워버리는 시스템입니다.`;
   }
 
   if (month.eventType === "underPrincipal") {
@@ -942,7 +1097,7 @@ function getEmotionVerdict(month: EmotionMonth) {
   }
 
   if (month.eventType === "milestone") {
-    return `여기서 팔았다면 마음은 편했겠지만, 최종 금액 중 ${formatKrw(month.missedAmount)}은 내 계좌에 도착하지 못했습니다.`;
+    return `단지 수익을 확정 짓고 마음 편해지고 싶다는 이유로 내렸다면, 이 계좌가 더 큰 괴물이 되는 장면을 밖에서 지켜봐야 했습니다.`;
   }
 
   if (month.eventType === "surge") {
@@ -958,7 +1113,7 @@ function getEmotionVerdict(month: EmotionMonth) {
   }
 
   if (month.eventType === "sideways") {
-    return "사람을 가장 오래 지치게 만드는 건 폭락보다 무반응의 시간입니다. 이 구간에서 많은 투자자는 더 자극적인 종목으로 갈아탑니다.";
+    return "폭락보다 무서운 게 소외감입니다. 남들이 돈 벌 때 내 자산만 멈춰 있으면 갈아타고 싶어집니다. 그리고 이상하게 내가 팔자마자 랠리가 시작됩니다.";
   }
 
   return "조용한 달도 장기투자의 일부입니다. 아무 일도 없어 보이는 시간이 쌓여야, 나중에 한 번의 큰 움직임을 온전히 가져갈 수 있습니다.";
@@ -1066,33 +1221,46 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     });
 
     const month: EmotionMonth = {
+      chainLabel: null,
+      chainMonths: 0,
+      criticalZone: false,
       date: point.date,
       drawdownPct,
       eventType: emotion.eventType,
+      futureMasked: false,
       impulseLabel: emotion.impulseLabel,
       label: emotion.label,
       marker: emotion.marker,
       missedAmount: Math.max(0, finalValue - value),
       mindLine: "",
+      monthIndex: index,
+      monthlyChangeKrw: value - previousValue,
       monthlyReturnPct,
       note: "",
+      noiseLine: "",
       peakBreakout: isBreakout,
       peakWaitMonths: previousPeakWaitMonths,
+      previousValue,
+      tangibleLine: "",
       tone: emotion.tone,
       totalReturnPct,
       value,
       verdict: "",
     };
     const verdict = getEmotionVerdict(month);
+    const tangibleLine = getTangibleLine(month);
+    const noiseLine = getNoiseLine(month);
 
     return {
       ...month,
       mindLine: getEmotionMindLine(month),
       note: verdict,
+      noiseLine,
+      tangibleLine,
       verdict,
     };
   });
-  const emotionMonths = Array.from(
+  const dedupedEmotionMonths = Array.from(
     rawEmotionMonths
       .reduce((map, month) => {
         map.set(month.date.slice(0, 7), month);
@@ -1100,6 +1268,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
       }, new Map<string, EmotionMonth>())
       .values(),
   );
+  const emotionMonths = applyCriticalChains(dedupedEmotionMonths);
 
   return {
     assetReturnPct: finalReturnPct,
@@ -1723,16 +1892,30 @@ function getEmotionLegendDescription(tone: EmotionTone) {
 }
 
 function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
+  const lastReplayablePosition = Math.max(0, analysis.emotionMonths.length - 7);
   const defaultMonth =
-    [...analysis.emotionMonths]
-      .filter((month) => month.tone === "panic" || month.tone === "underwater")
-      .sort((left, right) => left.monthlyReturnPct - right.monthlyReturnPct)[0] ??
-    analysis.emotionMonths.find((month) => month.tone === "temptation") ??
+    analysis.emotionMonths.find(
+      (month, index) =>
+        index <= lastReplayablePosition &&
+        (month.tone === "panic" || month.tone === "underwater" || month.tone === "temptation"),
+    ) ??
+    analysis.emotionMonths.find((month, index) => index <= lastReplayablePosition) ??
     analysis.emotionMonths[0]!;
   const [selectedDate, setSelectedDate] = useState(defaultMonth.date);
 
   const selectedMonth =
     analysis.emotionMonths.find((month) => month.date === selectedDate) ?? defaultMonth;
+  const selectedMonthPosition = Math.max(
+    0,
+    analysis.emotionMonths.findIndex((month) => month.date === selectedMonth.date),
+  );
+  const futureMaskCount = Math.max(
+    0,
+    Math.min(6, analysis.emotionMonths.length - selectedMonthPosition - 1),
+  );
+  const monthPositions = new Map(
+    analysis.emotionMonths.map((month, index) => [month.date, index] as const),
+  );
   const worstMonth = [...analysis.emotionMonths].sort(
     (left, right) => left.monthlyReturnPct - right.monthlyReturnPct,
   )[0]!;
@@ -1771,18 +1954,20 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
             {formatMonth(worstMonth.date)} - {formatPct(Math.abs(worstMonth.monthlyReturnPct))}
           </div>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-bold text-slate-300">
-          <div className="rounded-[16px] bg-white/[0.08] px-3 py-3">
-            <div className="text-slate-400">최악의 한 달</div>
-            <div className="mt-1 text-base font-black text-white">
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-bold">
+          <div className="rounded-[18px] bg-white px-3 py-3 text-slate-950 shadow-[0_10px_22px_rgba(15,23,42,0.18)]">
+            <div className="text-[11px] font-black text-slate-500">최악의 한 달</div>
+            <div className="mt-1 text-lg font-black text-rose-600">
               {formatPct(worstMonth.monthlyReturnPct)}
             </div>
+            <div className="mt-1 text-[10px] font-bold text-slate-400">{formatMonth(worstMonth.date)}</div>
           </div>
-          <div className="rounded-[16px] bg-white/[0.08] px-3 py-3">
-            <div className="text-slate-400">최고의 한 달</div>
-            <div className="mt-1 text-base font-black text-white">
+          <div className="rounded-[18px] bg-white px-3 py-3 text-slate-950 shadow-[0_10px_22px_rgba(15,23,42,0.18)]">
+            <div className="text-[11px] font-black text-slate-500">최고의 한 달</div>
+            <div className="mt-1 text-lg font-black text-emerald-600">
               {formatPct(bestMonth.monthlyReturnPct)}
             </div>
+            <div className="mt-1 text-[10px] font-bold text-slate-400">{formatMonth(bestMonth.date)}</div>
           </div>
         </div>
       </div>
@@ -1805,33 +1990,41 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         )}
       </div>
 
-      <SelectedEmotionMonthCard selectedMonth={selectedMonth} />
+      <SelectedEmotionMonthCard futureMaskCount={futureMaskCount} selectedMonth={selectedMonth} />
 
       <div className="mt-5 space-y-4">
         {years.map(([year, months]) => (
           <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-3 py-3" key={year}>
             <div className="mb-2 text-xs font-black text-slate-400">{year}</div>
             <div className="grid grid-cols-12 gap-1.5">
-              {months.map((month) => (
-                <button
-                  aria-label={`${formatMonth(month.date)} ${month.label} ${month.impulseLabel}`}
-                  className={`relative flex h-8 items-center justify-center rounded-[10px] border text-[9px] font-black transition active:scale-95 ${
-                    selectedMonth.date === month.date
-                      ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/20`
-                      : getEmotionToneClasses(month.tone)
-                  }`}
-                  key={month.date}
-                  onClick={() => setSelectedDate(month.date)}
-                  type="button"
-                >
-                  <span>{month.date.slice(5, 7)}</span>
-                  {month.marker ? (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-black text-slate-950 shadow-sm">
-                      {month.marker}
-                    </span>
-                  ) : null}
-                </button>
-              ))}
+              {months.map((month) => {
+                const monthPosition = monthPositions.get(month.date) ?? 0;
+                const isFutureMasked =
+                  monthPosition > selectedMonthPosition && monthPosition <= selectedMonthPosition + 6;
+                const isSelected = selectedMonth.date === month.date;
+                const toneClass = isFutureMasked && !isSelected
+                  ? "border-slate-900 bg-slate-950 text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.18)]"
+                  : getEmotionToneClasses(month.tone);
+
+                return (
+                  <button
+                    aria-label={`${formatMonth(month.date)} ${month.label} ${month.impulseLabel}`}
+                    className={`relative flex h-8 items-center justify-center rounded-[10px] border text-[9px] font-black transition active:scale-95 ${
+                      isSelected ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/25` : toneClass
+                    } ${month.criticalZone ? "outline outline-2 outline-offset-1 outline-rose-300/70" : ""}`}
+                    key={month.date}
+                    onClick={() => setSelectedDate(month.date)}
+                    type="button"
+                  >
+                    <span>{isFutureMasked && !isSelected ? "?" : month.date.slice(5, 7)}</span>
+                    {month.marker || month.criticalZone ? (
+                      <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-black text-slate-950 shadow-sm">
+                        {month.criticalZone ? "⚡" : month.marker}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}
@@ -1840,7 +2033,13 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
   );
 }
 
-function SelectedEmotionMonthCard({ selectedMonth }: { selectedMonth: EmotionMonth }) {
+function SelectedEmotionMonthCard({
+  futureMaskCount,
+  selectedMonth,
+}: {
+  futureMaskCount: number;
+  selectedMonth: EmotionMonth;
+}) {
   return (
     <div className="sticky top-3 z-20 mt-5 rounded-[28px] border border-slate-200 bg-white/95 px-4 py-3 shadow-[0_18px_60px_rgba(15,23,42,0.18)] backdrop-blur">
       <div className="flex items-center justify-between gap-3">
@@ -1864,6 +2063,16 @@ function SelectedEmotionMonthCard({ selectedMonth }: { selectedMonth: EmotionMon
           ↗ 전고점 돌파까지 {selectedMonth.peakWaitMonths}개월
         </div>
       ) : null}
+      {selectedMonth.chainLabel ? (
+        <div className="mt-2 rounded-[18px] border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-black leading-5 text-rose-700">
+          ⚡ 멘탈 크리티컬 존: {selectedMonth.chainLabel}
+        </div>
+      ) : null}
+      <div className="mt-2 rounded-[18px] bg-slate-950 px-3 py-2 text-xs font-bold leading-5 text-slate-200">
+        {futureMaskCount > 0
+          ? `미래 암전: 이 달을 누른 순간, 이후 ${futureMaskCount}개월은 일부러 가렸습니다. 그때의 당신도 다음 장면을 몰랐습니다.`
+          : "미래 암전: 이 달은 현재에 가까운 구간입니다. 직전의 흔들림만 보고 판단해야 했던 상태로 읽어보세요."}
+      </div>
       <div className="mt-3 grid grid-cols-4 gap-1.5">
         <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
           <div className="text-[9px] font-black text-slate-400">평가액</div>
@@ -1893,7 +2102,14 @@ function SelectedEmotionMonthCard({ selectedMonth }: { selectedMonth: EmotionMon
       <p className="mt-2 rounded-[18px] bg-amber-50 px-3 py-2.5 text-sm font-black leading-5 text-slate-900">
         “{selectedMonth.mindLine}”
       </p>
-      <p className="mt-2 max-h-10 overflow-hidden text-xs font-semibold leading-5 text-slate-600">
+      <p className="mt-2 rounded-[18px] bg-rose-50 px-3 py-2 text-xs font-bold leading-5 text-rose-700">
+        {selectedMonth.tangibleLine}
+      </p>
+      <p className="mt-2 rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-slate-600">
+        <span className="font-black text-slate-900">주변 소음 </span>
+        {selectedMonth.noiseLine}
+      </p>
+      <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
         <span className="font-black text-slate-900">판정 </span>
         {selectedMonth.verdict}
       </p>
