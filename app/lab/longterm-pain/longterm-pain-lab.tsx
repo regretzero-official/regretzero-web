@@ -32,7 +32,7 @@ import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-da
 type AssetTab = "all" | "kospi" | "nasdaq100" | "sp500" | "etf" | "coin";
 type BottomTab = "home" | "search" | "live" | "saved";
 type RaceStatus = "complete" | "idle" | "loading" | "racing";
-type RealityAnswer = "buyMore" | "hold" | "sellEarly" | "sellFear";
+type EmotionTone = "panic" | "recovery" | "sideways" | "temptation" | "underwater";
 
 interface LabAssetMeta {
   groups: string[];
@@ -52,9 +52,13 @@ interface PainMilestone {
 
 interface EmotionMonth {
   date: string;
+  drawdownPct: number;
   label: string;
+  monthlyReturnPct: number;
   note: string;
-  tone: "danger" | "neutral" | "success" | "warning";
+  tone: EmotionTone;
+  totalReturnPct: number;
+  value: number;
 }
 
 interface PainAnalysis {
@@ -151,7 +155,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "기아",
     oneLiner:
-      "전기차와 SUV 흐름을 타며 한국 자동차 산업의 체력이 어떻게 평가받는지 보여주는 대표주입니다.",
+      "글로벌 SUV와 전기차 흐름을 타며 한국 자동차 산업의 체력이 한 단계 올라섰는지 시험하게 만드는 대표주입니다.",
     searchTerms: ["기아", "kia", "000270", "자동차"],
     theme: "자동차",
     ticker: "000270",
@@ -160,7 +164,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "SK하이닉스",
     oneLiner:
-      "AI 서버에 필요한 고대역폭 메모리 수요가 커질수록 투자자의 시선이 먼저 몰리는 반도체 핵심주입니다.",
+      "AI 서버의 심장인 HBM 수요가 폭발할 때, 한국 반도체 대형주가 얼마나 거칠게 재평가되는지 보여줍니다.",
     searchTerms: ["sk하이닉스", "하이닉스", "000660", "반도체"],
     theme: "반도체",
     ticker: "000660",
@@ -169,7 +173,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "LG",
     oneLiner:
-      "전자, 화학, 배터리 계열사를 묶어 보는 한국 대표 지주사라 시장 분위기를 넓게 읽기 좋습니다.",
+      "전자, 화학, 배터리까지 한국 핵심 산업의 DNA를 한 번에 읽게 해주는 밸류업 기대의 대표 지주사입니다.",
     searchTerms: ["lg", "003550", "지주"],
     theme: "지주",
     ticker: "003550",
@@ -178,7 +182,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "현대차",
     oneLiner:
-      "전기차, 하이브리드, 글로벌 판매 사이클이 한꺼번에 반영되는 한국 자동차 대표주입니다.",
+      "전기차 전환과 글로벌 판매 사이클 속에서 가치주와 성장주 사이를 아슬아슬하게 오가는 한국 제조업의 대들보입니다.",
     searchTerms: ["현대차", "현대자동차", "005380", "자동차"],
     theme: "자동차",
     ticker: "005380",
@@ -187,7 +191,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "POSCO홀딩스",
     oneLiner:
-      "철강의 현금창출력과 2차전지 소재 기대가 함께 섞인 한국 소재 대표주입니다.",
+      "전통 철강의 현금창출력 위에 2차전지 소재 기대가 얹히며 대형 소재주가 얼마나 요동칠 수 있는지 보여줍니다.",
     searchTerms: ["posco", "포스코", "005490", "소재"],
     theme: "소재",
     ticker: "005490",
@@ -196,7 +200,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "삼성전자",
     oneLiner:
-      "메모리, 파운드리, 스마트기기까지 연결된 한국 주식시장의 가장 익숙한 기준점입니다.",
+      "한국 주식시장의 자존심이자 기준점입니다. 다만 메모리 사이클의 겨울을 버티는 일은 생각보다 훨씬 외롭습니다.",
     searchTerms: ["삼성전자", "삼성", "005930", "반도체"],
     theme: "반도체",
     ticker: "005930",
@@ -205,7 +209,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "한화에어로스페이스",
     oneLiner:
-      "방산 수출과 우주항공 기대가 겹치며 최근 한국 성장주 관심을 강하게 끄는 종목입니다.",
+      "K-방산 수출과 우주항공 기대가 겹치며 한국 시장에서 가장 뜨겁게 불타오른 성장주 중 하나입니다.",
     searchTerms: ["한화에어로스페이스", "한화에어로", "012450", "방산"],
     theme: "방산",
     ticker: "012450",
@@ -214,7 +218,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "삼성물산",
     oneLiner:
-      "건설, 상사, 바이오 지분 가치가 함께 움직이는 삼성그룹 대표 지주 성격의 종목입니다.",
+      "건설, 상사, 패션, 바이오 지분이 얽혀 있어 한국형 지주사가 갖는 복잡한 프리미엄을 보여줍니다.",
     searchTerms: ["삼성물산", "028260", "지주"],
     theme: "지주",
     ticker: "028260",
@@ -223,7 +227,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "KT&G",
     oneLiner:
-      "큰 폭의 성장보다 꾸준한 현금흐름과 배당 매력을 보고 접근하는 한국 소비재 대표주입니다.",
+      "화려한 성장은 없지만 담배와 인삼이 만드는 단단한 현금흐름과 배당의 안온함을 느끼게 해줍니다.",
     searchTerms: ["kt&g", "케이티앤지", "033780", "배당"],
     theme: "소비재",
     ticker: "033780",
@@ -232,7 +236,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "두산에너빌리티",
     oneLiner:
-      "원전과 에너지 설비 기대가 커질 때 한국 산업재에서 가장 먼저 언급되는 종목 중 하나입니다.",
+      "글로벌 원전 부활과 에너지 설비 기대가 커질 때 한국 대형 산업재가 받는 프리미엄과 변동성을 보여줍니다.",
     searchTerms: ["두산에너빌리티", "두산", "034020", "원전"],
     theme: "에너지",
     ticker: "034020",
@@ -241,7 +245,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "NAVER",
     oneLiner:
-      "검색, 커머스, 콘텐츠, AI가 한 회사 안에 묶인 한국 인터넷 플랫폼의 대표 선수입니다.",
+      "검색과 쇼핑을 쥔 한국 인터넷의 왕자입니다. 글로벌 빅테크 공세 속에서 내수 플랫폼의 가치를 지켜내는 사투를 보여줍니다.",
     searchTerms: ["네이버", "naver", "035420", "플랫폼"],
     theme: "플랫폼",
     ticker: "035420",
@@ -250,7 +254,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "카카오",
     oneLiner:
-      "국민 메신저에서 금융, 콘텐츠까지 확장한 플랫폼 기업이 기대와 실망을 어떻게 오가는지 보여줍니다.",
+      "전 국민의 일상을 지배하는 메신저에서 시작된 확장이 대중의 기대와 실망을 얼마나 극단적으로 오갔는지 보여줍니다.",
     searchTerms: ["카카오", "kakao", "035720", "플랫폼"],
     theme: "플랫폼",
     ticker: "035720",
@@ -259,7 +263,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "신한지주",
     oneLiner:
-      "금리와 경기 흐름에 따라 은행주의 안정성과 한계를 함께 보여주는 금융 대표주입니다.",
+      "안정적 이익과 배당 매력을 주지만, 규제와 경기 흐름에 갇히는 은행주의 한계도 함께 보여줍니다.",
     searchTerms: ["신한지주", "신한", "055550", "금융"],
     theme: "금융",
     ticker: "055550",
@@ -268,7 +272,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "셀트리온",
     oneLiner:
-      "바이오시밀러 기대가 커질 때 한국 바이오 투자심리가 얼마나 뜨겁고 차가워지는지 보여줍니다.",
+      "바이오시밀러 개척자의 기대와 의심이 한국 바이오 투자자들의 환호와 절망을 어떻게 만들었는지 보여줍니다.",
     searchTerms: ["셀트리온", "068270", "바이오"],
     theme: "바이오",
     ticker: "068270",
@@ -277,7 +281,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "KOSPI"],
     name: "KODEX 200",
     oneLiner:
-      "한국 대표 기업 묶음을 한 번에 사는 ETF라 코스피 장기투자의 체감을 보기 좋습니다.",
+      "대한민국 대표 기업 200개를 통째로 매수해 코스피 장기투자가 얼마나 지루하고 가혹한지 체감시켜 줍니다.",
     searchTerms: ["kodex 200", "코덱스200", "069500", "코스피 etf"],
     theme: "한국지수 ETF",
     ticker: "069500",
@@ -286,7 +290,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "KB금융",
     oneLiner:
-      "은행, 카드, 증권, 보험을 묶어 금리와 배당 기대를 함께 보는 한국 금융 대표주입니다.",
+      "리딩 금융그룹의 주주환원 매력과 금리 사이클에 따라 움직이는 한국 금융주의 교과서 같은 종목입니다.",
     searchTerms: ["kb금융", "국민은행", "105560", "금융"],
     theme: "금융",
     ticker: "105560",
@@ -295,7 +299,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["KOSPI"],
     name: "삼성바이오로직스",
     oneLiner:
-      "글로벌 의약품 생산 수요가 커질수록 한국 바이오 대형주의 프리미엄을 대표하는 종목입니다.",
+      "글로벌 의약품 생산을 맡는 CMO 강자입니다. 경기와 무관하게 굴러가는 대형 바이오주의 프리미엄을 상징합니다.",
     searchTerms: ["삼성바이오로직스", "삼바", "207940", "바이오"],
     theme: "바이오",
     ticker: "207940",
@@ -304,7 +308,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "KOSPI", "S&P500"],
     name: "TIGER 미국S&P500",
     oneLiner:
-      "원화로 미국 대표 기업에 접근하는 ETF라 한국 투자자가 가장 쉽게 미국 장기투자를 체감할 수 있습니다.",
+      "원화로 미국 잔고를 쌓는 대중적인 통로입니다. 한국 투자자가 일상 속에서 미국의 우상향에 동승하는 방법입니다.",
     searchTerms: ["tiger 미국s&p500", "360750", "미국 etf", "s&p500"],
     theme: "미국지수 ETF",
     ticker: "360750",
@@ -313,7 +317,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "애플",
     oneLiner:
-      "아이폰이라는 일상적 제품이 거대한 현금흐름과 브랜드 충성도로 바뀌는 힘을 보여줍니다.",
+      "아이폰이라는 일상적 중독을 압도적 현금흐름으로 바꾼 기업입니다. 지루함을 견디면 보상이 따르는 장기투자의 정석입니다.",
     searchTerms: ["애플", "apple", "aapl"],
     theme: "빅테크",
     ticker: "AAPL",
@@ -322,7 +326,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "AMD",
     oneLiner:
-      "반도체 경쟁 구도가 바뀔 때 후발주자가 얼마나 극적으로 재평가될 수 있는지 보여줍니다.",
+      "반도체 패권 경쟁이 요동칠 때 후발주자의 재평가가 투자자에게 어떤 기쁨과 고통을 주는지 보여줍니다.",
     searchTerms: ["amd", "반도체"],
     theme: "반도체",
     ticker: "AMD",
@@ -331,7 +335,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "아마존",
     oneLiner:
-      "쇼핑 회사처럼 보이지만 클라우드와 물류 체계가 결합된 거대한 현금흐름 기업입니다.",
+      "단순 쇼핑몰이 아니라 클라우드와 물류 인프라를 장악한 거대한 독점 생태계의 힘을 보여줍니다.",
     searchTerms: ["아마존", "amazon", "amzn", "aws"],
     theme: "클라우드",
     ticker: "AMZN",
@@ -340,7 +344,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "브로드컴",
     oneLiner:
-      "AI 인프라와 네트워크 반도체가 커질수록 조용히 같이 언급되는 고수익 반도체 기업입니다.",
+      "AI 인프라와 네트워크 반도체의 숨은 지배자입니다. 화려하진 않아도 가장 확실하게 현금을 짜내는 기업입니다.",
     searchTerms: ["브로드컴", "broadcom", "avgo"],
     theme: "반도체",
     ticker: "AVGO",
@@ -349,7 +353,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "버크셔 해서웨이",
     oneLiner:
-      "화려한 기술주가 아니어도 긴 시간 자본 배분이 얼마나 강한 결과를 만들 수 있는지 보여줍니다.",
+      "화려한 기술주 없이도 위대한 자본 배치가 긴 시간 동안 어떻게 복리의 마법을 완성하는지 보여줍니다.",
     searchTerms: ["버크셔", "berkshire", "brkb", "버핏"],
     theme: "복합 지주",
     ticker: "BRK.B",
@@ -358,7 +362,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Coin"],
     name: "비트코인",
     oneLiner:
-      "누구도 마음대로 찍어낼 수 없는 희소성에 투자한다는 아이디어가 시장에서 어떻게 가격이 되는지 보여줍니다.",
+      "프로그래밍된 희소성이라는 낯선 개념이 대중의 비아냥을 뚫고 가격 자체가 서사가 되는 과정을 보여줍니다.",
     searchTerms: ["비트코인", "bitcoin", "btc"],
     theme: "희소 자산",
     ticker: "BTC",
@@ -367,7 +371,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "코스트코",
     oneLiner:
-      "화려한 기술보다 멤버십과 가격 신뢰가 얼마나 강한 사업 모델이 되는지 보여주는 소비재 대표주입니다.",
+      "화려한 기술 대신 멤버십 독점과 가격 신뢰가 얼마나 무서운 고객 충성도를 만드는지 보여주는 소비재 끝판왕입니다.",
     searchTerms: ["코스트코", "costco", "cost"],
     theme: "소비재",
     ticker: "COST",
@@ -376,7 +380,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Coin"],
     name: "이더리움",
     oneLiner:
-      "디지털 자산이 단순 보관 수단을 넘어 앱과 금융 인프라의 바닥이 될 수 있다는 실험입니다.",
+      "단순 코인을 넘어 가상세계의 금융과 앱이 돌아가는 인프라가 시장에서 어떤 가치를 받는지 시험합니다.",
     searchTerms: ["이더리움", "ethereum", "eth"],
     theme: "스마트계약",
     ticker: "ETH",
@@ -385,7 +389,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "알파벳",
     oneLiner:
-      "검색 광고라는 강력한 현금흐름 위에 유튜브, 클라우드, AI 기대가 얹힌 기업입니다.",
+      "구글 검색의 철옹성 같은 독점력 위에 유튜브와 AI라는 엔진을 얹은 거대한 현금흐름 기업입니다.",
     searchTerms: ["알파벳", "구글", "google", "googl"],
     theme: "빅테크",
     ticker: "GOOGL",
@@ -394,7 +398,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "존슨앤드존슨",
     oneLiner:
-      "경기와 유행이 바뀌어도 헬스케어 수요가 쉽게 사라지지 않는다는 방어적 성격을 보여줍니다.",
+      "유행과 경기가 아무리 바뀌어도 인류의 건강 수요는 쉽게 사라지지 않는다는 방어주의 정석입니다.",
     searchTerms: ["존슨앤드존슨", "jnj", "헬스케어"],
     theme: "헬스케어",
     ticker: "JNJ",
@@ -403,7 +407,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "JP모건",
     oneLiner:
-      "금리, 경기, 금융 시스템에 대한 시장의 믿음이 대형 은행 주가에 어떻게 녹아드는지 보여줍니다.",
+      "글로벌 금융 시스템의 강자입니다. 금리와 경기 사이클의 소음 속에서 대형 은행주가 갖는 체력을 보여줍니다.",
     searchTerms: ["jp모건", "jpmorgan", "jpm", "은행"],
     theme: "금융",
     ticker: "JPM",
@@ -412,7 +416,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "코카콜라",
     oneLiner:
-      "성장이 느려 보여도 브랜드와 유통망이 긴 시간 얼마나 질긴 현금흐름을 만드는지 보여줍니다.",
+      "성장은 느려 보여도 백 년이 넘는 브랜드 자산이 긴 시간 동안 얼마나 질기고 단단한 복리를 만드는지 증명합니다.",
     searchTerms: ["코카콜라", "coca cola", "ko"],
     theme: "소비재",
     ticker: "KO",
@@ -421,7 +425,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "마스터카드",
     oneLiner:
-      "사람들이 돈을 쓸 때마다 결제망이 수수료를 얻는 구조가 얼마나 강한지 보여주는 기업입니다.",
+      "비자와 함께 글로벌 결제망을 양분하며, 인류의 소비가 늘수록 조용히 통행세를 쌓는 기업입니다.",
     searchTerms: ["마스터카드", "mastercard", "ma"],
     theme: "결제",
     ticker: "MA",
@@ -430,7 +434,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "메타",
     oneLiner:
-      "사람들의 시간을 붙잡는 플랫폼이 광고와 AI 투자로 다시 평가받는 과정을 보여줍니다.",
+      "인류의 시간을 지배하는 플랫폼입니다. 대중의 조롱과 광고 위기를 딛고 주가가 어떻게 부활하는지 보여줍니다.",
     searchTerms: ["메타", "meta", "facebook", "instagram"],
     theme: "플랫폼",
     ticker: "META",
@@ -439,7 +443,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "마이크로소프트",
     oneLiner:
-      "오래된 소프트웨어 회사가 클라우드와 AI를 만나 다시 성장주로 평가받은 사례입니다.",
+      "전통 소프트웨어 거인이 클라우드와 AI를 만나 어떻게 가장 트렌디한 성장주로 부활했는지 증명합니다.",
     searchTerms: ["마이크로소프트", "microsoft", "msft"],
     theme: "클라우드",
     ticker: "MSFT",
@@ -448,7 +452,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "엔비디아",
     oneLiner:
-      "AI 시대에 모두가 필요한 장비를 파는 회사가 되면서 시장의 상상력을 가장 세게 자극한 종목입니다.",
+      "AI 시대의 심장을 파는 기업입니다. 거대한 상상력만큼 계좌를 사정없이 뒤흔드는 변동성의 끝판왕입니다.",
     searchTerms: ["엔비디아", "nvidia", "nvda", "ai"],
     theme: "AI 반도체",
     ticker: "NVDA",
@@ -457,7 +461,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "P&G",
     oneLiner:
-      "매일 쓰는 생활용품이 얼마나 안정적인 장기 현금흐름이 될 수 있는지 보여주는 방어주입니다.",
+      "면도기, 기저귀, 샴푸처럼 매일 쓰는 생활용품이 하락장에서 얼마나 단단한 방패가 되는지 보여줍니다.",
     searchTerms: ["p&g", "피앤지", "pg", "생활용품"],
     theme: "소비재",
     ticker: "PG",
@@ -466,7 +470,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "Nasdaq100"],
     name: "QQQ",
     oneLiner:
-      "나스닥 대표 기업들을 한 번에 담아 기술주 장기투자의 기복과 보상을 동시에 보여주는 ETF입니다.",
+      "미국 기술주 엘리트들의 집합소입니다. 화려한 상승의 열매를 먹기 위해 얼마나 매운 변동성을 견뎌야 하는지 알려줍니다.",
     searchTerms: ["qqq", "나스닥", "나스닥100", "etf"],
     theme: "미국지수 ETF",
     ticker: "QQQ",
@@ -475,7 +479,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "Nasdaq100"],
     name: "SOXX",
     oneLiner:
-      "AI, 서버, 스마트기기 수요가 반도체 산업 전체를 어떻게 흔드는지 한 번에 볼 수 있는 ETF입니다.",
+      "반도체 산업 전체의 사이클을 한 바퀴에 돌리는 ETF입니다. 업황의 거대한 파도에 내 멘탈을 시험하기 좋습니다.",
     searchTerms: ["soxx", "반도체 etf", "미국 반도체"],
     theme: "반도체 ETF",
     ticker: "SOXX",
@@ -484,7 +488,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "S&P500"],
     name: "SPY",
     oneLiner:
-      "미국 대표 기업 전체에 분산 투자하는 가장 익숙한 출발점입니다.",
+      "미국 자본주의의 심장 그 자체입니다. 지루해 보이지만 긴 시간 동안 자산가들을 승리로 이끈 출발점입니다.",
     searchTerms: ["spy", "s&p500", "미국지수", "etf"],
     theme: "미국지수 ETF",
     ticker: "SPY",
@@ -493,7 +497,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["Nasdaq100", "S&P500"],
     name: "테슬라",
     oneLiner:
-      "전기차 회사인지, 에너지 회사인지, AI 회사인지에 따라 기대와 실망이 크게 흔들리는 종목입니다.",
+      "전기차, 에너지, 로봇, AI. 이 회사를 무엇으로 정의하느냐에 따라 천국과 지옥을 극단적으로 오가는 종목입니다.",
     searchTerms: ["테슬라", "tesla", "tsla", "전기차"],
     theme: "전기차",
     ticker: "TSLA",
@@ -502,7 +506,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "비자",
     oneLiner:
-      "현금을 덜 쓰고 카드와 디지털 결제가 늘수록 조용히 수수료를 쌓는 결제 네트워크입니다.",
+      "전 세계 사람이 돈을 쓸 때마다 조용히 통행세를 걷는 결제 네트워크의 위력을 보여줍니다.",
     searchTerms: ["비자", "visa", "v", "결제"],
     theme: "결제",
     ticker: "V",
@@ -511,7 +515,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["ETF", "S&P500"],
     name: "VOO",
     oneLiner:
-      "낮은 비용으로 S&P500에 장기투자하는 가장 단순한 방법 중 하나입니다.",
+      "가장 낮은 비용으로 미국의 우상향에 내 시간을 베팅하는 단순하고 강력한 방법입니다.",
     searchTerms: ["voo", "s&p500", "미국 etf"],
     theme: "미국지수 ETF",
     ticker: "VOO",
@@ -520,7 +524,7 @@ const ASSET_META: Record<string, LabAssetMeta> = {
     groups: ["S&P500"],
     name: "엑슨모빌",
     oneLiner:
-      "유가와 에너지 사이클이 오래된 산업 기업의 주가를 얼마나 크게 흔드는지 보여줍니다.",
+      "국제 유가와 원자재 사이클의 거대한 파도가 오래된 에너지 거인의 주가를 어떻게 들었다 놨다 하는지 보여줍니다.",
     searchTerms: ["엑슨모빌", "exxon", "xom", "에너지"],
     theme: "에너지",
     ticker: "XOM",
@@ -538,21 +542,10 @@ const TAB_OPTIONS: Array<{ id: AssetTab; label: string }> = [
 
 const BOTTOM_TABS: Array<{ icon: typeof Home; id: BottomTab; label: string }> = [
   { icon: Home, id: "home", label: "홈" },
-  { icon: Search, id: "search", label: "검색" },
-  { icon: Radio, id: "live", label: "라이브" },
-  { icon: Bookmark, id: "saved", label: "보관함" },
+  { icon: Search, id: "search", label: "탐색" },
+  { icon: Radio, id: "live", label: "실험" },
+  { icon: Bookmark, id: "saved", label: "기록" },
 ];
-
-const REALITY_FEEDBACK: Record<RealityAnswer, string> = {
-  buyMore:
-    "그 답을 실제 계좌에서 해냈다면 이미 상위권입니다. 다만 하락의 끝이 보이지 않을 때 더 사는 일은 지식보다 고독을 견디는 일에 가깝습니다.",
-  hold:
-    "말은 쉽지만, 실제 계좌에서 수천만 원이 사라질 때는 손가락이 먼저 매도 버튼으로 갑니다. 그래서 의지가 아니라 구조가 필요합니다.",
-  sellEarly:
-    "핵심을 짚었습니다. 많은 사람은 폭락보다 작은 성공을 못 견딥니다. 눈앞의 수익을 확정하려다 더 큰 시간을 팔아버립니다.",
-  sellFear:
-    "정직한 답입니다. 인간은 손실을 피하도록 설계되어 있습니다. 장기투자가 어려운 건 의지가 약해서가 아니라 본능을 거스르기 때문입니다.",
-};
 
 function getMeta(assetId: ComparisonAssetId): LabAssetMeta {
   const asset = assetCatalog[assetId];
@@ -697,6 +690,76 @@ function getValue(point: RacePoint, assetId: ComparisonAssetId) {
   return Number(point[assetId] ?? 0);
 }
 
+function getEmotionTone({
+  drawdownPct,
+  isAth,
+  monthlyReturnPct,
+  totalReturnPct,
+  value,
+  startValue,
+}: {
+  drawdownPct: number;
+  isAth: boolean;
+  monthlyReturnPct: number;
+  startValue: number;
+  totalReturnPct: number;
+  value: number;
+}): { label: string; tone: EmotionTone } {
+  if (monthlyReturnPct <= -15) {
+    return { label: "패닉", tone: "panic" };
+  }
+
+  if (value < startValue * 0.98) {
+    return { label: "지옥", tone: "underwater" };
+  }
+
+  if (drawdownPct <= -35) {
+    return { label: "지옥", tone: "underwater" };
+  }
+
+  if (totalReturnPct >= 100 && monthlyReturnPct >= 4) {
+    return { label: "유혹", tone: "temptation" };
+  }
+
+  if (isAth && totalReturnPct > 0) {
+    return { label: "환호", tone: "recovery" };
+  }
+
+  if (Math.abs(monthlyReturnPct) <= 3 && drawdownPct < -5) {
+    return { label: "소외감", tone: "sideways" };
+  }
+
+  if (monthlyReturnPct >= 8) {
+    return { label: "회복", tone: "recovery" };
+  }
+
+  return { label: "버티는 달", tone: "sideways" };
+}
+
+function getEmotionNote(month: EmotionMonth) {
+  if (month.tone === "panic") {
+    return `한 달 만에 계좌가 ${formatPct(Math.abs(month.monthlyReturnPct))} 녹아내렸습니다. 지나고 보면 작은 점 하나지만, 당시에는 온 세상 뉴스가 이 자산은 끝났다고 속삭였을 달입니다.`;
+  }
+
+  if (month.tone === "underwater") {
+    if (month.value >= PRINCIPAL_KRW) {
+      return `전고점 대비 ${formatPct(month.drawdownPct)}까지 밀린 달입니다. 수익은 남아 있어도, 이미 번 돈이 증발하는 장면은 원금 손실만큼 사람을 흔듭니다.`;
+    }
+
+    return `처음 넣은 원금마저 깨진 달입니다. 이때 장기투자는 멋진 철학이 아니라 당장 집어던지고 싶은 지독한 숙제로 바뀝니다.`;
+  }
+
+  if (month.tone === "temptation") {
+    return `누적 수익률이 ${formatPct(month.totalReturnPct)}까지 올라왔습니다. 다시 떨어지기 전에 팔고 나중에 싸게 살까 하는 오만이 가장 그럴듯하게 들리는 달입니다.`;
+  }
+
+  if (month.tone === "recovery") {
+    return `긴 터널을 지나 다시 위로 올라선 달입니다. 이 순간은 예측을 잘한 사람이 아니라, 소음과 유혹을 견디고 시장에 남아 있던 사람에게만 열립니다.`;
+  }
+
+  return `기가 막히게 제자리걸음만 반복하는 달입니다. 주변에서 다른 자산으로 돈 벌었다는 소리가 들릴수록 소외감과 지루함이 커집니다.`;
+}
+
 function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): PainAnalysis | null {
   if (build.points.length < 2) {
     return null;
@@ -765,54 +828,50 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     .filter((item): item is PainMilestone => Boolean(item));
 
   const worstDrops = [...monthlyDrops].sort((left, right) => left.dropPct - right.dropPct).slice(0, 3);
-  const firstProfitPoint = points.find((point) => getValue(point, assetId) >= startValue * 1.1);
-  const first2xPoint = milestones.find((item) => item.multiple === 2);
   const finalReturnPct = startValue > 0 ? (finalValue / startValue - 1) * 100 : 0;
-  const emotionMonths: EmotionMonth[] = [
-    ...worstDrops.slice(0, 2).map((item) => ({
-      date: item.date,
-      label: item.dropPct <= -20 ? "패닉" : "급락",
-      note: `한 달 수익률이 ${formatPct(item.dropPct)}까지 밀렸습니다. 지나고 보면 점 하나지만, 당시에는 계좌 앱을 여는 것 자체가 고통이었을 달입니다.`,
-      tone: "danger" as const,
-    })),
-  ];
-
-  if (underPrincipalMonths > 0) {
-    const underPrincipalPoint = points.find((point) => getValue(point, assetId) < startValue);
-    if (underPrincipalPoint) {
-      emotionMonths.push({
-        date: underPrincipalPoint.date,
-        label: "원금 침식",
-        note: "처음 넣은 돈보다 평가금액이 작아졌습니다. 이때 장기투자라는 말은 갑자기 멋진 말이 아니라 버거운 숙제가 됩니다.",
-        tone: "warning",
-      });
-    }
-  }
-
-  if (firstProfitPoint) {
-    emotionMonths.push({
-      date: firstProfitPoint.date,
-      label: "첫 수익",
-      note: "처음으로 꽤 오른 것처럼 보이는 구간입니다. 이때부터 매도 버튼은 조용히, 하지만 집요하게 눈에 들어옵니다.",
-      tone: "success",
+  let emotionPeak = startValue;
+  const rawEmotionMonths = points.map((point, index) => {
+    const value = getValue(point, assetId);
+    const previousValue = index > 0 ? getValue(points[index - 1]!, assetId) : startValue;
+    const monthlyReturnPct = previousValue > 0 ? (value / previousValue - 1) * 100 : 0;
+    const nextPeak = Math.max(emotionPeak, value);
+    const isAth = value >= nextPeak;
+    emotionPeak = nextPeak;
+    const drawdownPct = emotionPeak > 0 ? (value / emotionPeak - 1) * 100 : 0;
+    const totalReturnPct = startValue > 0 ? (value / startValue - 1) * 100 : 0;
+    const emotion = getEmotionTone({
+      drawdownPct,
+      isAth,
+      monthlyReturnPct,
+      startValue,
+      totalReturnPct,
+      value,
     });
-  }
 
-  if (first2xPoint) {
-    emotionMonths.push({
-      date: first2xPoint.date,
-      label: "2배 돌파",
-      note: "원금이 두 배가 된 순간입니다. 많은 사람은 여기서 천재가 된 기분을 느끼고, 더 큰 시간을 팔아버립니다.",
-      tone: "success",
-    });
-  }
+    const month: EmotionMonth = {
+      date: point.date,
+      drawdownPct,
+      label: emotion.label,
+      monthlyReturnPct,
+      note: "",
+      tone: emotion.tone,
+      totalReturnPct,
+      value,
+    };
 
-  emotionMonths.push({
-    date: finalPoint.date,
-    label: "현재",
-    note: `결국 ${formatPct(finalReturnPct)}의 결과가 남았습니다. 문제는 이 숫자가 아니라, 이 숫자까지 오는 시간을 버틸 수 있었느냐입니다.`,
-    tone: "neutral",
+    return {
+      ...month,
+      note: getEmotionNote(month),
+    };
   });
+  const emotionMonths = Array.from(
+    rawEmotionMonths
+      .reduce((map, month) => {
+        map.set(month.date.slice(0, 7), month);
+        return map;
+      }, new Map<string, EmotionMonth>())
+      .values(),
+  );
 
   return {
     assetReturnPct: finalReturnPct,
@@ -914,7 +973,6 @@ export function LongtermPainLab() {
   const [raceError, setRaceError] = useState("");
   const [raceStatus, setRaceStatus] = useState<RaceStatus>("idle");
   const [visibleCount, setVisibleCount] = useState(0);
-  const [realityAnswer, setRealityAnswer] = useState<RealityAnswer | null>(null);
   const [lastCompletedAssetId, setLastCompletedAssetId] = useState<ComparisonAssetId | null>(null);
 
   const selectedMeta = getMeta(selectedAssetId);
@@ -947,7 +1005,6 @@ export function LongtermPainLab() {
       setRaceError("");
       setRaceStatus("loading");
       setVisibleCount(0);
-      setRealityAnswer(null);
 
       window.requestAnimationFrame(() => {
         raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1036,13 +1093,11 @@ export function LongtermPainLab() {
                 <RaceStage
                   analysis={analysis}
                   currentPoint={currentPoint}
-                  onAnswer={setRealityAnswer}
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
                   raceAssets={raceAssets}
                   raceBuild={raceBuild}
                   raceStatus={raceStatus}
-                  realityAnswer={realityAnswer}
                   selectedMeta={selectedMeta}
                   visibleData={visibleData}
                 />
@@ -1084,13 +1139,13 @@ function Header() {
   return (
     <header className="flex items-center justify-between py-2">
       <div>
-        <div className="text-sm font-black tracking-[-0.03em] text-slate-950">RegretZero</div>
+        <div className="text-sm font-black tracking-[-0.03em] text-slate-950">레그렛제로</div>
         <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-          Long-term reality lab
+          장기투자 생존 실험실
         </div>
       </div>
       <div className="rounded-full border border-white bg-white/70 px-3 py-2 text-xs font-bold text-slate-500 shadow-sm">
-        실제 데이터
+        100% 실전 데이터
       </div>
     </header>
   );
@@ -1107,19 +1162,19 @@ function Hero({
 }) {
   return (
     <SectionCard className="overflow-hidden">
-      <div className="text-[12px] font-black uppercase tracking-[0.24em] text-blue-500">START</div>
+      <div className="text-[12px] font-black uppercase tracking-[0.24em] text-blue-500">시뮬레이션 시작</div>
       <h1 className="mt-3 text-[2.3rem] font-black leading-[1.02] tracking-[-0.09em] text-slate-950">
-        10년 전 샀다면,
+        10년 전 오늘 샀다면,
         <br />
-        나는 끝까지 버텼을까요?
+        끝까지 버텼을까요?
       </h1>
       <p className="mt-4 text-[15px] font-semibold leading-7 text-slate-600">
-        수익률 숫자만 보면 쉬워 보입니다. 하지만 진짜 문제는 그 돈이 만들어지는
-        시간을 온전히 살아내는 일입니다.
+        결과만 보면 투자만큼 쉬운 게 없습니다. 진짜 문제는 그 돈이 불어나는 시간을
+        맨몸으로 견뎌내는 일입니다.
       </p>
 
       <div className="mt-6 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
-        <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">오늘의 첫 레이스</div>
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">지금 주목받는 실험</div>
         <div className="mt-3 flex items-start justify-between gap-3">
           <div>
             <div className="text-2xl font-black tracking-[-0.06em] text-slate-950">
@@ -1134,7 +1189,7 @@ function Hero({
             onClick={onOpenSearch}
             type="button"
           >
-            종목 바꾸기
+            종목 변경
           </button>
         </div>
         <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
@@ -1145,7 +1200,7 @@ function Hero({
         onClick={onStart}
         type="button"
       >
-        1,000만원으로 차트레이스 시작
+        원금 1,000만 원으로 시작하기
         <ChevronRight size={18} />
       </button>
     </SectionCard>
@@ -1157,21 +1212,21 @@ function EmptyRaceGuide({ onOpenSearch }: { onOpenSearch: () => void }) {
     <SectionCard>
       <div className="flex items-center gap-2 text-sm font-black text-slate-500">
         <LineChart size={17} />
-        아직 결과는 없습니다
+        아직 열리지 않은 미래
       </div>
       <p className="mt-3 text-lg font-black leading-7 tracking-[-0.05em] text-slate-950">
-        먼저 레이스를 돌려야 숫자가 열립니다.
+        시뮬레이션을 끝까지 완료해야 결과가 공개됩니다.
       </p>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        리스트에서 수익률을 미리 보여주지 않습니다. 이 서비스의 핵심은 결과표가 아니라,
-        그 결과가 만들어지는 시간을 직접 보는 것입니다.
+        레그렛제로는 정답을 먼저 보여주지 않습니다. 최종 수익률을 먼저 보면
+        나도 벌었겠다는 착각에 빠지기 때문입니다.
       </p>
       <button
         className="mt-4 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700"
         onClick={onOpenSearch}
         type="button"
       >
-        원하는 종목 먼저 찾기
+        종목 선택하러 가기
       </button>
     </SectionCard>
   );
@@ -1180,25 +1235,21 @@ function EmptyRaceGuide({ onOpenSearch }: { onOpenSearch: () => void }) {
 function RaceStage({
   analysis,
   currentPoint,
-  onAnswer,
   onOpenSearch,
   onRestart,
   raceAssets,
   raceBuild,
   raceStatus,
-  realityAnswer,
   selectedMeta,
   visibleData,
 }: {
   analysis: PainAnalysis | null;
   currentPoint: RacePoint | null;
-  onAnswer: (answer: RealityAnswer) => void;
   onOpenSearch: () => void;
   onRestart: () => void;
   raceAssets: RaceChartAsset[];
   raceBuild: RaceBuildResult | null;
   raceStatus: RaceStatus;
-  realityAnswer: RealityAnswer | null;
   selectedMeta: LabAssetMeta;
   visibleData: RacePoint[];
 }) {
@@ -1210,14 +1261,18 @@ function RaceStage({
         <div className="px-2 pb-3 pt-2">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-blue-500">
             <Clock3 size={15} />
-            {raceStatus === "racing" ? "Racing" : raceStatus === "loading" ? "Loading" : "Complete"}
+            {raceStatus === "racing"
+              ? "자산 시뮬레이션 중"
+              : raceStatus === "loading"
+                ? "10년 전 과거로 이동 중"
+                : "시뮬레이션 완료"}
           </div>
           <h2 className="mt-2 text-2xl font-black tracking-[-0.07em] text-slate-950">
-            {selectedMeta.name} vs 예금 vs 금
+            {selectedMeta.name} vs 은행 예금 vs 금
           </h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-            자산과 금은 실제 과거 데이터, 예금은 고정 복리 기준입니다.
-            {raceBuild ? ` 비교 구간은 ${formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate)}입니다.` : ""}
+            예금은 복리 기준, 자산과 금은 실제 과거 시장 데이터입니다.
+            {raceBuild ? ` 시뮬레이션 구간: ${formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate)}` : ""}
           </p>
         </div>
         <RaceChart
@@ -1226,8 +1281,8 @@ function RaceStage({
           currentPoint={currentPoint}
           data={visibleData}
           fullData={raceBuild?.points ?? []}
-          headerSubtitle="결과 해석은 레이스가 끝난 뒤에만 열립니다."
-          headerTitle="한 달씩 지나가며 계좌가 흔들립니다"
+          headerSubtitle="최종 결과는 레이스가 끝난 뒤에 공개됩니다."
+          headerTitle="한 달 한 달, 내 자산의 실제 흔들림입니다"
           isLoading={raceStatus === "loading" || !raceBuild}
           principalKrw={PRINCIPAL_KRW}
         />
@@ -1241,11 +1296,11 @@ function RaceStage({
             </div>
             <div>
               <h3 className="text-lg font-black tracking-[-0.05em] text-slate-950">
-                아직 결론을 보여주지 않습니다
+                잠시만 결과를 가려둡니다
               </h3>
               <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-                장기투자는 마지막 숫자만 보면 너무 쉬워 보입니다. 지금은 그 숫자가 만들어지는 중간의
-                흔들림을 먼저 봐야 합니다.
+                마지막 숫자만 보면 투자가 너무 쉬워 보입니다. 지금은 내 계좌가 사정없이 흔들리는
+                과정에 집중해 주세요.
               </p>
             </div>
           </div>
@@ -1256,9 +1311,8 @@ function RaceStage({
           <PainDashboard analysis={analysis} />
           <TemptationDashboard analysis={analysis} />
           <EmotionMap analysis={analysis} />
-          <RealityQuestion
-            answer={realityAnswer}
-            onAnswer={onAnswer}
+          <RegretZeroJudgement
+            analysis={analysis}
             onOpenSearch={onOpenSearch}
             onRestart={onRestart}
           />
@@ -1277,20 +1331,21 @@ function ResultSummary({
 }) {
   return (
     <SectionCard>
-      <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-500">Race complete</div>
+      <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-500">타임머신 도착</div>
       <h2 className="mt-3 text-[2rem] font-black leading-[1.08] tracking-[-0.08em] text-slate-950">
-        {selectedMeta.name}에 넣었다면
+        10년 전 {selectedMeta.name}에 넣은
         <br />
-        지금 {formatKrw(analysis.finalValue)}입니다
+        1,000만 원은 {formatKrw(analysis.finalValue)}
       </h2>
       <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-        문제는 이 돈을 벌었느냐가 아닙니다. 당신이 이 흔들림을 보고도 팔지 않을 수 있었느냐입니다.
+        중요한 건 이 화려한 숫자가 아닙니다. 사정없이 흔들리는 화면을 보면서도,
+        당신은 매도 버튼을 참아낼 수 있었을까요?
       </p>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <MetricCard label="예금 대비 차이" value={formatKrw(analysis.bankGap)} />
-        <MetricCard label="금 대비 차이" value={formatKrw(analysis.goldGap)} />
-        <MetricCard label="최종 수익률" value={formatPct(analysis.assetReturnPct)} />
-        <MetricCard label="실제 비교 기간" value={formatDateRange(analysis.resolvedStartDate, analysis.resolvedEndDate)} />
+        <MetricCard label="은행 예금 대비" value={formatKrw(analysis.bankGap)} />
+        <MetricCard label="금 대비" value={formatKrw(analysis.goldGap)} />
+        <MetricCard label="누적 수익률" value={formatPct(analysis.assetReturnPct)} />
+        <MetricCard label="실전 데이터 기간" value={formatDateRange(analysis.resolvedStartDate, analysis.resolvedEndDate)} />
       </div>
     </SectionCard>
   );
@@ -1301,33 +1356,33 @@ function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
     <SectionCard>
       <div className="flex items-center gap-2 text-sm font-black text-rose-500">
         <TrendingDown size={18} />
-        이 돈을 벌기까지 견뎠어야 할 고통
+        1. 이 자산이 준 하락의 고통
       </div>
       <div className="mt-4 grid gap-3">
         <MetricCard
-          label="계좌가 가장 처참하게 부서진 순간"
+          label="계좌가 가장 처참하게 녹아내린 순간"
           value={formatPct(analysis.maxDrawdownPct)}
           warning
         />
         <MetricCard
-          label="전고점 아래에서 한숨 쉬며 보낸 시간"
+          label="본전 아래에서 한숨 쉬며 보낸 시간"
           value={`${analysis.underATHMonths}개월`}
           warning
         />
         <MetricCard
-          label="원금마저 깨져 망했다고 느꼈을 기간"
+          label="원금까지 깨져 망했다고 느꼈을 기간"
           value={`${analysis.underPrincipalMonths}개월`}
           warning={analysis.underPrincipalMonths > 0}
         />
         <MetricCard
-          label="전고점 회복까지 가장 긴 기다림"
+          label="물린 뒤 탈출하기까지 가장 긴 기다림"
           value={`${analysis.longestRecoveryMonths}개월`}
           warning
         />
       </div>
       <p className="mt-4 rounded-[22px] bg-slate-950 px-4 py-4 text-sm font-semibold leading-6 text-[#f8fafc]">
-        차트는 지나고 보면 아름답습니다. 하지만 전체 기간의 {analysis.underATHPercent}%는
-        고점보다 낮아진 계좌를 보며 지금이라도 팔아야 하나 고민했을 시간입니다.
+        차트는 지나고 보면 아름다운 우상향입니다. 하지만 당신이 보낸 시간의 {analysis.underATHPercent}%는
+        고점보다 낮아진 계좌를 보며 지금이라도 팔아야 하나 피눈물 나게 고민했을 구간입니다.
       </p>
     </SectionCard>
   );
@@ -1338,9 +1393,10 @@ function TemptationDashboard({ analysis }: { analysis: PainAnalysis }) {
 
   return (
     <SectionCard>
-      <div className="text-sm font-black text-amber-600">이 돈을 놓칠 뻔했던 익절의 유혹</div>
+      <div className="text-sm font-black text-amber-600">2. 수억 원의 미래를 팔아치울 뻔한 익절의 함정</div>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        떨어질 때만 무서운 게 아닙니다. 조금 벌었을 때 이 정도면 됐다며 내리는 순간도 장기투자를 망칩니다.
+        떨어질 때만 무서운 게 아닙니다. 조금 벌었을 때 이 정도면 됐다며 내리고 싶은 본능이
+        장기투자를 가장 확실하게 망칩니다.
       </p>
       {analysis.milestones.length ? (
         <div className="mt-4 space-y-3">
@@ -1350,117 +1406,282 @@ function TemptationDashboard({ analysis }: { analysis: PainAnalysis }) {
               key={`${milestone.multiple}-${milestone.date}`}
             >
               <div className="text-xs font-black text-amber-700">
-                첫 {milestone.multiple}배 달성 · {formatMonth(milestone.date)}
+                첫 {milestone.multiple}배 달성의 덫 · {formatMonth(milestone.date)}
               </div>
               <div className="mt-2 text-lg font-black tracking-[-0.05em] text-slate-950">
-                당시 평가금액 {formatKrw(milestone.value)}
+                당시 자산 가치: {formatKrw(milestone.value)}
               </div>
               <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-                여기서 줄 때 먹자며 내렸다면 최종 금액 중 {formatKrw(milestone.missedAmount)}을
-                눈앞에서 보내야 했습니다.
+                줄 때 먹자며 이때 내렸다면, 최종 자산의{" "}
+                {formatPct((milestone.missedAmount / analysis.finalValue) * 100)}인{" "}
+                {formatKrw(milestone.missedAmount)}을 눈앞에서 놓쳤습니다.
               </p>
             </div>
           ))}
         </div>
       ) : (
         <div className="mt-4 rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm font-semibold leading-6 text-slate-500">
-          이 구간에서는 2배 이상의 익절 유혹보다 버티는 고통이 더 컸습니다. 수익이 크지 않았어도
-          긴 시간 마음이 편했다는 뜻은 아닙니다.
+          이 자산은 하락의 고통보다 푼돈만 쥐고 탈출하고 싶은 유혹이 더 강한 종목이었습니다.
+          마음이 편했던 구간은 단 한 순간도 없습니다.
         </div>
       )}
       {firstMilestone ? (
         <div className="mt-4 rounded-[22px] bg-slate-950 px-4 py-4 text-sm font-semibold leading-6 text-[#f8fafc]">
-          장기투자는 손실을 버티는 일만이 아닙니다. 작은 성공에 조기 만족하지 않는 일이기도 합니다.
+          장기투자는 하락을 견디는 일만이 아닙니다. 내 자산이 불어날 때 작은 성공에 조기 만족하지 않는 인내이기도 합니다.
         </div>
       ) : null}
     </SectionCard>
   );
+}
+
+function getEmotionToneClasses(tone: EmotionTone) {
+  if (tone === "panic") {
+    return "border-rose-300 bg-rose-500 text-white shadow-[0_8px_18px_rgba(244,63,94,0.22)]";
+  }
+
+  if (tone === "underwater") {
+    return "border-slate-900 bg-slate-950 text-white shadow-[0_8px_18px_rgba(15,23,42,0.24)]";
+  }
+
+  if (tone === "temptation") {
+    return "border-amber-300 bg-amber-400 text-slate-950 shadow-[0_8px_18px_rgba(251,191,36,0.2)]";
+  }
+
+  if (tone === "recovery") {
+    return "border-emerald-300 bg-emerald-400 text-slate-950 shadow-[0_8px_18px_rgba(52,211,153,0.18)]";
+  }
+
+  return "border-slate-200 bg-slate-100 text-slate-500";
+}
+
+function getEmotionLegendLabel(tone: EmotionTone) {
+  if (tone === "panic") {
+    return "패닉";
+  }
+
+  if (tone === "underwater") {
+    return "지옥";
+  }
+
+  if (tone === "temptation") {
+    return "유혹";
+  }
+
+  if (tone === "recovery") {
+    return "환호";
+  }
+
+  return "소외감";
+}
+
+function getEmotionLegendDescription(tone: EmotionTone) {
+  if (tone === "panic") {
+    return "갑작스러운 폭락";
+  }
+
+  if (tone === "underwater") {
+    return "원금 훼손 구간";
+  }
+
+  if (tone === "temptation") {
+    return "조기 익절의 덫";
+  }
+
+  if (tone === "recovery") {
+    return "신고가 쟁취";
+  }
+
+  return "지루한 횡보";
 }
 
 function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
+  const defaultMonth =
+    [...analysis.emotionMonths]
+      .filter((month) => month.tone === "panic" || month.tone === "underwater")
+      .sort((left, right) => left.monthlyReturnPct - right.monthlyReturnPct)[0] ??
+    analysis.emotionMonths.find((month) => month.tone === "temptation") ??
+    analysis.emotionMonths[0]!;
+  const [selectedDate, setSelectedDate] = useState(defaultMonth.date);
+
+  const selectedMonth =
+    analysis.emotionMonths.find((month) => month.date === selectedDate) ?? defaultMonth;
+  const years = Array.from(
+    analysis.emotionMonths.reduce((map, month) => {
+      const year = month.date.slice(0, 4);
+      const list = map.get(year) ?? [];
+      list.push(month);
+      map.set(year, list);
+      return map;
+    }, new Map<string, EmotionMonth[]>()),
+  );
+
   return (
     <SectionCard>
-      <div className="text-sm font-black text-slate-950">월별 감정 지도</div>
+      <div className="text-sm font-black text-slate-950">3. 한 달 한 달의 멘탈 지도</div>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        10년은 한 문장이 아니라 수십 번의 흔들림입니다. 아래는 계좌를 열 때마다 마음이 흔들렸을 순간들입니다.
+        10년은 한 줄의 선이 아니라 120번 안팎의 심리전입니다. 색상 타일을 눌러, 그달의 계좌가
+        당신에게 어떤 감정을 강요했을지 확인해 보세요.
       </p>
-      <div className="mt-4 space-y-3">
-        {analysis.emotionMonths.slice(0, 6).map((month) => (
-          <div
-            className="rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-4"
-            key={`${month.date}-${month.label}`}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-black text-slate-950">{month.label}</div>
-              <div className="text-xs font-black text-slate-400">{formatMonth(month.date)}</div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        {(["panic", "underwater", "temptation", "recovery", "sideways"] as EmotionTone[]).map(
+          (tone) => (
+            <div className="flex items-center gap-2 rounded-[18px] bg-slate-50 px-3 py-2" key={tone}>
+              <span className={`h-3 w-3 rounded-full ${getEmotionToneClasses(tone).split(" ").slice(1, 2).join(" ")}`} />
+              <span>
+                <span className="block text-[11px] font-black text-slate-600">
+                  {getEmotionLegendLabel(tone)}
+                </span>
+                <span className="block text-[9px] font-bold text-slate-400">
+                  {getEmotionLegendDescription(tone)}
+                </span>
+              </span>
             </div>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{month.note}</p>
+          ),
+        )}
+      </div>
+
+      <div className="mt-5 space-y-4">
+        {years.map(([year, months]) => (
+          <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-3 py-3" key={year}>
+            <div className="mb-2 text-xs font-black text-slate-400">{year}</div>
+            <div className="grid grid-cols-12 gap-1.5">
+              {months.map((month) => (
+                <button
+                  aria-label={`${formatMonth(month.date)} ${month.label}`}
+                  className={`h-7 rounded-[9px] border text-[9px] font-black transition ${
+                    selectedMonth.date === month.date
+                      ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/20`
+                      : getEmotionToneClasses(month.tone)
+                  }`}
+                  key={month.date}
+                  onClick={() => setSelectedDate(month.date)}
+                  type="button"
+                >
+                  {month.date.slice(5, 7)}
+                </button>
+              ))}
+            </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-5 rounded-[26px] border border-slate-200 bg-white px-4 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+              선택한 달
+            </div>
+            <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
+              {formatMonth(selectedMonth.date)} · {selectedMonth.label}
+            </div>
+          </div>
+          <div className={`rounded-full px-3 py-1 text-xs font-black ${getEmotionToneClasses(selectedMonth.tone)}`}>
+            {getEmotionLegendLabel(selectedMonth.tone)}
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
+            <div className="text-[10px] font-black text-slate-400">한 달</div>
+            <div className="mt-1 text-sm font-black text-slate-950">
+              {formatPct(selectedMonth.monthlyReturnPct)}
+            </div>
+          </div>
+          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
+            <div className="text-[10px] font-black text-slate-400">고점 대비</div>
+            <div className="mt-1 text-sm font-black text-slate-950">
+              {formatPct(selectedMonth.drawdownPct)}
+            </div>
+          </div>
+          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
+            <div className="text-[10px] font-black text-slate-400">평가액</div>
+            <div className="mt-1 text-sm font-black text-slate-950">
+              {formatKrw(selectedMonth.value)}
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{selectedMonth.note}</p>
       </div>
     </SectionCard>
   );
 }
 
-function RealityQuestion({
-  answer,
-  onAnswer,
+function RegretZeroJudgement({
+  analysis,
   onOpenSearch,
   onRestart,
 }: {
-  answer: RealityAnswer | null;
-  onAnswer: (answer: RealityAnswer) => void;
+  analysis: PainAnalysis;
   onOpenSearch: () => void;
   onRestart: () => void;
 }) {
-  const options: Array<{ id: RealityAnswer; label: string }> = [
-    { id: "sellFear", label: "하락할 때 무서워서 중간에 던졌을 것 같다" },
-    { id: "sellEarly", label: "오를 때 아까워서 적당히 먹고 팔았을 것 같다" },
-    { id: "hold", label: "흔들렸겠지만 끝까지 들고 갔을 것 같다" },
-    { id: "buyMore", label: "기회라 생각하고 오히려 더 샀을 것 같다" },
-  ];
+  const fearMonth =
+    [...analysis.emotionMonths]
+      .filter((month) => month.tone === "panic" || month.tone === "underwater")
+      .sort((left, right) => left.monthlyReturnPct - right.monthlyReturnPct)[0] ??
+    analysis.emotionMonths[0]!;
+  const temptation = analysis.milestones[0] ?? null;
 
   return (
     <SectionCard>
-      <div className="text-sm font-black text-slate-950">솔직히 고백해 봅시다</div>
+      <div className="text-sm font-black text-slate-950">4. 레그렛제로 생존 진단</div>
       <h3 className="mt-2 text-2xl font-black leading-tight tracking-[-0.06em] text-slate-950">
-        당신이라면 폭락의 공포와 익절의 유혹을 모두 이겨내고 이 계좌를 지켜낼 수 있었을까요?
+        당신이 가장 흔들렸을 가능성이 높은 순간
       </h3>
-      <div className="mt-5 space-y-2">
-        {options.map((option) => (
-          <button
-            className={`w-full rounded-[20px] border px-4 py-4 text-left text-sm font-black leading-6 transition ${
-              answer === option.id
-                ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
-                : "border-slate-200 bg-white text-slate-700"
-            }`}
-            key={option.id}
-            onClick={() => onAnswer(option.id)}
-            type="button"
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-      {answer ? (
-        <div className="mt-4 rounded-[22px] border border-blue-100 bg-blue-50 px-4 py-4 text-sm font-semibold leading-6 text-slate-700">
-          {REALITY_FEEDBACK[answer]}
+      <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+        이제 질문하지 않겠습니다. 데이터가 이미 말해줍니다. 장기투자는 의지 문제가 아니라, 내가
+        무너질 구간을 미리 알고 구조를 만드는 문제입니다.
+      </p>
+
+      <div className="mt-5 space-y-3">
+        <div className="rounded-[24px] border border-rose-100 bg-rose-50 px-4 py-4">
+          <div className="text-xs font-black text-rose-500">공포 매도 위험</div>
+          <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
+            {formatMonth(fearMonth.date)} · {formatPct(fearMonth.monthlyReturnPct)}
+          </div>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+            이 달에는 계좌를 열 때마다 팔아야 할 이유가 먼저 보였을 가능성이 큽니다.
+          </p>
         </div>
-      ) : null}
+
+        {temptation ? (
+          <div className="rounded-[24px] border border-amber-100 bg-amber-50 px-4 py-4">
+            <div className="text-xs font-black text-amber-600">익절 도망 위험</div>
+            <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
+              {formatMonth(temptation.date)} · 첫 {temptation.multiple}배
+            </div>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+              이때 내렸다면 최종 자산 중 {formatKrw(temptation.missedAmount)}을 눈앞에서 놓쳤습니다.
+            </p>
+          </div>
+        ) : null}
+
+        <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+          <div className="text-xs font-black text-slate-500">지루함 이탈 위험</div>
+          <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
+            전고점 아래 {analysis.underATHMonths}개월
+          </div>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+            장기투자를 망치는 건 폭락만이 아닙니다. 아무 일도 안 일어나는 것 같은 시간이 더 오래
+            사람을 지치게 만듭니다.
+          </p>
+        </div>
+      </div>
+
       <div className="mt-5 grid grid-cols-2 gap-3">
         <button
           className="rounded-[20px] border border-slate-200 bg-white px-4 py-4 text-sm font-black text-slate-700"
           onClick={onRestart}
           type="button"
         >
-          다시 보기
+          레이스 다시 보기
         </button>
         <button
           className="rounded-[20px] bg-slate-950 px-4 py-4 text-sm font-black text-[#f8fafc]"
           onClick={onOpenSearch}
           type="button"
         >
-          다른 종목 찾기
+          다른 자산 도전하기
         </button>
       </div>
     </SectionCard>
@@ -1492,14 +1713,15 @@ function AssetSearch({
     <div className="space-y-4">
       <Header />
       <SectionCard>
-        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">Search</div>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">자산 탐색</div>
         <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
-          원하는 종목을 고르고,
+          실험할 종목을 고르고,
           <br />
-          직접 레이스를 돌려보세요
+          10년의 시간 속으로 들어가 보세요
         </h1>
         <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-          목록에서는 결과를 숨깁니다. 종목을 고른 뒤 레이스를 봐야 10년의 흔들림이 열립니다.
+          자산 목록에서는 최종 수익률을 보여주지 않습니다. 직접 10년의 흔들림을 목격해야
+          투자라는 감각이 열리기 때문입니다.
         </p>
         <label className="mt-5 flex items-center gap-3 rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-3">
           <Search className="text-slate-400" size={18} />
@@ -1566,7 +1788,7 @@ function AssetSearch({
 
       <div className="fixed bottom-20 left-1/2 z-30 w-full max-w-[520px] -translate-x-1/2 px-4">
         <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_18px_60px_rgba(15,23,42,0.2)]">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">선택한 종목</div>
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">내가 고른 자산</div>
           <div className="mt-2 flex items-start justify-between gap-3">
             <div>
               <div className="text-xl font-black tracking-[-0.05em] text-slate-950">
@@ -1581,7 +1803,7 @@ function AssetSearch({
               onClick={() => onStartRace(selectedAssetId)}
               type="button"
             >
-              레이스
+              시뮬레이션
             </button>
           </div>
           <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
@@ -1595,18 +1817,18 @@ function LiveIdeas({ onStartRace }: { onStartRace: (assetId: ComparisonAssetId) 
   const ideas: Array<{ assetId: ComparisonAssetId; line: string; title: string }> = [
     {
       assetId: "nvda",
-      line: "모두가 AI를 말하지만, 실제로 10년을 들고 가는 일은 전혀 다른 문제입니다.",
-      title: "AI 반도체의 환호와 공포",
+      line: "모두가 AI를 찬양하지만, 이 주식도 본전을 못 찾던 시간이 있었습니다.",
+      title: "엔비디아: 환호 뒤에 숨은 공포",
     },
     {
       assetId: "005930",
-      line: "가장 익숙한 국민주도 긴 시간은 생각보다 편안하지 않았습니다.",
-      title: "삼성전자를 오래 들고 있었다면",
+      line: "가장 익숙한 국민주도 10년 내내 마음 편했던 것은 아닙니다.",
+      title: "국민주 삼성전자의 진짜 민낯",
     },
     {
       assetId: "spy",
-      line: "분산투자도 하락장을 없애주지는 않습니다. 다만 살아남는 방식을 바꿉니다.",
-      title: "시장 전체를 샀을 때의 시간",
+      line: "분산투자는 하락장을 없애주지 않습니다. 다만 살아남는 방식을 바꿉니다.",
+      title: "미국 시장 전체에 묻어두었다면",
     },
   ];
 
@@ -1614,14 +1836,14 @@ function LiveIdeas({ onStartRace }: { onStartRace: (assetId: ComparisonAssetId) 
     <div className="space-y-4">
       <Header />
       <SectionCard>
-        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-emerald-500">Live</div>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-emerald-500">라이브 실험</div>
         <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
-          오늘 다시 볼 만한
+          오늘의 실전 멘탈
           <br />
-          장기투자 실험
+          시뮬레이션 추천
         </h1>
         <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-          매일 바뀌는 추천처럼 보이되, 핵심은 같습니다. 숫자보다 시간을 보게 만드는 레이스입니다.
+          매일 새로운 자산으로 멘탈을 점검합니다. 숫자가 아니라 시간의 무게를 견뎌보세요.
         </p>
       </SectionCard>
       <div className="space-y-3">
@@ -1664,41 +1886,41 @@ function SavedView({
     <div className="space-y-4">
       <Header />
       <SectionCard>
-        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">Saved</div>
+        <div className="text-[12px] font-black uppercase tracking-[0.22em] text-blue-500">나의 기록</div>
         <h1 className="mt-2 text-3xl font-black tracking-[-0.08em] text-slate-950">
-          내가 버틸 수 있었는지
+          내가 흔들렸던
           <br />
-          기록으로 남기는 곳
+          멘탈을 기록하는 곳
         </h1>
         <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-          지금은 마지막으로 완료한 레이스만 보여줍니다. 이후에는 종목별 멘탈 기록과 다시 보기 기능으로 확장할 수 있습니다.
+          지금은 직전에 완료한 시뮬레이션만 보관합니다. 이후에는 자산별 멘탈 리포트로 확장할 수 있습니다.
         </p>
       </SectionCard>
       {analysis && meta && lastCompletedAssetId ? (
         <SectionCard>
-          <div className="text-sm font-black text-slate-500">마지막 완료 레이스</div>
+          <div className="text-sm font-black text-slate-500">최근 시뮬레이션 자산</div>
           <div className="mt-2 text-2xl font-black tracking-[-0.06em] text-slate-950">
             {meta.name} · {formatKrw(analysis.finalValue)}
           </div>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
             최대 낙폭 {formatPct(analysis.maxDrawdownPct)}, 전고점 아래 {analysis.underATHMonths}개월.
-            이 숫자는 수익률보다 오래 남는 장기투자의 민낯입니다.
+            이 숫자는 수익률 뒤에 숨은 장기투자의 진짜 민낯입니다.
           </p>
           <button
             className="mt-4 rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-[#f8fafc]"
             onClick={() => onStartRace(lastCompletedAssetId)}
             type="button"
           >
-            다시 레이스 보기
+            기록 다시 보기
           </button>
         </SectionCard>
       ) : (
         <SectionCard>
           <div className="text-lg font-black tracking-[-0.05em] text-slate-950">
-            아직 저장할 레이스가 없습니다
+            아직 보관된 기록이 없습니다
           </div>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-            홈에서 레이스를 끝까지 본 뒤, 이곳에서 내가 어떤 구간에 흔들렸을지 다시 확인할 수 있게 만들 예정입니다.
+            홈에서 시뮬레이션을 끝까지 완료하면, 어떤 공포와 유혹에 취약했는지 이곳에서 다시 확인할 수 있습니다.
           </p>
         </SectionCard>
       )}
