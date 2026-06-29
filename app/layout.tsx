@@ -1,6 +1,5 @@
-﻿import type { Metadata, Viewport } from "next";
+﻿import type { Metadata } from "next";
 import { IBM_Plex_Mono, Noto_Sans_KR } from "next/font/google";
-import { ServiceWorkerRegister } from "@/src/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const notoSansKr = Noto_Sans_KR({
@@ -19,36 +18,16 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.regretzero.kr";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  manifest: "/manifest.webmanifest",
-  title: "RegretZero | 그때 안 산 대가, 금과 붙이면 보입니다",
-  description:
-    "과거에 못 산 종목이 진짜 아쉬운 선택이었는지, 금(GLD)과 같은 돈으로 붙여 바로 보여주는 투자 비교 사이트",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "RegretZero",
-  },
-  icons: {
-    icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/icons/icon-180.png", sizes: "180x180", type: "image/png" }],
-  },
+  title: "RegretZero | 놓친 투자, 숫자로 다시 보기",
+  description: "10년 전 투자 후회와 앞으로 10년의 기회를 함께 보여주는 장기 투자 시뮬레이터",
   openGraph: {
-    title: "RegretZero | 그때 안 산 대가, 금과 붙이면 보입니다",
-    description:
-      "과거에 못 산 종목이 진짜 아쉬운 선택이었는지, 금(GLD)과 같은 돈으로 붙여 바로 보여주는 투자 비교 사이트",
+    title: "RegretZero | 놓친 투자, 숫자로 다시 보기",
+    description: "10년 전 투자 후회와 앞으로 10년의 기회를 함께 보여주는 장기 투자 시뮬레이터",
     url: siteUrl,
     siteName: "RegretZero",
     locale: "ko_KR",
     type: "website",
   },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -59,7 +38,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${ibmPlexMono.variable} antialiased`}>
-        <ServiceWorkerRegister />
         {children}
       </body>
     </html>
