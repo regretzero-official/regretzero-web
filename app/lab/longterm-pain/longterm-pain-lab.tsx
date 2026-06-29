@@ -33,6 +33,18 @@ type AssetTab = "all" | "kospi" | "nasdaq100" | "sp500" | "etf" | "coin";
 type BottomTab = "home" | "search" | "live" | "saved";
 type RaceStatus = "complete" | "idle" | "loading" | "racing";
 type EmotionTone = "panic" | "recovery" | "sideways" | "temptation" | "underwater";
+type EmotionEventType =
+  | "breakout"
+  | "crash"
+  | "deepDrawdown"
+  | "firstProfit"
+  | "milestone"
+  | "pullback"
+  | "quiet"
+  | "recovery"
+  | "sideways"
+  | "surge"
+  | "underPrincipal";
 
 interface LabAssetMeta {
   groups: string[];
@@ -53,12 +65,20 @@ interface PainMilestone {
 interface EmotionMonth {
   date: string;
   drawdownPct: number;
+  eventType: EmotionEventType;
+  impulseLabel: string;
   label: string;
+  marker: string;
+  missedAmount: number;
+  mindLine: string;
   monthlyReturnPct: number;
   note: string;
+  peakBreakout: boolean;
+  peakWaitMonths: number;
   tone: EmotionTone;
   totalReturnPct: number;
   value: number;
+  verdict: string;
 }
 
 interface PainAnalysis {
@@ -690,74 +710,258 @@ function getValue(point: RacePoint, assetId: ComparisonAssetId) {
   return Number(point[assetId] ?? 0);
 }
 
-function getEmotionTone({
+function getEmotionEvent({
   drawdownPct,
   isAth,
+  isBreakout,
   monthlyReturnPct,
+  peakWaitMonths,
+  previousValue,
   totalReturnPct,
   value,
   startValue,
 }: {
   drawdownPct: number;
   isAth: boolean;
+  isBreakout: boolean;
   monthlyReturnPct: number;
+  peakWaitMonths: number;
+  previousValue: number;
   startValue: number;
   totalReturnPct: number;
   value: number;
-}): { label: string; tone: EmotionTone } {
+}): {
+  eventType: EmotionEventType;
+  impulseLabel: string;
+  label: string;
+  marker: string;
+  tone: EmotionTone;
+} {
   if (monthlyReturnPct <= -15) {
-    return { label: "패닉", tone: "panic" };
+    return {
+      eventType: "crash",
+      impulseLabel: "무서워서 팔고 싶은 달",
+      label: "폭락",
+      marker: "▼",
+      tone: "panic",
+    };
   }
 
   if (value < startValue * 0.98) {
-    return { label: "지옥", tone: "underwater" };
+    return {
+      eventType: "underPrincipal",
+      impulseLabel: "도망치고 싶은 달",
+      label: "원금 붕괴",
+      marker: "●",
+      tone: "underwater",
+    };
   }
 
   if (drawdownPct <= -35) {
-    return { label: "지옥", tone: "underwater" };
+    return {
+      eventType: "deepDrawdown",
+      impulseLabel: "번 돈을 지키고 싶은 달",
+      label: "장기 물림",
+      marker: "●",
+      tone: "underwater",
+    };
   }
 
-  if (totalReturnPct >= 100 && monthlyReturnPct >= 4) {
-    return { label: "유혹", tone: "temptation" };
+  if (isBreakout && peakWaitMonths >= 2) {
+    return {
+      eventType: "breakout",
+      impulseLabel: "탈출하고 싶은 달",
+      label: "전고점 돌파",
+      marker: "↗",
+      tone: "recovery",
+    };
+  }
+
+  if (previousValue < startValue && value >= startValue) {
+    return {
+      eventType: "firstProfit",
+      impulseLabel: "본전 찾고 나가고 싶은 달",
+      label: "첫 수익",
+      marker: "+",
+      tone: "recovery",
+    };
+  }
+
+  if (previousValue < startValue * 10 && value >= startValue * 10) {
+    return {
+      eventType: "milestone",
+      impulseLabel: "인생 수익을 확정하고 싶은 달",
+      label: "10배의 유혹",
+      marker: "★",
+      tone: "temptation",
+    };
+  }
+
+  if (previousValue < startValue * 5 && value >= startValue * 5) {
+    return {
+      eventType: "milestone",
+      impulseLabel: "먹고 튀고 싶은 달",
+      label: "5배의 유혹",
+      marker: "★",
+      tone: "temptation",
+    };
+  }
+
+  if (previousValue < startValue * 2 && value >= startValue * 2) {
+    return {
+      eventType: "milestone",
+      impulseLabel: "수익을 지키고 싶은 달",
+      label: "2배의 유혹",
+      marker: "★",
+      tone: "temptation",
+    };
+  }
+
+  if (monthlyReturnPct >= 25 || (totalReturnPct >= 100 && monthlyReturnPct >= 15)) {
+    return {
+      eventType: "surge",
+      impulseLabel: "오늘 팔면 승자 같아지는 달",
+      label: "폭등",
+      marker: "▲",
+      tone: "temptation",
+    };
+  }
+
+  if (monthlyReturnPct <= -8 && totalReturnPct > 20) {
+    return {
+      eventType: "pullback",
+      impulseLabel: "수익 반납이 아까운 달",
+      label: "수익 반납",
+      marker: "↓",
+      tone: "panic",
+    };
   }
 
   if (isAth && totalReturnPct > 0) {
-    return { label: "환호", tone: "recovery" };
+    return {
+      eventType: "recovery",
+      impulseLabel: "환호하면서도 불안한 달",
+      label: "신고가",
+      marker: "●",
+      tone: "recovery",
+    };
   }
 
   if (Math.abs(monthlyReturnPct) <= 3 && drawdownPct < -5) {
-    return { label: "소외감", tone: "sideways" };
+    return {
+      eventType: "sideways",
+      impulseLabel: "지루해서 갈아타고 싶은 달",
+      label: "횡보",
+      marker: "~",
+      tone: "sideways",
+    };
   }
 
   if (monthlyReturnPct >= 8) {
-    return { label: "회복", tone: "recovery" };
+    return {
+      eventType: "recovery",
+      impulseLabel: "다시 희망이 보이는 달",
+      label: "회복",
+      marker: "↑",
+      tone: "recovery",
+    };
   }
 
-  return { label: "버티는 달", tone: "sideways" };
+  return {
+    eventType: "quiet",
+    impulseLabel: "아무 일도 없어 의심되는 달",
+    label: "버티는 달",
+    marker: "",
+    tone: "sideways",
+  };
 }
 
-function getEmotionNote(month: EmotionMonth) {
-  if (month.tone === "panic") {
+function getEmotionMindLine(month: EmotionMonth) {
+  if (month.eventType === "breakout") {
+    return "드디어 살아났다. 이제 본전 찾았으니 그만할까?";
+  }
+
+  if (month.eventType === "crash") {
+    return "역시 고점에 물렸구나. 더 늦기 전에 손절해야 하나?";
+  }
+
+  if (month.eventType === "underPrincipal") {
+    return "원금까지 깨졌네. 장기투자 같은 말은 다 허상 아닐까?";
+  }
+
+  if (month.eventType === "deepDrawdown") {
+    return "수익은 남아 있는데, 왜 이렇게 진 것 같은 기분이 들지?";
+  }
+
+  if (month.eventType === "firstProfit") {
+    return "겨우 본전 넘었다. 이번엔 욕심내지 말고 빠질까?";
+  }
+
+  if (month.eventType === "milestone") {
+    return "이 정도면 인생 수익 아닌가? 여기서 팔면 최소한 이긴 거잖아.";
+  }
+
+  if (month.eventType === "surge") {
+    return "오늘 팔면 승자 아닐까? 이 상승이 계속될 리 없잖아.";
+  }
+
+  if (month.eventType === "pullback") {
+    return "번 돈이 사라지고 있다. 지금이라도 챙겨야 하나?";
+  }
+
+  if (month.eventType === "recovery") {
+    return "드디어 분위기가 돌아왔다. 그런데 또 꺾이면 어떡하지?";
+  }
+
+  if (month.eventType === "sideways") {
+    return "다른 건 다 오르는 것 같은데, 왜 이것만 제자리일까?";
+  }
+
+  return "아무 일도 없네. 이걸 계속 들고 있는 게 맞나?";
+}
+
+function getEmotionVerdict(month: EmotionMonth) {
+  if (month.eventType === "breakout") {
+    return `전고점 회복까지 ${month.peakWaitMonths}개월이 걸렸습니다. 많은 사람은 이 순간을 승리로 착각하고, 진짜 장기 수익이 시작되기 전에 계좌를 닫습니다.`;
+  }
+
+  if (month.eventType === "crash") {
     return `한 달 만에 계좌가 ${formatPct(Math.abs(month.monthlyReturnPct))} 녹아내렸습니다. 지나고 보면 작은 점 하나지만, 당시에는 온 세상 뉴스가 이 자산은 끝났다고 속삭였을 달입니다.`;
   }
 
-  if (month.tone === "underwater") {
-    if (month.value >= PRINCIPAL_KRW) {
-      return `전고점 대비 ${formatPct(month.drawdownPct)}까지 밀린 달입니다. 수익은 남아 있어도, 이미 번 돈이 증발하는 장면은 원금 손실만큼 사람을 흔듭니다.`;
-    }
-
-    return `처음 넣은 원금마저 깨진 달입니다. 이때 장기투자는 멋진 철학이 아니라 당장 집어던지고 싶은 지독한 숙제로 바뀝니다.`;
+  if (month.eventType === "underPrincipal") {
+    return "이 달을 버티는 건 의지보다 구조의 문제입니다. 계좌 앱을 지우고 자동이체만 남기는 사람이 오히려 더 오래 살아남습니다.";
   }
 
-  if (month.tone === "temptation") {
-    return `누적 수익률이 ${formatPct(month.totalReturnPct)}까지 올라왔습니다. 다시 떨어지기 전에 팔고 나중에 싸게 살까 하는 오만이 가장 그럴듯하게 들리는 달입니다.`;
+  if (month.eventType === "deepDrawdown") {
+    return `전고점 대비 ${formatPct(month.drawdownPct)}까지 밀렸습니다. 수익은 남아 있어도, 이미 번 돈이 사라지는 장면은 원금 손실만큼 사람을 흔듭니다.`;
   }
 
-  if (month.tone === "recovery") {
+  if (month.eventType === "firstProfit") {
+    return "본전 회복은 축하할 일이지만 동시에 가장 위험한 탈출 신호입니다. 여기서 나가면 고통은 끝나지만 복리도 함께 끝납니다.";
+  }
+
+  if (month.eventType === "milestone") {
+    return `여기서 팔았다면 마음은 편했겠지만, 최종 금액 중 ${formatKrw(month.missedAmount)}은 내 계좌에 도착하지 못했습니다.`;
+  }
+
+  if (month.eventType === "surge") {
+    return `한 달 수익률만 ${formatPct(month.monthlyReturnPct)}입니다. 이런 달일수록 내가 천재가 된 것 같지만, 대부분의 조기 매도는 바로 이 착각에서 시작됩니다.`;
+  }
+
+  if (month.eventType === "pullback") {
+    return "수익을 잃는 고통은 손실만큼 날카롭습니다. 장기투자는 돈을 버는 순간에도 계속 흔들립니다.";
+  }
+
+  if (month.eventType === "recovery") {
     return `긴 터널을 지나 다시 위로 올라선 달입니다. 이 순간은 예측을 잘한 사람이 아니라, 소음과 유혹을 견디고 시장에 남아 있던 사람에게만 열립니다.`;
   }
 
-  return `기가 막히게 제자리걸음만 반복하는 달입니다. 주변에서 다른 자산으로 돈 벌었다는 소리가 들릴수록 소외감과 지루함이 커집니다.`;
+  if (month.eventType === "sideways") {
+    return "사람을 가장 오래 지치게 만드는 건 폭락보다 무반응의 시간입니다. 이 구간에서 많은 투자자는 더 자극적인 종목으로 갈아탑니다.";
+  }
+
+  return "조용한 달도 장기투자의 일부입니다. 아무 일도 없어 보이는 시간이 쌓여야, 나중에 한 번의 큰 움직임을 온전히 가져갈 수 있습니다.";
 }
 
 function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): PainAnalysis | null {
@@ -830,19 +1034,32 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
   const worstDrops = [...monthlyDrops].sort((left, right) => left.dropPct - right.dropPct).slice(0, 3);
   const finalReturnPct = startValue > 0 ? (finalValue / startValue - 1) * 100 : 0;
   let emotionPeak = startValue;
+  let monthsSinceEmotionPeak = 0;
   const rawEmotionMonths = points.map((point, index) => {
     const value = getValue(point, assetId);
     const previousValue = index > 0 ? getValue(points[index - 1]!, assetId) : startValue;
     const monthlyReturnPct = previousValue > 0 ? (value / previousValue - 1) * 100 : 0;
-    const nextPeak = Math.max(emotionPeak, value);
-    const isAth = value >= nextPeak;
-    emotionPeak = nextPeak;
+    const previousPeak = emotionPeak;
+    const previousPeakWaitMonths = monthsSinceEmotionPeak;
+    const isBreakout = index > 0 && previousPeakWaitMonths > 0 && value > previousPeak * 1.005;
+    const isAth = value >= previousPeak;
+
+    if (isAth) {
+      emotionPeak = value;
+      monthsSinceEmotionPeak = 0;
+    } else {
+      monthsSinceEmotionPeak += 1;
+    }
+
     const drawdownPct = emotionPeak > 0 ? (value / emotionPeak - 1) * 100 : 0;
     const totalReturnPct = startValue > 0 ? (value / startValue - 1) * 100 : 0;
-    const emotion = getEmotionTone({
+    const emotion = getEmotionEvent({
       drawdownPct,
       isAth,
+      isBreakout,
       monthlyReturnPct,
+      peakWaitMonths: previousPeakWaitMonths,
+      previousValue,
       startValue,
       totalReturnPct,
       value,
@@ -851,17 +1068,28 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     const month: EmotionMonth = {
       date: point.date,
       drawdownPct,
+      eventType: emotion.eventType,
+      impulseLabel: emotion.impulseLabel,
       label: emotion.label,
+      marker: emotion.marker,
+      missedAmount: Math.max(0, finalValue - value),
+      mindLine: "",
       monthlyReturnPct,
       note: "",
+      peakBreakout: isBreakout,
+      peakWaitMonths: previousPeakWaitMonths,
       tone: emotion.tone,
       totalReturnPct,
       value,
+      verdict: "",
     };
+    const verdict = getEmotionVerdict(month);
 
     return {
       ...month,
-      note: getEmotionNote(month),
+      mindLine: getEmotionMindLine(month),
+      note: verdict,
+      verdict,
     };
   });
   const emotionMonths = Array.from(
@@ -1505,6 +1733,14 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
 
   const selectedMonth =
     analysis.emotionMonths.find((month) => month.date === selectedDate) ?? defaultMonth;
+  const worstMonth = [...analysis.emotionMonths].sort(
+    (left, right) => left.monthlyReturnPct - right.monthlyReturnPct,
+  )[0]!;
+  const bestMonth = [...analysis.emotionMonths].sort(
+    (left, right) => right.monthlyReturnPct - left.monthlyReturnPct,
+  )[0]!;
+  const motionScore = Math.max(Math.abs(worstMonth.monthlyReturnPct), Math.abs(bestMonth.monthlyReturnPct));
+  const motionLabel = motionScore >= 35 ? "극심" : motionScore >= 20 ? "매우 높음" : "높음";
   const years = Array.from(
     analysis.emotionMonths.reduce((map, month) => {
       const year = month.date.slice(0, 4);
@@ -1516,12 +1752,40 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
   );
 
   return (
-    <SectionCard>
-      <div className="text-sm font-black text-slate-950">3. 한 달 한 달의 멘탈 지도</div>
+    <SectionCard className="pb-7">
+      <div className="text-sm font-black text-slate-950">3. 월별 멘탈 리플레이</div>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        10년은 한 줄의 선이 아니라 120번 안팎의 심리전입니다. 색상 타일을 눌러, 그달의 계좌가
-        당신에게 어떤 감정을 강요했을지 확인해 보세요.
+        차트는 결과를 보여줍니다. 멘탈 리플레이는 당신이 중간에 왜 팔고 싶어졌을지를
+        한 달씩 보여줍니다.
       </p>
+
+      <div className="mt-4 rounded-[24px] bg-slate-950 px-4 py-4 text-[#f8fafc]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
+              계좌 멀미 지수
+            </div>
+            <div className="mt-1 text-2xl font-black tracking-[-0.06em]">{motionLabel}</div>
+          </div>
+          <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-black text-cyan-100">
+            {formatMonth(worstMonth.date)} - {formatPct(Math.abs(worstMonth.monthlyReturnPct))}
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-bold text-slate-300">
+          <div className="rounded-[16px] bg-white/[0.08] px-3 py-3">
+            <div className="text-slate-400">최악의 한 달</div>
+            <div className="mt-1 text-base font-black text-white">
+              {formatPct(worstMonth.monthlyReturnPct)}
+            </div>
+          </div>
+          <div className="rounded-[16px] bg-white/[0.08] px-3 py-3">
+            <div className="text-slate-400">최고의 한 달</div>
+            <div className="mt-1 text-base font-black text-white">
+              {formatPct(bestMonth.monthlyReturnPct)}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         {(["panic", "underwater", "temptation", "recovery", "sideways"] as EmotionTone[]).map(
@@ -1541,6 +1805,8 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         )}
       </div>
 
+      <SelectedEmotionMonthCard selectedMonth={selectedMonth} />
+
       <div className="mt-5 space-y-4">
         {years.map(([year, months]) => (
           <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-3 py-3" key={year}>
@@ -1548,8 +1814,8 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
             <div className="grid grid-cols-12 gap-1.5">
               {months.map((month) => (
                 <button
-                  aria-label={`${formatMonth(month.date)} ${month.label}`}
-                  className={`h-7 rounded-[9px] border text-[9px] font-black transition ${
+                  aria-label={`${formatMonth(month.date)} ${month.label} ${month.impulseLabel}`}
+                  className={`relative flex h-8 items-center justify-center rounded-[10px] border text-[9px] font-black transition active:scale-95 ${
                     selectedMonth.date === month.date
                       ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/20`
                       : getEmotionToneClasses(month.tone)
@@ -1558,51 +1824,80 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
                   onClick={() => setSelectedDate(month.date)}
                   type="button"
                 >
-                  {month.date.slice(5, 7)}
+                  <span>{month.date.slice(5, 7)}</span>
+                  {month.marker ? (
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-black text-slate-950 shadow-sm">
+                      {month.marker}
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </div>
           </div>
         ))}
       </div>
-
-      <div className="mt-5 rounded-[26px] border border-slate-200 bg-white px-4 py-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
-              선택한 달
-            </div>
-            <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
-              {formatMonth(selectedMonth.date)} · {selectedMonth.label}
-            </div>
-          </div>
-          <div className={`rounded-full px-3 py-1 text-xs font-black ${getEmotionToneClasses(selectedMonth.tone)}`}>
-            {getEmotionLegendLabel(selectedMonth.tone)}
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
-            <div className="text-[10px] font-black text-slate-400">한 달</div>
-            <div className="mt-1 text-sm font-black text-slate-950">
-              {formatPct(selectedMonth.monthlyReturnPct)}
-            </div>
-          </div>
-          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
-            <div className="text-[10px] font-black text-slate-400">고점 대비</div>
-            <div className="mt-1 text-sm font-black text-slate-950">
-              {formatPct(selectedMonth.drawdownPct)}
-            </div>
-          </div>
-          <div className="rounded-[18px] bg-slate-50 px-3 py-3">
-            <div className="text-[10px] font-black text-slate-400">평가액</div>
-            <div className="mt-1 text-sm font-black text-slate-950">
-              {formatKrw(selectedMonth.value)}
-            </div>
-          </div>
-        </div>
-        <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{selectedMonth.note}</p>
-      </div>
     </SectionCard>
+  );
+}
+
+function SelectedEmotionMonthCard({ selectedMonth }: { selectedMonth: EmotionMonth }) {
+  return (
+    <div className="sticky top-3 z-20 mt-5 rounded-[28px] border border-slate-200 bg-white/95 px-4 py-3 shadow-[0_18px_60px_rgba(15,23,42,0.18)] backdrop-blur">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+            선택한 달의 매도 충동
+          </div>
+          <div className="mt-1 text-xl font-black tracking-[-0.05em] text-slate-950">
+            {formatMonth(selectedMonth.date)} · {selectedMonth.label}
+          </div>
+        </div>
+        <div className={`shrink-0 rounded-full px-3 py-1 text-xs font-black ${getEmotionToneClasses(selectedMonth.tone)}`}>
+          {selectedMonth.marker || getEmotionLegendLabel(selectedMonth.tone)}
+        </div>
+      </div>
+      <div className="mt-2 inline-flex rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white">
+        {selectedMonth.impulseLabel}
+      </div>
+      {selectedMonth.peakBreakout ? (
+        <div className="ml-2 mt-2 inline-flex rounded-full border border-cyan-100 bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-700">
+          ↗ 전고점 돌파까지 {selectedMonth.peakWaitMonths}개월
+        </div>
+      ) : null}
+      <div className="mt-3 grid grid-cols-4 gap-1.5">
+        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+          <div className="text-[9px] font-black text-slate-400">평가액</div>
+          <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
+            {formatKrw(selectedMonth.value)}
+          </div>
+        </div>
+        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+          <div className="text-[9px] font-black text-slate-400">한 달</div>
+          <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
+            {formatPct(selectedMonth.monthlyReturnPct)}
+          </div>
+        </div>
+        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+          <div className="text-[9px] font-black text-slate-400">원금</div>
+          <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
+            {formatPct(selectedMonth.totalReturnPct)}
+          </div>
+        </div>
+        <div className="rounded-[16px] bg-slate-50 px-1.5 py-2">
+          <div className="text-[9px] font-black text-slate-400">고점</div>
+          <div className="mt-1 text-[10px] font-black leading-4 text-slate-950">
+            {formatPct(selectedMonth.drawdownPct)}
+          </div>
+        </div>
+      </div>
+      <p className="mt-2 rounded-[18px] bg-amber-50 px-3 py-2.5 text-sm font-black leading-5 text-slate-900">
+        “{selectedMonth.mindLine}”
+      </p>
+      <p className="mt-2 max-h-10 overflow-hidden text-xs font-semibold leading-5 text-slate-600">
+        <span className="font-black text-slate-900">판정 </span>
+        {selectedMonth.verdict}
+      </p>
+    </div>
   );
 }
 
