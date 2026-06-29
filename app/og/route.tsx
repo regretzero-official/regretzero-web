@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "RegretZero 10년 결과 요약 카드";
+export const alt = "Regretzero 후회 영수증 팩트 카드";
 export const size = {
   width: 1200,
   height: 630,
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
           }}
         >
           <div style={{ color: "#2563eb", fontSize: 24, fontWeight: 800, letterSpacing: 8 }}>
-            REGRETZERO SUMMARY
+            REGRETZERO RECEIPT
           </div>
           <div
             style={{
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
             {asset}의 10년을 다시 계산했습니다
           </div>
           <div style={{ color: "#475569", fontSize: 28, lineHeight: 1.45, marginTop: 22 }}>
-            투자 권유가 아닌 과거 시뮬레이션입니다. 최종 금액과 그 사이의 하락 구간을 함께 봅니다.
+            투자 권유가 아닌 과거 시뮬레이션입니다. 최종 금액과 함께 버텨야 했던 시간을 봅니다.
           </div>
 
           <div style={{ display: "flex", gap: 22, marginTop: 44 }}>

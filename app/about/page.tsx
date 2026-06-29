@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { InfoPage } from "@/components/info-page";
 
 export const metadata: Metadata = {
-  title: "RegretZero 소개 | 10년 전 투자 시뮬레이터",
+  title: "Regretzero 소개 | 10년 전 투자 시뮬레이터",
   description:
-    "RegretZero는 화려한 최종 수익률만 뽐내는 계산기가 아닙니다. 동일한 자금이 겪어낸 세월의 흔적을 복기하며, 다음 10년을 준비하도록 돕습니다.",
+    "Regretzero는 화려한 최종 수익률만 뽐내는 계산기가 아닙니다. 동일한 자금이 겪어낸 세월의 흔적을 복기하며, 다음 10년을 준비하도록 돕습니다.",
 };
 
 export default function AboutPage() {
@@ -21,9 +21,9 @@ export default function AboutPage() {
         title: "이제 직접\n10년을 확인해보세요",
       }}
       description={
-        "RegretZero는 화려한 최종 수익률만 뽐내는 계산기가 아닙니다.\n동일한 자금이 겪어낸 세월의 흔적을 복기하며, 당신이 다가올 미래의 10년을 흔들림 없이 준비하도록 돕습니다."
+        "Regretzero는 화려한 최종 수익률만 뽐내는 계산기가 아닙니다.\n동일한 자금이 겪어낸 세월의 흔적을 복기하며, 당신이 다가올 미래의 10년을 흔들림 없이 준비하도록 돕습니다."
       }
-      eyebrow="RegretZero가 보는 것"
+      eyebrow="Regretzero가 보는 것"
       footerExtra={
         <div className="space-y-1">
           <p>
@@ -47,7 +47,7 @@ export default function AboutPage() {
       }}
       sectionEyebrow="PRINCIPLES"
       sectionSubtitle="후회를 자극하기보다, 오래 버틸 기준을 남기는 것이 목표입니다."
-      sectionTitle={"RegretZero가\n지키는 원칙"}
+      sectionTitle={"Regretzero가\n지키는 원칙"}
       sections={[
         {
           body: "감정적인 확신이나 막연한 예측 대신, 지나간 역사적 가격 흐름과 정밀한 연산 데이터만 투명하게 보여드립니다.",

@@ -95,7 +95,7 @@ export function InfoPage({
               className="text-base font-semibold tracking-[-0.04em] text-[var(--rz-text-primary)]"
               href="/"
             >
-              RegretZero
+              Regretzero
             </Link>
           </div>
           <Link

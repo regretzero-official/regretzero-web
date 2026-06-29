@@ -29,7 +29,7 @@ export const PRINCIPLE_FOCUS_OPTIONS: Array<{
   label: string;
 }> = [
   {
-    description: "좋은 결과까지 가는 동안 견뎌야 했던 시간을 봅니다.",
+    description: "좋은 결과보다 그 결과까지 버틸 수 있는 시간을 봅니다.",
     id: "endurance",
     label: "오래 버티기",
   },
@@ -99,7 +99,7 @@ function buildHeadline(input: TenYearPrincipleInput) {
   }
 
   if (isSevereDrawdown(input.maxDrawdownPct)) {
-    return "나는 좋은 결과만 보지 않고, 그 결과까지 버틴 시간을 함께 기억합니다.";
+    return "나는 좋은 결과보다, 그 결과까지 버틴 시간을 먼저 기억합니다.";
   }
 
   return "나는 빠른 판단보다 오래 지킬 수 있는 기준을 선택합니다.";
@@ -128,7 +128,7 @@ function buildLessonLine(input: TenYearPrincipleInput) {
 function buildPromiseLines(input: TenYearPrincipleInput) {
   const cycleLine =
     input.reviewCycle === "1년"
-      ? "1년에 한 번만, 내 원칙이 여전히 유효한지 점검합니다."
+      ? "1년에 한 번만, 결과보다 원칙이 여전히 유효한지 점검합니다."
       : `${input.reviewCycle}마다 한 번만, 감정이 아니라 원칙이 유효한지 점검합니다.`;
 
   if (input.focus === "monthly" || input.investmentMode === "monthly") {
@@ -189,7 +189,7 @@ export function buildTenYearPrincipleCard(input: TenYearPrincipleInput): TenYear
       "앞으로 지킬 기준",
       ...promiseLines.map((line) => `- ${line}`),
       "",
-      "RegretZero",
+      "Regretzero",
     ].join("\n"),
     summary,
     title: "나의 10년 원칙",

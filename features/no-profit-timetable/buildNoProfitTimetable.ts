@@ -288,7 +288,7 @@ export function buildNoProfitTimetable({
 
 export function buildNoProfitTimetableShareText(timetable: NoProfitTimetable) {
   return [
-    `RegretZero ${timetable.assetLabel} 인내의 세월 지도`,
+    `Regretzero ${timetable.assetLabel} 인내의 세월 지도`,
     `${timetable.assetLabel}의 최종 숫자만큼 기다림도 길었습니다.`,
     `고점 아래 있었던 시간: ${formatNoProfitDuration(timetable.belowHighMonths)}`,
     `원금 아래 있었던 시간: ${formatNoProfitDuration(timetable.belowPrincipalMonths)}`,

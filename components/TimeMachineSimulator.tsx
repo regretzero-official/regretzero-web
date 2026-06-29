@@ -719,7 +719,7 @@ export default function TimeMachineSimulator() {
       `${selectedSeries.meta.resolvedStartDate}에 ${selectedAsset.displayName}에 ${formatKoreanCurrency(principalValue)}을 넣었다면`,
       `${selectedSeries.meta.resolvedEndDate}에는 ${formatKoreanCurrency(finalPoint.selectedValue)}이 됐어요.`,
       `S&P 500과의 차이는 ${formatKoreanCurrency(spyGap)}예요.`,
-      "아직 남은 10년은 RegretZero에서 먼저 살펴보세요.",
+      "아직 남은 10년은 Regretzero에서 먼저 살펴보세요.",
     ].join(" ");
 
     try {
@@ -729,7 +729,7 @@ export default function TimeMachineSimulator() {
       };
 
       if (typeof shareNavigator.share === "function") {
-        await shareNavigator.share({ text: shareText, title: "RegretZero" });
+        await shareNavigator.share({ text: shareText, title: "Regretzero" });
       } else if (shareNavigator.clipboard) {
         await shareNavigator.clipboard.writeText(shareText);
       } else {
@@ -782,7 +782,7 @@ export default function TimeMachineSimulator() {
             <ChevronLeft className="h-5 w-5" />
           </button>
           <Image
-            alt="RegretZero"
+            alt="Regretzero"
             className="h-8 w-auto object-contain"
             height={32}
             priority

@@ -45,7 +45,7 @@ export const MORE_MENU_SECTIONS: AppMenuSection[] = [
       },
       {
         badge: "ABOUT",
-        description: "RegretZero가 보여주려는 기준과 데이터의 한계를 설명합니다.",
+        description: "Regretzero가 보여주려는 기준과 데이터의 한계를 설명합니다.",
         href: "/about",
         title: "소개",
       },
@@ -254,7 +254,7 @@ export function ControlledAppMenu({
                     후회를 기준으로 바꾸는 공간
                   </h3>
                   <p className="mt-4 text-base leading-7 text-slate-600">
-                    RegretZero는 지나간 선택을 자책하기보다, 가혹한 시장을 버텨낼
+                    Regretzero는 지나간 선택을 자책하기보다, 가혹한 시장을 버텨낼
                     나만의 기준을 확인하는 타임머신입니다.
                   </p>
                   <Link
@@ -262,7 +262,7 @@ export function ControlledAppMenu({
                     href="/about"
                     onClick={() => handleNavigate("/about")}
                   >
-                    RegretZero 이야기 보기
+                    Regretzero 이야기 보기
                   </Link>
                 </div>
 

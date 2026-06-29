@@ -74,7 +74,7 @@ export const FUTURE_SCENARIO_PRESETS: FutureScenarioPreset[] = [
     id: "base",
     label: "기준",
     stressDrawdownPct: -35,
-    tone: "중간에 -35%까지 밀리는 구간을 감당할 수 있는지 보는 가정입니다.",
+    tone: "결과보다 중간에 -35%를 견딜 수 있는지가 핵심입니다.",
   },
   {
     annualReturnPct: 9,
@@ -295,7 +295,7 @@ export function buildFutureScenarioShareText({
   results: FutureScenarioResult[];
 }) {
   return [
-    "RegretZero 다음 10년 시나리오",
+    "Regretzero 다음 10년 시나리오",
     "",
     `지금 ${formatKrw(initialKrw)}, 매달 ${formatKrw(monthlyKrw)}을 10년 동안 넣는다면`,
     "",
@@ -315,7 +315,7 @@ export function buildFutureStressTestShareText({
   result: FutureStressTestResult;
 }) {
   return [
-    "RegretZero 미래 하락장 리허설",
+    "Regretzero 미래 하락장 리허설",
     "",
     `${result.assetLabel}의 과거 속도를 다음 10년에 한 번 더 가정해봤습니다.`,
     `총 투입액: ${formatKrw(result.totalInvestedKrw)}`,

@@ -3,31 +3,31 @@ import type { Metadata } from "next";
 import { InfoPage } from "@/components/info-page";
 
 export const metadata: Metadata = {
-  title: "RegretZero 가이드 | 그때 샀다면 지금 어디쯤일까",
+  title: "Regretzero 가이드 | 10년 전 샀다면 얼마가 되었을까",
   description:
-    "두 자산의 과거 10년을 같은 금액으로 비교해보세요. 최종 금액뿐 아니라 하락, 회복, 버티기까지 함께 봅니다.",
+    "두 자산의 과거 10년 흐름을 같은 금액으로 비교해보세요. 최종 금액뿐 아니라 하락, 회복, 버티기까지 함께 봅니다.",
 };
 
 export default function GuidePage() {
   return (
     <InfoPage
       closingCta={{
-        body: "복잡하게 고르기 어렵다면 대표 예시부터 시작하세요. 마지막 금액과 함께 그 사이의 하락 구간도 같이 볼 수 있습니다.",
+        body: "복잡하게 고르기 어렵다면 대표 예시부터 시작하세요. 결과보다 중요한 건 그 시간을 버틸 수 있었는지입니다.",
         href: "/",
         label: "대표 예시로 시작",
         points: ["자산 선택", "같은 금액", "하락과 회복"],
         secondaryHref: "/about",
-        secondaryLabel: "RegretZero 소개",
+        secondaryLabel: "Regretzero 소개",
         title: "놓친 10년보다\n남은 10년이 중요합니다",
       }}
       description={
-        "RegretZero는 10년 전 같은 돈이 어디에 있었는지 보여주는 시뮬레이터예요.\n마지막 금액만 보지 않고, 그 금액까지 지나온 하락과 회복도 함께 봅니다."
+        "Regretzero는 10년 전 같은 돈이 어디에 있었는지 보여주는 시뮬레이터예요.\n마지막 금액만 보지 않고, 그 금액까지 지나온 하락과 회복도 함께 봅니다."
       }
       eyebrow="처음 오셨나요?"
       faq={[
         {
           answer:
-            "아니요. RegretZero는 특정 자산을 사라고 말하지 않습니다. 이미 지나간 과거의 흐름을 같은 기준으로 보여줍니다.",
+            "아니요. Regretzero는 특정 자산을 사라고 말하지 않습니다. 이미 지나간 과거의 흐름을 같은 기준으로 보여줍니다.",
           question: "앞으로 오를 자산을 알려주나요?",
         },
         {
@@ -62,7 +62,7 @@ export default function GuidePage() {
         {
           description:
             "미국 나스닥100을 따라가는 대표 ETF입니다. 애플, 마이크로소프트, 엔비디아 같은 미국 대형 기술주의 흐름을 볼 때 많이 씁니다.",
-          example: "RegretZero에서는 미국 기술주 ETF로 표시합니다.",
+          example: "Regretzero에서는 미국 기술주 ETF로 표시합니다.",
           id: "qqq",
           term: "QQQ",
         },
@@ -80,7 +80,7 @@ export default function GuidePage() {
         },
         {
           description:
-            "은행에 돈을 맡기고 정해진 이자를 받는 방식입니다. RegretZero에서는 안정적인 비교 기준으로 단순화해 사용합니다.",
+            "은행에 돈을 맡기고 정해진 이자를 받는 방식입니다. Regretzero에서는 안정적인 비교 기준으로 단순화해 사용합니다.",
           example: "현재 기준은 연 2.7% 복리 가정입니다.",
           term: "예금",
         },
@@ -181,7 +181,7 @@ export default function GuidePage() {
           title: "금액과 방식 선택",
         },
         {
-          body: "10년 동안 평가액 격차가 언제 벌어졌는지 레이스 차트로 봅니다.",
+          body: "10년 동안 평가액이 어떻게 갈라졌는지 레이스 차트로 봅니다.",
           title: "흐름 확인",
         },
         {
@@ -200,7 +200,7 @@ export default function GuidePage() {
         },
         {
           body: "마지막 수익률 뒤에 숨어 있는 하락과 회복 시간을 함께 읽습니다.",
-          title: "금액과 과정",
+          title: "결과보다 과정",
         },
         {
           body: "큰 하락을 버틴 일이 실제로 얼마나 어려웠는지 봅니다.",

@@ -18,7 +18,7 @@ const display = Cormorant_Garamond({
 
 const siteUrl = "https://www.regretzero.kr";
 const siteTitle =
-  "RegretZero | 10\uB144 \uC804 \uC0C0\uB2E4\uBA74 \uC9C0\uAE08 \uC5BC\uB9C8\uAC00 \uB418\uC5C8\uC744\uAE4C\uC694?";
+  "Regretzero | 10\uB144 \uC804 \uC0C0\uB2E4\uBA74 \uC9C0\uAE08 \uC5BC\uB9C8\uAC00 \uB418\uC5C8\uC744\uAE4C\uC694?";
 const siteDescription =
   "10\uB144 \uC804 \uC0C0\uB2E4\uBA74 \uC9C0\uAE08 \uC5BC\uB9C8\uAC00 \uB418\uC5C8\uC744\uAE4C\uC694? \uAC19\uC740 \uB3C8\uC774 \uC9C0\uB098\uC628 \uD750\uB984\uACFC \uD558\uB77D, \uD68C\uBCF5\uC758 \uC2DC\uAC04\uC744 \uD568\uAED8 \uBCF4\uB294 \uACFC\uAC70 \uD22C\uC790 \uC2DC\uBBAC\uB808\uC774\uD130\uC785\uB2C8\uB2E4.";
 const openGraphDescription =
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     description: openGraphDescription,
     locale: "ko_KR",
-    siteName: "RegretZero",
+    siteName: "Regretzero",
     title: siteTitle,
     type: "website",
     url: siteUrl,
@@ -43,13 +43,13 @@ export const metadata: Metadata = {
         url: defaultOgImage,
         width: 1200,
         height: 630,
-        alt: "RegretZero",
+        alt: "Regretzero",
       },
     ],
   },
   title: {
     default: siteTitle,
-    template: "%s | RegretZero",
+    template: "%s | Regretzero",
   },
   twitter: {
     card: "summary_large_image",

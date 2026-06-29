@@ -160,7 +160,7 @@ async function shareSummary(summary: string) {
 
   const payload = {
     text: summary,
-    title: "RegretZero",
+    title: "Regretzero",
     url: window.location.origin,
   };
 

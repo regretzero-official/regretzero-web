@@ -422,7 +422,7 @@ async function fetchYahooSeries(
   const response = await fetch(url.toString(), {
     headers: {
       Accept: "application/json",
-      "User-Agent": "RegretZero/1.0",
+      "User-Agent": "Regretzero/1.0",
     },
     next: { revalidate: 60 * 60 * 24 },
   });
