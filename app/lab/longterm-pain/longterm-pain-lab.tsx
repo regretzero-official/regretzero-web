@@ -8,7 +8,6 @@ import {
   LineChart,
   Radio,
   Search,
-  ShieldAlert,
   TrendingDown,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -109,8 +108,21 @@ interface PainAnalysis {
   underPrincipalMonths: number;
 }
 
+type RaceEventTone = "danger" | "neutral" | "recovery" | "temptation";
+
+interface RaceEventStop {
+  date: string;
+  description: string;
+  id: string;
+  index: number;
+  moneyLabel: string;
+  title: string;
+  tone: RaceEventTone;
+}
+
 const PRINCIPAL_KRW = DEFAULT_AMOUNT;
-const RACE_DURATION_MS = 12_000;
+const RACE_ACTIVE_DURATION_MS = 20_000;
+const RACE_EVENT_PAUSE_MS = 1_700;
 
 const RACE_ASSET_IDS: ComparisonAssetId[] = ["deposit", "gold"];
 const CURATED_ASSET_IDS: ComparisonAssetId[] = [
@@ -976,7 +988,7 @@ function getTangibleValueLabel(amount: number) {
 
 function getTangibleLine(month: EmotionMonth) {
   if (month.monthlyChangeKrw < -1_000_000) {
-    return `이번 달에만 ${formatKrw(Math.abs(month.monthlyChangeKrw))}이 사라졌습니다. ${getTangibleValueLabel(month.monthlyChangeKrw)}가 계좌에서 증발한 셈입니다.`;
+    return `이번 달에만 ${formatKrw(Math.abs(month.monthlyChangeKrw))}이 사라졌습니다. 계좌에서 빠져나간 돈은 ${getTangibleValueLabel(month.monthlyChangeKrw)}에 가깝습니다.`;
   }
 
   if (
@@ -987,7 +999,7 @@ function getTangibleLine(month: EmotionMonth) {
   }
 
   if (month.monthlyChangeKrw > 1_000_000) {
-    return `이번 달에만 ${formatKrw(month.monthlyChangeKrw)}이 불어났습니다. ${getTangibleValueLabel(month.monthlyChangeKrw)}가 갑자기 생긴 듯한 착각을 부르는 달입니다.`;
+    return `이번 달에만 ${formatKrw(month.monthlyChangeKrw)}이 불어났습니다. 갑자기 ${getTangibleValueLabel(month.monthlyChangeKrw)}이 생긴 듯한 착각을 부르는 달입니다.`;
   }
 
   return "숫자는 작아 보여도, 이런 달이 반복되면 사람은 결국 더 자극적인 선택을 찾게 됩니다.";
@@ -1301,6 +1313,88 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
   };
 }
 
+function getEventTone(month: EmotionMonth): RaceEventTone {
+  if (month.tone === "panic" || month.tone === "underwater") {
+    return "danger";
+  }
+
+  if (month.tone === "temptation") {
+    return "temptation";
+  }
+
+  if (month.tone === "recovery") {
+    return "recovery";
+  }
+
+  return "neutral";
+}
+
+function buildRaceEventStops(analysis: PainAnalysis | null): RaceEventStop[] {
+  if (!analysis) {
+    return [];
+  }
+
+  const stops = new Map<string, RaceEventStop>();
+  const addStop = (month: EmotionMonth | undefined, fallbackTitle?: string) => {
+    if (!month || stops.has(month.date)) {
+      return;
+    }
+
+    const isDrop = month.monthlyChangeKrw < 0;
+    const absChange = Math.abs(month.monthlyChangeKrw);
+    stops.set(month.date, {
+      date: month.date,
+      description:
+        month.eventType === "milestone"
+          ? "여기서 팔면 이미 이긴 것처럼 보입니다. 하지만 장기투자의 가장 큰 유혹은 바로 작은 성공입니다."
+          : month.eventType === "breakout"
+            ? "드디어 고점을 되찾은 달입니다. 많은 사람은 이 순간 고통이 끝났다며 계좌를 닫습니다."
+            : isDrop
+              ? "벌었다고 믿었던 돈이 계좌에서 빠져나가는 장면입니다. 숫자는 지나가도 감정은 오래 남습니다."
+              : "계좌가 좋아지는 달에도 마음은 편하지 않습니다. 올라갈수록 팔고 싶은 이유도 커집니다.",
+      id: `race-stop-${month.date}`,
+      index: month.monthIndex,
+      moneyLabel: isDrop
+        ? `${formatKrw(absChange)} 사라짐`
+        : month.totalReturnPct >= 100
+          ? `원금 대비 ${formatMultiple(month.value / PRINCIPAL_KRW)}`
+          : `${formatKrw(absChange)} 증가`,
+      title: fallbackTitle ?? month.label,
+      tone: getEventTone(month),
+    });
+  };
+
+  const byDate = new Map(analysis.emotionMonths.map((month) => [month.date, month] as const));
+  const firstTwoX = analysis.milestones.find((milestone) => milestone.multiple === 2);
+  const firstFiveX = analysis.milestones.find((milestone) => milestone.multiple === 5);
+  const worstMonth = [...analysis.emotionMonths].sort(
+    (left, right) => left.monthlyReturnPct - right.monthlyReturnPct,
+  )[0];
+  const biggestDrawdown = [...analysis.emotionMonths].sort(
+    (left, right) => left.drawdownPct - right.drawdownPct,
+  )[0];
+  const bestMonth = [...analysis.emotionMonths].sort(
+    (left, right) => right.monthlyReturnPct - left.monthlyReturnPct,
+  )[0];
+  const breakout = analysis.emotionMonths.find((month) => month.eventType === "breakout");
+  const criticalChain = [...analysis.emotionMonths]
+    .filter((month) => month.criticalZone)
+    .sort((left, right) => right.chainMonths - left.chainMonths)[0];
+
+  addStop(firstTwoX ? byDate.get(firstTwoX.date) : undefined, "첫 2배의 유혹");
+  addStop(firstFiveX ? byDate.get(firstFiveX.date) : undefined, "첫 5배의 유혹");
+  addStop(worstMonth, "최악의 한 달");
+  addStop(biggestDrawdown, "고점 대비 가장 아픈 달");
+  addStop(criticalChain, "연속으로 흔들린 구간");
+  addStop(breakout, "전고점 재돌파");
+  addStop(bestMonth, "가장 크게 오른 달");
+
+  return [...stops.values()]
+    .filter((stop) => stop.index > 0)
+    .sort((left, right) => left.index - right.index)
+    .slice(0, 6);
+}
+
 function filterAssetByTab(meta: LabAssetMeta, activeTab: AssetTab) {
   if (activeTab === "all") {
     return true;
@@ -1382,6 +1476,7 @@ export function LongtermPainLab() {
   const [raceStatus, setRaceStatus] = useState<RaceStatus>("idle");
   const [visibleCount, setVisibleCount] = useState(0);
   const [lastCompletedAssetId, setLastCompletedAssetId] = useState<ComparisonAssetId | null>(null);
+  const [activeRaceEventId, setActiveRaceEventId] = useState<string | null>(null);
 
   const selectedMeta = getMeta(selectedAssetId);
   const currentPoint = raceBuild?.points[Math.max(0, visibleCount - 1)] ?? null;
@@ -1402,6 +1497,11 @@ export function LongtermPainLab() {
     () => (raceBuild ? buildPainAnalysis(raceBuild, selectedAssetId) : null),
     [raceBuild, selectedAssetId],
   );
+  const raceEventStops = useMemo(() => buildRaceEventStops(analysis), [analysis]);
+  const activeRaceEvent = useMemo(
+    () => raceEventStops.find((stop) => stop.id === activeRaceEventId) ?? null,
+    [activeRaceEventId, raceEventStops],
+  );
 
   const startRace = useCallback(
     async (assetId?: ComparisonAssetId) => {
@@ -1413,6 +1513,7 @@ export function LongtermPainLab() {
       setRaceError("");
       setRaceStatus("loading");
       setVisibleCount(0);
+      setActiveRaceEventId(null);
 
       window.requestAnimationFrame(() => {
         raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1438,25 +1539,57 @@ export function LongtermPainLab() {
 
     let frameId = 0;
     const startedAt = performance.now();
+    const eventStops = raceEventStops.filter(
+      (stop) => stop.index > 0 && stop.index < raceBuild.points.length - 1,
+    );
+    const totalPauseMs = eventStops.length * RACE_EVENT_PAUSE_MS;
+    const totalDurationMs = RACE_ACTIVE_DURATION_MS + totalPauseMs;
+    const lastPointIndex = Math.max(1, raceBuild.points.length - 1);
 
     const tick = (timestamp: number) => {
-      const progress = Math.min(1, (timestamp - startedAt) / RACE_DURATION_MS);
-      const nextCount = Math.max(1, Math.ceil(raceBuild.points.length * progress));
-      setVisibleCount(nextCount);
+      const elapsed = Math.max(0, timestamp - startedAt);
+      let consumedPauseMs = 0;
+      let activeElapsedMs = elapsed;
+      let pausedEvent: RaceEventStop | null = null;
 
-      if (progress < 1) {
+      for (const stop of eventStops) {
+        const stopTimeMs = (stop.index / lastPointIndex) * RACE_ACTIVE_DURATION_MS;
+        const pauseStartMs = stopTimeMs + consumedPauseMs;
+        const pauseEndMs = pauseStartMs + RACE_EVENT_PAUSE_MS;
+
+        if (elapsed < pauseStartMs) {
+          break;
+        }
+
+        if (elapsed >= pauseStartMs && elapsed < pauseEndMs) {
+          activeElapsedMs = stopTimeMs;
+          pausedEvent = stop;
+          break;
+        }
+
+        consumedPauseMs += RACE_EVENT_PAUSE_MS;
+        activeElapsedMs = elapsed - consumedPauseMs;
+      }
+
+      const progress = Math.min(1, activeElapsedMs / RACE_ACTIVE_DURATION_MS);
+      const nextIndex = Math.min(lastPointIndex, Math.round(lastPointIndex * progress));
+      setVisibleCount(nextIndex + 1);
+      setActiveRaceEventId(pausedEvent?.id ?? null);
+
+      if (elapsed < totalDurationMs) {
         frameId = requestAnimationFrame(tick);
         return;
       }
 
       setVisibleCount(raceBuild.points.length);
+      setActiveRaceEventId(null);
       setRaceStatus("complete");
       setLastCompletedAssetId(selectedAssetId);
     };
 
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [raceBuild, raceStatus, selectedAssetId]);
+  }, [raceBuild, raceEventStops, raceStatus, selectedAssetId]);
 
   const labAssetIds = useMemo(() => getLabAssetIds(), []);
   const filteredAssets = useMemo(() => {
@@ -1498,13 +1631,16 @@ export function LongtermPainLab() {
                 <EmptyRaceGuide />
               ) : (
                 <RaceStage
+                  activeRaceEvent={activeRaceEvent}
                   analysis={analysis}
                   currentPoint={currentPoint}
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
                   raceAssets={raceAssets}
                   raceBuild={raceBuild}
+                  raceEventStops={raceEventStops}
                   raceStatus={raceStatus}
+                  selectedAssetId={selectedAssetId}
                   selectedMeta={selectedMeta}
                   visibleData={visibleData}
                 />
@@ -1635,93 +1771,319 @@ function EmptyRaceGuide() {
 }
 
 function RaceStage({
+  activeRaceEvent,
   analysis,
   currentPoint,
   onOpenSearch,
   onRestart,
   raceAssets,
   raceBuild,
+  raceEventStops,
   raceStatus,
+  selectedAssetId,
   selectedMeta,
   visibleData,
 }: {
+  activeRaceEvent: RaceEventStop | null;
   analysis: PainAnalysis | null;
   currentPoint: RacePoint | null;
   onOpenSearch: () => void;
   onRestart: () => void;
   raceAssets: RaceChartAsset[];
   raceBuild: RaceBuildResult | null;
+  raceEventStops: RaceEventStop[];
   raceStatus: RaceStatus;
+  selectedAssetId: ComparisonAssetId;
   selectedMeta: LabAssetMeta;
   visibleData: RacePoint[];
 }) {
   const isComplete = raceStatus === "complete" && analysis;
+  const selectedValue = currentPoint ? getValue(currentPoint, selectedAssetId) : PRINCIPAL_KRW;
+  const previousPoint = visibleData.length > 1 ? visibleData[visibleData.length - 2]! : null;
+  const previousValue = previousPoint ? getValue(previousPoint, selectedAssetId) : selectedValue;
+  const monthlyChangeKrw = selectedValue - previousValue;
+  const monthlyReturnPct = previousValue > 0 ? (selectedValue / previousValue - 1) * 100 : 0;
+  const currentIndex = currentPoint?.index ?? 0;
+  const visiblePeak = raceBuild
+    ? raceBuild.points
+        .slice(0, Math.max(1, currentIndex + 1))
+        .reduce((peak, point) => Math.max(peak, getValue(point, selectedAssetId)), PRINCIPAL_KRW)
+    : PRINCIPAL_KRW;
+  const drawdownFromPeak = selectedValue - visiblePeak;
+  const progressPct =
+    raceBuild && raceBuild.points.length > 1
+      ? Math.min(100, Math.max(0, (currentIndex / (raceBuild.points.length - 1)) * 100))
+      : 0;
+  const currentDate = currentPoint?.date ?? raceBuild?.resolvedStartDate ?? "";
 
   return (
     <div className="space-y-5">
       <SectionCard className="p-3">
-        <div className="px-2 pb-3 pt-2">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-blue-500">
-            <Clock3 size={15} />
-            {raceStatus === "racing"
-              ? "자산 시뮬레이션 중"
-              : raceStatus === "loading"
-                ? "10년 전 과거로 이동 중"
-                : "시뮬레이션 완료"}
-          </div>
-          <h2 className="mt-2 text-2xl font-black tracking-[-0.07em] text-slate-950">
-            {selectedMeta.name}의 10년 레이스
-          </h2>
-          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-            자산과 금은 실제 과거 데이터, 예금은 연 3.04% 복리 기준입니다.
-            {raceBuild ? ` 시뮬레이션 구간: ${formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate)}` : ""}
-          </p>
-        </div>
+        <RaceTimeRail
+          currentDate={currentDate}
+          eventCount={raceEventStops.length}
+          isPaused={Boolean(activeRaceEvent)}
+          progressPct={progressPct}
+          raceStatus={raceStatus}
+          rangeLabel={raceBuild ? formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate) : ""}
+          selectedName={selectedMeta.name}
+        />
         <RaceChart
           assets={raceAssets}
           basisLabel="1.0배 = 1,000만원"
+          compact
           currentPoint={currentPoint}
           data={visibleData}
           fullData={raceBuild?.points ?? []}
-          headerSubtitle="최종 금액은 레이스가 끝난 뒤 공개됩니다."
-          headerTitle="10년의 흔들림을 먼저 봅니다"
+          headerSubtitle=""
+          headerTitle=""
           isLoading={raceStatus === "loading" || !raceBuild}
           principalKrw={PRINCIPAL_KRW}
         />
+        <RaceAccountPulseCard
+          activeEvent={activeRaceEvent}
+          currentDate={currentDate}
+          drawdownFromPeak={drawdownFromPeak}
+          monthlyChangeKrw={monthlyChangeKrw}
+          monthlyReturnPct={monthlyReturnPct}
+          raceStatus={raceStatus}
+          selectedMeta={selectedMeta}
+          value={selectedValue}
+          visiblePeak={visiblePeak}
+        />
       </SectionCard>
 
-      {!isComplete ? (
-        <SectionCard>
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-slate-950 p-2 text-[#f8fafc]">
-              <ShieldAlert size={18} />
-            </div>
-            <div>
-              <h3 className="text-lg font-black tracking-[-0.05em] text-slate-950">
-                잠시만 결과를 가려둡니다
-              </h3>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-                마지막 숫자만 보면 투자가 너무 쉬워 보입니다. 지금은 내 계좌가 사정없이 흔들리는
-                과정에 집중해 주세요.
-              </p>
-            </div>
-          </div>
-        </SectionCard>
-      ) : (
+      {isComplete ? (
         <>
           <ResultSummary analysis={analysis} selectedMeta={selectedMeta} />
           <PainDashboard analysis={analysis} />
           <TemptationDashboard analysis={analysis} />
-          <EmotionMap analysis={analysis} />
+          <EmotionMap
+            analysis={analysis}
+            key={`${analysis.resolvedStartDate}-${analysis.resolvedEndDate}-${Math.round(analysis.finalValue)}`}
+          />
           <RegretZeroJudgement
             analysis={analysis}
             onOpenSearch={onOpenSearch}
             onRestart={onRestart}
           />
         </>
-      )}
+      ) : null}
     </div>
   );
+}
+
+function RaceTimeRail({
+  currentDate,
+  eventCount,
+  isPaused,
+  progressPct,
+  raceStatus,
+  rangeLabel,
+  selectedName,
+}: {
+  currentDate: string;
+  eventCount: number;
+  isPaused: boolean;
+  progressPct: number;
+  raceStatus: RaceStatus;
+  rangeLabel: string;
+  selectedName: string;
+}) {
+  const statusLabel =
+    raceStatus === "loading"
+      ? "과거 데이터 불러오는 중"
+      : raceStatus === "complete"
+        ? "레이스 완료"
+        : isPaused
+          ? "중요 장면 정지"
+          : "레이스 진행 중";
+
+  return (
+    <div className="mb-3 rounded-[22px] border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
+            <Clock3 size={14} />
+            {statusLabel}
+          </div>
+          <div className="mt-1 truncate text-lg font-black tracking-[-0.06em] text-slate-950">
+            {selectedName} 10년 레이스
+          </div>
+          <div className="mt-0.5 text-[11px] font-bold text-slate-400">
+            {rangeLabel || "실제 월별 데이터 기준"} · 중요 장면 {eventCount}번 정지
+          </div>
+        </div>
+        <div className="shrink-0 rounded-[18px] bg-slate-950 px-3 py-2 text-right text-[#f8fafc] shadow-sm">
+          <div className="text-[10px] font-black text-white/45">현재 시점</div>
+          <div className="mt-0.5 text-sm font-black tracking-[-0.04em]">
+            {currentDate ? formatMonth(currentDate) : "--"}
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className={`h-full rounded-full transition-all duration-300 ${
+            isPaused ? "bg-amber-400" : "bg-blue-500"
+          }`}
+          style={{ width: `${progressPct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function RaceAccountPulseCard({
+  activeEvent,
+  currentDate,
+  drawdownFromPeak,
+  monthlyChangeKrw,
+  monthlyReturnPct,
+  raceStatus,
+  selectedMeta,
+  value,
+  visiblePeak,
+}: {
+  activeEvent: RaceEventStop | null;
+  currentDate: string;
+  drawdownFromPeak: number;
+  monthlyChangeKrw: number;
+  monthlyReturnPct: number;
+  raceStatus: RaceStatus;
+  selectedMeta: LabAssetMeta;
+  value: number;
+  visiblePeak: number;
+}) {
+  const isLoading = raceStatus === "loading";
+  const isComplete = raceStatus === "complete";
+  const isDrop = monthlyChangeKrw < 0;
+  const isTemptation = value >= PRINCIPAL_KRW * 2 || monthlyReturnPct >= 12;
+  const tone: RaceEventTone = activeEvent?.tone ?? (isComplete ? "recovery" : isDrop ? "danger" : isTemptation ? "temptation" : "neutral");
+  const toneClass = getRacePulseToneClasses(tone);
+  const title = activeEvent
+    ? activeEvent.title
+    : isLoading
+      ? "10년 전 가격을 불러오는 중"
+      : isComplete
+        ? "레이스가 끝났습니다"
+      : isDrop
+        ? "돈이 사라지는 달"
+        : isTemptation
+          ? "팔고 싶은 수익 구간"
+          : "계좌가 흔들리는 중";
+  const moneyLabel = activeEvent
+    ? activeEvent.moneyLabel
+    : isLoading
+      ? "잠시만 기다려 주세요"
+      : isComplete
+        ? formatKrw(value)
+      : isDrop
+        ? `${formatKrw(Math.abs(monthlyChangeKrw))} 사라짐`
+        : isTemptation
+          ? `원금 대비 ${formatMultiple(value / PRINCIPAL_KRW)}`
+          : `${formatKrw(Math.abs(monthlyChangeKrw))} 움직임`;
+  const description = activeEvent
+    ? activeEvent.description
+    : isLoading
+      ? "결과를 먼저 보여주지 않고, 실제 월별 흐름부터 준비합니다."
+      : isComplete
+        ? "최종 금액은 아래 표로 정리했습니다. 이제 중요한 건 이 결과를 얻기까지 버텼어야 할 시간입니다."
+      : isDrop
+        ? "방금 전까지 벌었다고 믿었던 돈이 계좌에서 빠져나가는 중입니다."
+        : isTemptation
+          ? "여기서 팔면 이긴 것처럼 보입니다. 그래서 더 위험합니다."
+          : "최종 결과보다 어려운 건 이 흔들림을 한 달씩 살아내는 일입니다.";
+
+  return (
+    <div className={`mt-3 rounded-[24px] border px-4 py-4 ${toneClass.container}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className={`text-[11px] font-black uppercase tracking-[0.18em] ${toneClass.eyebrow}`}>
+            {currentDate ? formatMonth(currentDate) : "레이스 준비"}
+          </div>
+          <h3 className="mt-1 text-xl font-black leading-tight tracking-[-0.06em] text-slate-950">
+            {title}
+          </h3>
+        </div>
+        <div className={`rounded-full px-3 py-1.5 text-xs font-black ${toneClass.badge}`}>
+          {activeEvent ? "정지" : isComplete ? "완료" : isDrop ? "하락" : isTemptation ? "유혹" : "진행"}
+        </div>
+      </div>
+      <div className={`mt-3 text-[1.75rem] font-black leading-none tracking-[-0.08em] ${toneClass.value}`}>
+        {moneyLabel}
+      </div>
+      <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
+        {description}
+      </p>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <RacePulseMetric label="평가금액" value={formatKrw(value)} />
+        <RacePulseMetric label="이번 달" value={formatPct(monthlyReturnPct)} warning={monthlyChangeKrw < 0} />
+        <RacePulseMetric
+          label="고점 대비"
+          value={drawdownFromPeak < 0 ? `-${formatKrw(Math.abs(drawdownFromPeak))}` : formatKrw(Math.max(visiblePeak - value, 0))}
+          warning={drawdownFromPeak < 0}
+        />
+      </div>
+      <div className="mt-3 rounded-[18px] bg-white/68 px-3 py-2 text-[11px] font-bold leading-5 text-slate-500">
+        {selectedMeta.name}, 금은 실제 과거 데이터 기준입니다. 예금은 연 3.04% 복리 기준으로 비교합니다.
+      </div>
+    </div>
+  );
+}
+
+function RacePulseMetric({
+  label,
+  value,
+  warning = false,
+}: {
+  label: string;
+  value: string;
+  warning?: boolean;
+}) {
+  return (
+    <div className="rounded-[17px] bg-white/78 px-2.5 py-2 shadow-sm">
+      <div className="text-[10px] font-black text-slate-400">{label}</div>
+      <div className={`mt-1 truncate text-xs font-black tracking-[-0.03em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function getRacePulseToneClasses(tone: RaceEventTone) {
+  if (tone === "danger") {
+    return {
+      badge: "bg-rose-100 text-rose-700",
+      container: "border-rose-100 bg-rose-50",
+      eyebrow: "text-rose-500",
+      value: "text-rose-600",
+    };
+  }
+
+  if (tone === "temptation") {
+    return {
+      badge: "bg-amber-100 text-amber-700",
+      container: "border-amber-100 bg-amber-50",
+      eyebrow: "text-amber-600",
+      value: "text-amber-700",
+    };
+  }
+
+  if (tone === "recovery") {
+    return {
+      badge: "bg-emerald-100 text-emerald-700",
+      container: "border-emerald-100 bg-emerald-50",
+      eyebrow: "text-emerald-600",
+      value: "text-emerald-700",
+    };
+  }
+
+  return {
+    badge: "bg-slate-100 text-slate-600",
+    container: "border-slate-200 bg-slate-50",
+    eyebrow: "text-blue-500",
+    value: "text-slate-950",
+  };
 }
 
 function ResultSummary({
@@ -1941,7 +2303,7 @@ function getEmotionToneClasses(tone: EmotionTone) {
   }
 
   if (tone === "underwater") {
-    return "border-slate-900 bg-slate-950 text-white shadow-[0_8px_18px_rgba(15,23,42,0.24)]";
+    return "border-rose-200 bg-rose-100 text-rose-700 shadow-[0_8px_18px_rgba(244,63,94,0.12)]";
   }
 
   if (tone === "temptation") {
@@ -1995,32 +2357,91 @@ function getEmotionLegendDescription(tone: EmotionTone) {
   return "지루한 횡보";
 }
 
+function getEmotionHighlightTitle(month: EmotionMonth) {
+  if (month.criticalZone) {
+    return "연속으로 멘탈이 흔들린 구간";
+  }
+
+  if (month.eventType === "milestone") {
+    return `첫 ${formatMultiple(month.value / PRINCIPAL_KRW)}의 익절 유혹`;
+  }
+
+  if (month.peakBreakout) {
+    return "드디어 전고점을 다시 뚫은 달";
+  }
+
+  if (month.eventType === "crash" || month.eventType === "deepDrawdown") {
+    return "가장 포기하고 싶었을 달";
+  }
+
+  if (month.eventType === "surge") {
+    return "가장 팔고 싶게 오른 달";
+  }
+
+  if (month.eventType === "sideways") {
+    return "지루함이 제일 위험했던 달";
+  }
+
+  return month.label;
+}
+
+function getEmotionImpactLine(month: EmotionMonth) {
+  if (month.monthlyChangeKrw < 0) {
+    return `이번 달에만 ${formatKrw(Math.abs(month.monthlyChangeKrw))} 증발`;
+  }
+
+  if (month.totalReturnPct >= 100 && month.missedAmount > 0) {
+    return `여기서 팔았다면 ${formatKrw(month.missedAmount)}을 놓침`;
+  }
+
+  if (month.peakBreakout) {
+    return `고점 회복까지 ${month.peakWaitMonths}개월을 버팀`;
+  }
+
+  return `한 달 변동률 ${formatPct(month.monthlyReturnPct)}`;
+}
+
+function buildMentalReplayHighlights(analysis: PainAnalysis) {
+  const months = analysis.emotionMonths;
+  const byDate = new Map(months.map((month) => [month.date, month] as const));
+  const selected = new Map<string, EmotionMonth>();
+  const add = (month: EmotionMonth | undefined) => {
+    if (!month || selected.has(month.date)) {
+      return;
+    }
+
+    selected.set(month.date, month);
+  };
+
+  add([...months].sort((left, right) => left.monthlyReturnPct - right.monthlyReturnPct)[0]);
+  add([...months].sort((left, right) => left.drawdownPct - right.drawdownPct)[0]);
+  add(analysis.milestones[0] ? byDate.get(analysis.milestones[0].date) : undefined);
+  add(months.find((month) => month.peakBreakout));
+  add([...months].filter((month) => month.criticalZone).sort((left, right) => right.chainMonths - left.chainMonths)[0]);
+  add([...months].sort((left, right) => right.monthlyReturnPct - left.monthlyReturnPct)[0]);
+
+  if (selected.size < 5) {
+    [...months]
+      .sort((left, right) => {
+        const leftScore = Math.abs(left.monthlyReturnPct) + Math.abs(left.drawdownPct) + left.totalReturnPct / 20;
+        const rightScore = Math.abs(right.monthlyReturnPct) + Math.abs(right.drawdownPct) + right.totalReturnPct / 20;
+        return rightScore - leftScore;
+      })
+      .forEach(add);
+  }
+
+  return [...selected.values()].slice(0, 5);
+}
+
 function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
-  const lastReplayablePosition = Math.max(0, analysis.emotionMonths.length - 7);
-  const defaultMonth =
-    analysis.emotionMonths.find(
-      (month, index) =>
-        index <= lastReplayablePosition &&
-        (month.tone === "panic" || month.tone === "underwater" || month.tone === "temptation"),
-    ) ??
-    analysis.emotionMonths.find((month, index) => index <= lastReplayablePosition) ??
-    analysis.emotionMonths[0]!;
+  const highlightMonths = useMemo(() => buildMentalReplayHighlights(analysis), [analysis]);
+  const defaultMonth = highlightMonths[0] ?? analysis.emotionMonths[0]!;
   const [selectedDate, setSelectedDate] = useState(defaultMonth.date);
   const [selectedDetailOpen, setSelectedDetailOpen] = useState(false);
+  const [showFullMap, setShowFullMap] = useState(false);
 
   const selectedMonth =
     analysis.emotionMonths.find((month) => month.date === selectedDate) ?? defaultMonth;
-  const selectedMonthPosition = Math.max(
-    0,
-    analysis.emotionMonths.findIndex((month) => month.date === selectedMonth.date),
-  );
-  const futureMaskCount = Math.max(
-    0,
-    Math.min(6, analysis.emotionMonths.length - selectedMonthPosition - 1),
-  );
-  const monthPositions = new Map(
-    analysis.emotionMonths.map((month, index) => [month.date, index] as const),
-  );
   const worstMonth = [...analysis.emotionMonths].sort(
     (left, right) => left.monthlyReturnPct - right.monthlyReturnPct,
   )[0]!;
@@ -2038,6 +2459,19 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
       return map;
     }, new Map<string, EmotionMonth[]>()),
   );
+  const toneCounts = analysis.emotionMonths.reduce(
+    (counts, month) => {
+      counts[month.tone] += 1;
+      return counts;
+    },
+    {
+      panic: 0,
+      recovery: 0,
+      sideways: 0,
+      temptation: 0,
+      underwater: 0,
+    } satisfies Record<EmotionTone, number>,
+  );
 
   return (
     <SectionCard className="pb-7">
@@ -2045,17 +2479,17 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         <div>
           <div className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">멘탈 리플레이</div>
           <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.07em] text-slate-950">
-            수익률 뒤에 숨은
+            먼저 봐야 할
             <br />
-            120번의 흔들림
+            위험한 5개월
           </h2>
         </div>
         <div className="rounded-full bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-500">
-          월별 지도
+          TOP 5
         </div>
       </div>
       <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-        색 타일을 누르면 그 달에 왜 팔고 싶었는지 바로 열립니다.
+        전체 120개월을 다 보기 전에, 실제로 손이 매도 버튼으로 갔을 법한 달부터 짚어봅니다.
       </p>
 
       <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 px-3 py-3">
@@ -2067,7 +2501,7 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
             <div className="mt-1 text-2xl font-black tracking-[-0.06em] text-slate-950">{motionLabel}</div>
           </div>
           <div className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500 shadow-sm">
-            {formatMonth(worstMonth.date)} - {formatPct(Math.abs(worstMonth.monthlyReturnPct))}
+            {formatMonth(worstMonth.date)} · {formatPct(worstMonth.monthlyReturnPct)}
           </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-bold">
@@ -2106,65 +2540,121 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         )}
       </div>
 
-      <div className="mt-5 space-y-4">
-        {years.map(([year, months]) => (
-          <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-3 py-3" key={year}>
-            <div className="mb-2 text-xs font-black text-slate-400">{year}</div>
-            <div className="grid grid-cols-12 gap-1.5">
-              {months.map((month) => {
-                const monthPosition = monthPositions.get(month.date) ?? 0;
-                const isFutureMasked =
-                  monthPosition > selectedMonthPosition && monthPosition <= selectedMonthPosition + 6;
-                const isSelected = selectedMonth.date === month.date;
-                const toneClass = isFutureMasked && !isSelected
-                  ? "border-slate-900 bg-slate-950 text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.18)]"
-                  : getEmotionToneClasses(month.tone);
-
-                return (
-                  <button
-                    aria-label={`${formatMonth(month.date)} ${month.label} ${month.impulseLabel}`}
-                    className={`relative flex h-8 items-center justify-center rounded-[10px] border text-[9px] font-black transition active:scale-95 ${
-                      isSelected ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/25` : toneClass
-                    } ${month.criticalZone ? "outline outline-2 outline-offset-1 outline-rose-300/70" : ""}`}
-                    key={month.date}
-                    onClick={() => {
-                      setSelectedDate(month.date);
-                      setSelectedDetailOpen(false);
-                    }}
-                    type="button"
-                  >
-                    <span>{isFutureMasked && !isSelected ? "?" : month.date.slice(5, 7)}</span>
-                    {month.marker || month.criticalZone ? (
-                      <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-black text-slate-950 shadow-sm">
-                        {month.criticalZone ? "⚡" : month.marker}
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-            {months.some((month) => month.date === selectedMonth.date) ? (
-              <SelectedEmotionMonthCard
-                futureMaskCount={futureMaskCount}
-                isOpen={selectedDetailOpen}
-                onToggle={() => setSelectedDetailOpen((open) => !open)}
-                selectedMonth={selectedMonth}
-              />
-            ) : null}
+      <div className="mt-4 grid grid-cols-5 gap-1.5 rounded-[22px] bg-slate-50 px-3 py-3">
+        {(["panic", "underwater", "temptation", "recovery", "sideways"] as EmotionTone[]).map((tone) => (
+          <div className="text-center" key={tone}>
+            <div className={`mx-auto h-3 w-3 rounded-full border ${getEmotionToneClasses(tone)}`} />
+            <div className="mt-1 text-[10px] font-black text-slate-500">{getEmotionLegendLabel(tone)}</div>
+            <div className="text-[10px] font-black text-slate-950">{toneCounts[tone]}개월</div>
           </div>
         ))}
       </div>
+
+      <div className="mt-5 space-y-2.5">
+        {highlightMonths.map((month, index) => {
+          const isSelected = selectedMonth.date === month.date && selectedDetailOpen;
+
+          return (
+            <div className="space-y-2.5" key={month.date}>
+              <button
+                className={`w-full rounded-[22px] border bg-white px-3.5 py-3 text-left transition active:scale-[0.99] ${
+                  isSelected ? "border-slate-950 shadow-[0_12px_30px_rgba(15,23,42,0.12)]" : "border-slate-200"
+                }`}
+                onClick={() => {
+                  setSelectedDate(month.date);
+                  setSelectedDetailOpen(true);
+                }}
+                type="button"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                      {index + 1}번 장면 · {formatMonth(month.date)}
+                    </div>
+                    <div className="mt-1 text-base font-black leading-5 tracking-[-0.04em] text-slate-950">
+                      {getEmotionHighlightTitle(month)}
+                    </div>
+                    <div className="mt-1 text-xs font-bold leading-5 text-slate-500">
+                      {getEmotionImpactLine(month)}
+                    </div>
+                  </div>
+                  <div className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black ${getEmotionToneClasses(month.tone)}`}>
+                    {month.marker || getEmotionLegendLabel(month.tone)}
+                  </div>
+                </div>
+              </button>
+              {isSelected && !showFullMap ? (
+                <SelectedEmotionMonthCard
+                  isOpen
+                  onToggle={() => setSelectedDetailOpen(false)}
+                  selectedMonth={selectedMonth}
+                />
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        className="mt-4 w-full rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm"
+        onClick={() => setShowFullMap((open) => !open)}
+        type="button"
+      >
+        {showFullMap ? "전체 120개월 지도 접기" : "전체 120개월 지도 펼치기"}
+      </button>
+
+      {showFullMap ? (
+        <div className="mt-5 space-y-4">
+          {years.map(([year, months]) => (
+            <div className="rounded-[22px] border border-slate-200 bg-slate-50 px-3 py-3" key={year}>
+              <div className="mb-2 text-xs font-black text-slate-400">{year}</div>
+              <div className="grid grid-cols-12 gap-1.5">
+                {months.map((month) => {
+                  const isSelected = selectedMonth.date === month.date;
+
+                  return (
+                    <button
+                      aria-label={`${formatMonth(month.date)} ${month.label} ${month.impulseLabel}`}
+                      className={`relative flex h-8 items-center justify-center rounded-[10px] border text-[9px] font-black transition active:scale-95 ${
+                        isSelected ? `${getEmotionToneClasses(month.tone)} ring-2 ring-slate-950/25` : getEmotionToneClasses(month.tone)
+                      } ${month.criticalZone ? "outline outline-2 outline-offset-1 outline-rose-300/70" : ""}`}
+                      key={month.date}
+                      onClick={() => {
+                        setSelectedDate(month.date);
+                        setSelectedDetailOpen(true);
+                      }}
+                      type="button"
+                    >
+                      <span>{month.date.slice(5, 7)}</span>
+                      {month.marker || month.criticalZone ? (
+                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-black text-slate-950 shadow-sm">
+                          {month.criticalZone ? "⚡" : month.marker}
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              {months.some((month) => month.date === selectedMonth.date) && selectedDetailOpen ? (
+                <SelectedEmotionMonthCard
+                  isOpen
+                  onToggle={() => setSelectedDetailOpen(false)}
+                  selectedMonth={selectedMonth}
+                />
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
     </SectionCard>
   );
 }
 
 function SelectedEmotionMonthCard({
-  futureMaskCount,
   isOpen,
   onToggle,
   selectedMonth,
 }: {
-  futureMaskCount: number;
   isOpen: boolean;
   onToggle: () => void;
   selectedMonth: EmotionMonth;
@@ -2236,13 +2726,8 @@ function SelectedEmotionMonthCard({
       {isOpen ? (
         <div className="mt-3 space-y-2">
           <div className="rounded-[18px] bg-rose-50 px-3 py-2 text-xs font-bold leading-5 text-rose-700">
+            <span className="font-black">이 달의 숫자 </span>
             {selectedMonth.tangibleLine}
-          </div>
-          <div className="rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-bold leading-5 text-slate-600">
-            <span className="font-black text-slate-950">미래 암전 </span>
-            {futureMaskCount > 0
-              ? `이 달을 누른 순간, 이후 ${futureMaskCount}개월은 일부러 가렸습니다. 그때의 당신도 다음 장면을 몰랐습니다.`
-              : "이 달은 현재에 가까운 구간입니다. 직전의 흔들림만 보고 판단해야 했던 상태로 읽어보세요."}
           </div>
           <div className="rounded-[18px] bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-slate-600">
             <span className="font-black text-slate-950">주변 소음 </span>

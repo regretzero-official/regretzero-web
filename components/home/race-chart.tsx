@@ -28,6 +28,7 @@ export interface RaceChartAsset {
 interface RaceChartProps {
   assets: RaceChartAsset[];
   basisLabel?: string;
+  compact?: boolean;
   currentPoint: RacePoint | null;
   data: RacePoint[];
   fullData: RacePoint[];
@@ -308,6 +309,7 @@ function AnimatedMetric({ formatter, value }: AnimatedMetricProps) {
 export function RaceChart({
   assets,
   basisLabel,
+  compact = false,
   currentPoint,
   data,
   fullData,
@@ -476,7 +478,11 @@ export function RaceChart({
 
   if (isLoading || !fullData.length) {
     return (
-      <div className="surface-section flex h-[520px] items-center justify-center rounded-[30px] text-sm text-white/48">
+      <div
+        className={`surface-section flex items-center justify-center text-sm text-white/48 ${
+          compact ? "h-[330px] rounded-[24px]" : "h-[520px] rounded-[30px]"
+        }`}
+      >
         {"\uB808\uC774\uC2A4\uB97C \uC900\uBE44\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4..."}
       </div>
     );
@@ -518,8 +524,8 @@ export function RaceChart({
   const basisText = basisLabel ?? `1.0\uBC30 = ${formatKrwCompact(principalKrw)}`;
 
   return (
-    <div className="surface-section flex flex-col rounded-[26px] p-3 sm:rounded-[30px] sm:p-4">
-      <div className="order-3 mt-4 hidden items-start justify-between gap-3 sm:flex">
+    <div className={`surface-section flex flex-col ${compact ? "rounded-[24px] p-2" : "rounded-[26px] p-3 sm:rounded-[30px] sm:p-4"}`}>
+      <div className={`${compact ? "hidden" : "order-3 mt-4 hidden items-start justify-between gap-3 sm:flex"}`}>
         <div>
           <div className="text-[1.32rem] font-semibold tracking-[-0.05em] text-white">
             {headerTitle ?? `${formatKrwCompact(principalKrw)}\uC73C\uB85C \uCD9C\uBC1C\uD558\uBA74`}
@@ -546,7 +552,7 @@ export function RaceChart({
       </div>
 
       <div
-        className="order-2 mt-3 grid gap-2 sm:order-4 sm:mt-4"
+        className={`${compact ? "hidden" : "order-2 mt-3 grid gap-2 sm:order-4 sm:mt-4"}`}
         style={{ gridTemplateColumns: `repeat(${Math.max(1, assets.length)}, minmax(0, 1fr))` }}
       >
         {rankedSlotSummaries.map(({ asset, multiple, rank, slot, slotColor, slotGlow, value }) => (
@@ -611,7 +617,7 @@ export function RaceChart({
         ))}
       </div>
 
-      <div className="order-4 mt-4 hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3">
+      <div className={`${compact ? "hidden" : "order-4 mt-4 hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3"}`}>
         <div className="min-w-0 rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2.5">
           <div className="text-[10px] uppercase tracking-[0.16em] text-white/34">현재 1위</div>
           <div className="mt-1 truncate text-sm font-semibold text-white">
@@ -636,7 +642,7 @@ export function RaceChart({
 
       <div
         ref={plotRef}
-        className="surface-plot order-1 relative h-[280px] overflow-hidden rounded-[24px] sm:h-[400px] sm:rounded-[26px]"
+        className={`surface-plot order-1 relative overflow-hidden ${compact ? "h-[286px] rounded-[22px]" : "h-[280px] rounded-[24px] sm:h-[400px] sm:rounded-[26px]"}`}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.5),rgba(255,255,255,0))]" />
 
