@@ -5,7 +5,7 @@ export interface DepositSeriesPoint {
 
 export type SyntheticSeriesResolution = "daily" | "monthly" | "weekly";
 
-export const DEPOSIT_ANNUAL_RATE = 0.027;
+export const DEPOSIT_ANNUAL_RATE = 0.0304;
 
 const DEPOSIT_MONTHLY_RATE = Math.pow(1 + DEPOSIT_ANNUAL_RATE, 1 / 12) - 1;
 const AVG_MONTH_MS = 365.25 * 24 * 60 * 60 * 1000 / 12;

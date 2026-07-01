@@ -6,7 +6,7 @@ describe("getRaceDisplayLabel", () => {
   it("prefers an explicit short label when provided", () => {
     expect(
       getRaceDisplayLabel({
-        label: "예금(연 2.7% 가정)",
+        label: "예금(연 3.04% 가정)",
         marketTicker: undefined,
         shortLabel: "예금",
       }),

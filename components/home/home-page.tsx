@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -126,7 +126,7 @@ const SOLO_PRINCIPAL_RACE_ASSET: RaceChartAsset = {
   label: "예금 기준",
   shortLabel: "예금",
 };
-const SOLO_DEPOSIT_BENCHMARK_ANNUAL_RATE = 0.029;
+const SOLO_DEPOSIT_BENCHMARK_ANNUAL_RATE = 0.0304;
 
 interface ReferralCardCopy {
   badge: string;
@@ -1631,7 +1631,7 @@ function getHomeIntroSelectedLabel(asset: AssetOption) {
 
 function getHomeIntroSelectedDescription(asset: AssetOption) {
   if (asset.id === "deposit") {
-    return "연 2.7% 복리 가정";
+    return "연 3.04% 복리 가정";
   }
 
   if (asset.id === "005930") {
@@ -2056,7 +2056,7 @@ const RESULT_INFO_FALLBACKS: Partial<Record<ComparisonAssetId, string[]>> = {
     "상승 가능성과 큰 변동성을 함께 가진 자산입니다.",
   ],
   deposit: [
-    "연 2.7% 복리 가정 기준의 비교 자산입니다.",
+    "연 3.04% 복리 가정 기준의 비교 자산입니다.",
     "변동성은 낮지만 장기 기대수익도 제한적인 편입니다.",
   ],
   gangnam_gu_apt: [
@@ -4360,7 +4360,7 @@ export function HomePage() {
             : isRealEstateAsset(soloAsset)
               ? "실제 개별 매물이 아닌 평균 흐름 기반 비교값입니다."
               : soloAsset.id === "deposit"
-                ? "예금은 시중 은행 정기예금 기준(복리 연 2.7%~3.1% 흐름)의 비교 기준값입니다."
+                ? "예금은 시중 은행 정기예금 기준(연 3.04% 복리 가정)의 비교 기준값입니다."
                 : "",
         displayLabel: getResultCardAssetLabel(soloAsset),
         endPriceLabel,
@@ -4757,7 +4757,7 @@ export function HomePage() {
                   : isRealEstateAsset(asset)
                     ? "실제 개별 매물이 아닌 평균 흐름 기반 비교값입니다."
                     : asset.id === "deposit"
-                      ? "예금은 시중 은행 정기예금 기준(복리 연 2.7%~3.1% 흐름)의 비교 기준값입니다."
+                      ? "예금은 시중 은행 정기예금 기준(연 3.04% 복리 가정)의 비교 기준값입니다."
                       : "",
               displayLabel: getResultCardAssetLabel(asset),
               endPriceLabel,
@@ -5169,9 +5169,9 @@ export function HomePage() {
       ? "총 납입액과 최종 금액의 차이"
       : "후회가 갈라진 길";
   const resultTrustSummary = isMonthlyInvestmentMode
-    ? "매월 첫 비교 가능일 납입 · 총 납입액 기준 수익률 · 예금은 정기예금 기준(복리 연 2.7%~3.1% 흐름)"
+    ? "매월 첫 비교 가능일 납입 · 총 납입액 기준 수익률 · 예금은 정기예금 기준(연 3.04% 복리 가정)"
     : isPremiumCustomScenario
-    ? "실제 과거 데이터 기준 · 서울/강남구 아파트 비교 지원 · 예금은 정기예금 기준(복리 연 2.7%~3.1% 흐름)"
+    ? "실제 과거 데이터 기준 · 서울/강남구 아파트 비교 지원 · 예금은 정기예금 기준(연 3.04% 복리 가정)"
     : trustSummary;
   const resultTrustNotes = isPremiumCustomScenario
     ? trustNotes.filter((note) => !note.includes("10년"))
@@ -7412,7 +7412,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                     <div className="mt-7 space-y-4">
                       <RaceChart
                         assets={soloRaceAssets}
-                        basisLabel="시중 은행 정기예금 기준 (복리 연 2.7%~3.1% 흐름)"
+                        basisLabel="시중 은행 정기예금 기준 (연 3.04% 복리 가정)"
                         currentPoint={soloCurrentPoint}
                         data={soloRaceVisibleData}
                         fullData={soloRaceFullData}

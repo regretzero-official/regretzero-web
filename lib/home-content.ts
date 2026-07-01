@@ -102,21 +102,21 @@ export const assetCatalog: Record<ComparisonAssetId, AssetOption> = {
   }),
   deposit: createAsset({
     accent: "#8E97A4",
-    amountInfo: "예금: 연 2.7% 복리 가정 기준이에요.",
-    availabilityNote: "비교용 기준자산 · 고정 연 2.7% 복리 가정 · 실제 은행 상품 아님",
-    basis: "고정 연 2.7% 복리 가정 · 실제 은행 상품 아님",
+    amountInfo: "예금: 연 3.04% 복리 가정 기준이에요.",
+    availabilityNote: "비교용 기준자산 · 최근 정기예금 기준 연 3.04% 복리 가정 · 실제 은행 상품 아님",
+    basis: "최근 정기예금 기준 연 3.04% 복리 가정 · 실제 은행 상품 아님",
     category: "안전자산",
-    description: "연 2.7% 복리 가정",
+    description: "연 3.04% 복리 가정",
     glow: "rgba(142, 151, 164, 0.16)",
     id: "deposit",
     isAvailable: true,
     label: "예금",
     resultInfoLines: [
-      "연 2.7% 복리 가정 기준이에요.",
+      "연 3.04% 복리 가정 기준이에요.",
       "변동성은 낮지만 장기 기대수익도 제한적인 편이에요.",
     ],
-    searchTerms: ["예금", "정기예금", "현금", "deposit", "2.7%", "비교 기준"],
-    selectedSummary: "연 2.7% 복리 가정",
+    searchTerms: ["예금", "정기예금", "현금", "deposit", "3.04%", "비교 기준"],
+    selectedSummary: "연 3.04% 복리 가정",
     shortLabel: "예금",
   }),
   gold: createAsset({
@@ -940,14 +940,14 @@ export const trustNotes = [
   "코인과 금은 실제 종가 흐름을 사용해요.",
   "서울 아파트는 서울 상승 체감을 반영한 비교값이에요.",
   "강남구 아파트는 강남구 상승 체감을 반영한 비교값이에요.",
-  "예금은 연 2.7% 복리로 단순화한 기준값이에요.",
+  "예금은 연 3.04% 복리로 단순화한 기준값이에요.",
   "미국 자산과 달러 자산은 같은 날짜 환율로 원화 환산해요.",
   "예금은 실제 은행 상품이나 실시간 금리 피드가 아니에요.",
   "10년 데이터가 부족한 자산은 기본 비교에서 비활성화돼요.",
 ] as const;
 
 export const trustSummary =
-  "과거 흐름 기준 · 서울/강남구 아파트 비교 지원 · 예금은 연 2.7% 복리 가정";
+  "과거 흐름 기준 · 서울/강남구 아파트 비교 지원 · 예금은 연 3.04% 복리 가정";
 
 export const DEFAULT_AMOUNT = 10_000_000;
 export const INPUT_MAX_AMOUNT = 1_000_000_000_000;
