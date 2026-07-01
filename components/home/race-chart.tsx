@@ -28,6 +28,7 @@ export interface RaceChartAsset {
 interface RaceChartProps {
   assets: RaceChartAsset[];
   basisLabel?: string;
+  checkpointActive?: boolean;
   compact?: boolean;
   currentPoint: RacePoint | null;
   data: RacePoint[];
@@ -309,6 +310,7 @@ function AnimatedMetric({ formatter, value }: AnimatedMetricProps) {
 export function RaceChart({
   assets,
   basisLabel,
+  checkpointActive = false,
   compact = false,
   currentPoint,
   data,
@@ -642,7 +644,11 @@ export function RaceChart({
 
       <div
         ref={plotRef}
-        className={`surface-plot order-1 relative overflow-hidden ${compact ? "h-[286px] rounded-[22px]" : "h-[280px] rounded-[24px] sm:h-[400px] sm:rounded-[26px]"}`}
+        className={`surface-plot order-1 relative overflow-hidden ${
+          compact
+            ? `${checkpointActive ? "h-[232px]" : "h-[286px]"} rounded-[22px]`
+            : "h-[280px] rounded-[24px] sm:h-[400px] sm:rounded-[26px]"
+        }`}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.5),rgba(255,255,255,0))]" />
 
@@ -684,7 +690,11 @@ export function RaceChart({
         ) : null}
 
         <div
-          className="pointer-events-none absolute bottom-7 top-5 z-10 w-px bg-slate-300/70"
+          className={`pointer-events-none absolute bottom-7 top-5 z-10 ${
+            checkpointActive
+              ? "w-[2px] bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.75)]"
+              : "w-px bg-slate-300/70"
+          }`}
           style={{ left: currentX }}
         />
 
@@ -801,8 +811,9 @@ export function RaceChart({
               width={Y_AXIS_WIDTH}
             />
             <ReferenceLine
-              stroke="rgba(148,163,184,0.32)"
+              stroke={checkpointActive ? "rgba(251,191,36,0.95)" : "rgba(148,163,184,0.32)"}
               strokeDasharray="4 4"
+              strokeWidth={checkpointActive ? 2 : 1}
               x={currentIndex}
             />
 

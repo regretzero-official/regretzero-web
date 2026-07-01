@@ -122,7 +122,7 @@ interface RaceEventStop {
 
 const PRINCIPAL_KRW = DEFAULT_AMOUNT;
 const RACE_ACTIVE_DURATION_MS = 20_000;
-const RACE_EVENT_PAUSE_MS = 1_700;
+const RACE_EVENT_PAUSE_MS = 5_500;
 
 const RACE_ASSET_IDS: ComparisonAssetId[] = ["deposit", "gold"];
 const CURATED_ASSET_IDS: ComparisonAssetId[] = [
@@ -1392,7 +1392,7 @@ function buildRaceEventStops(analysis: PainAnalysis | null): RaceEventStop[] {
   return [...stops.values()]
     .filter((stop) => stop.index > 0)
     .sort((left, right) => left.index - right.index)
-    .slice(0, 6);
+    .slice(0, 5);
 }
 
 function filterAssetByTab(meta: LabAssetMeta, activeTab: AssetTab) {
@@ -1466,6 +1466,7 @@ function MetricCard({
 
 export function LongtermPainLab() {
   const raceSectionRef = useRef<HTMLDivElement | null>(null);
+  const skipRacePauseRef = useRef<string | null>(null);
   const [activeBottomTab, setActiveBottomTab] = useState<BottomTab>("home");
   const [assetTab, setAssetTab] = useState<AssetTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -1477,6 +1478,7 @@ export function LongtermPainLab() {
   const [visibleCount, setVisibleCount] = useState(0);
   const [lastCompletedAssetId, setLastCompletedAssetId] = useState<ComparisonAssetId | null>(null);
   const [activeRaceEventId, setActiveRaceEventId] = useState<string | null>(null);
+  const [raceCheckpointProgress, setRaceCheckpointProgress] = useState(0);
 
   const selectedMeta = getMeta(selectedAssetId);
   const currentPoint = raceBuild?.points[Math.max(0, visibleCount - 1)] ?? null;
@@ -1514,6 +1516,8 @@ export function LongtermPainLab() {
       setRaceStatus("loading");
       setVisibleCount(0);
       setActiveRaceEventId(null);
+      setRaceCheckpointProgress(0);
+      skipRacePauseRef.current = null;
 
       window.requestAnimationFrame(() => {
         raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1539,6 +1543,7 @@ export function LongtermPainLab() {
 
     let frameId = 0;
     const startedAt = performance.now();
+    let skippedPauseMs = 0;
     const eventStops = raceEventStops.filter(
       (stop) => stop.index > 0 && stop.index < raceBuild.points.length - 1,
     );
@@ -1547,10 +1552,12 @@ export function LongtermPainLab() {
     const lastPointIndex = Math.max(1, raceBuild.points.length - 1);
 
     const tick = (timestamp: number) => {
-      const elapsed = Math.max(0, timestamp - startedAt);
+      const rawElapsed = Math.max(0, timestamp - startedAt);
+      let elapsed = rawElapsed + skippedPauseMs;
       let consumedPauseMs = 0;
       let activeElapsedMs = elapsed;
       let pausedEvent: RaceEventStop | null = null;
+      let checkpointProgress = 0;
 
       for (const stop of eventStops) {
         const stopTimeMs = (stop.index / lastPointIndex) * RACE_ACTIVE_DURATION_MS;
@@ -1562,8 +1569,18 @@ export function LongtermPainLab() {
         }
 
         if (elapsed >= pauseStartMs && elapsed < pauseEndMs) {
+          if (skipRacePauseRef.current === stop.id) {
+            skippedPauseMs += pauseEndMs - elapsed;
+            skipRacePauseRef.current = null;
+            elapsed = rawElapsed + skippedPauseMs;
+            consumedPauseMs += RACE_EVENT_PAUSE_MS;
+            activeElapsedMs = elapsed - consumedPauseMs;
+            continue;
+          }
+
           activeElapsedMs = stopTimeMs;
           pausedEvent = stop;
+          checkpointProgress = ((elapsed - pauseStartMs) / RACE_EVENT_PAUSE_MS) * 100;
           break;
         }
 
@@ -1575,6 +1592,7 @@ export function LongtermPainLab() {
       const nextIndex = Math.min(lastPointIndex, Math.round(lastPointIndex * progress));
       setVisibleCount(nextIndex + 1);
       setActiveRaceEventId(pausedEvent?.id ?? null);
+      setRaceCheckpointProgress(Math.min(100, Math.max(0, checkpointProgress)));
 
       if (elapsed < totalDurationMs) {
         frameId = requestAnimationFrame(tick);
@@ -1583,6 +1601,7 @@ export function LongtermPainLab() {
 
       setVisibleCount(raceBuild.points.length);
       setActiveRaceEventId(null);
+      setRaceCheckpointProgress(0);
       setRaceStatus("complete");
       setLastCompletedAssetId(selectedAssetId);
     };
@@ -1590,6 +1609,12 @@ export function LongtermPainLab() {
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
   }, [raceBuild, raceEventStops, raceStatus, selectedAssetId]);
+
+  const continueRaceFromCheckpoint = useCallback((eventId: string) => {
+    skipRacePauseRef.current = eventId;
+    setActiveRaceEventId(null);
+    setRaceCheckpointProgress(0);
+  }, []);
 
   const labAssetIds = useMemo(() => getLabAssetIds(), []);
   const filteredAssets = useMemo(() => {
@@ -1634,6 +1659,8 @@ export function LongtermPainLab() {
                   activeRaceEvent={activeRaceEvent}
                   analysis={analysis}
                   currentPoint={currentPoint}
+                  checkpointProgressPct={raceCheckpointProgress}
+                  onContinueCheckpoint={continueRaceFromCheckpoint}
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
                   raceAssets={raceAssets}
@@ -1773,7 +1800,9 @@ function EmptyRaceGuide() {
 function RaceStage({
   activeRaceEvent,
   analysis,
+  checkpointProgressPct,
   currentPoint,
+  onContinueCheckpoint,
   onOpenSearch,
   onRestart,
   raceAssets,
@@ -1786,7 +1815,9 @@ function RaceStage({
 }: {
   activeRaceEvent: RaceEventStop | null;
   analysis: PainAnalysis | null;
+  checkpointProgressPct: number;
   currentPoint: RacePoint | null;
+  onContinueCheckpoint: (eventId: string) => void;
   onOpenSearch: () => void;
   onRestart: () => void;
   raceAssets: RaceChartAsset[];
@@ -1828,23 +1859,36 @@ function RaceStage({
           rangeLabel={raceBuild ? formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate) : ""}
           selectedName={selectedMeta.name}
         />
-        <RaceChart
-          assets={raceAssets}
-          basisLabel="1.0배 = 1,000만원"
-          compact
-          currentPoint={currentPoint}
-          data={visibleData}
-          fullData={raceBuild?.points ?? []}
-          headerSubtitle=""
-          headerTitle=""
-          isLoading={raceStatus === "loading" || !raceBuild}
-          principalKrw={PRINCIPAL_KRW}
-        />
+        <div className="relative">
+          <RaceChart
+            assets={raceAssets}
+            basisLabel="1.0배 = 1,000만원"
+            checkpointActive={Boolean(activeRaceEvent)}
+            compact
+            currentPoint={currentPoint}
+            data={visibleData}
+            fullData={raceBuild?.points ?? []}
+            headerSubtitle=""
+            headerTitle=""
+            isLoading={raceStatus === "loading" || !raceBuild}
+            principalKrw={PRINCIPAL_KRW}
+          />
+          {activeRaceEvent ? (
+            <>
+              <div className="pointer-events-none absolute inset-2 z-[8] rounded-[22px] bg-slate-950/16 backdrop-blur-[1px]" />
+              <div className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 rounded-full border border-amber-200 bg-white/92 px-3 py-1.5 text-[11px] font-black text-amber-700 shadow-[0_10px_24px_rgba(15,23,42,0.14)]">
+                체크포인트 · {formatMonth(activeRaceEvent.date)}
+              </div>
+            </>
+          ) : null}
+        </div>
         <RaceAccountPulseCard
           activeEvent={activeRaceEvent}
+          checkpointProgressPct={checkpointProgressPct}
           currentDate={currentDate}
           drawdownFromPeak={drawdownFromPeak}
           monthlyChangeKrw={monthlyChangeKrw}
+          onContinueCheckpoint={onContinueCheckpoint}
           monthlyReturnPct={monthlyReturnPct}
           raceStatus={raceStatus}
           selectedMeta={selectedMeta}
@@ -1935,9 +1979,11 @@ function RaceTimeRail({
 
 function RaceAccountPulseCard({
   activeEvent,
+  checkpointProgressPct,
   currentDate,
   drawdownFromPeak,
   monthlyChangeKrw,
+  onContinueCheckpoint,
   monthlyReturnPct,
   raceStatus,
   selectedMeta,
@@ -1945,9 +1991,11 @@ function RaceAccountPulseCard({
   visiblePeak,
 }: {
   activeEvent: RaceEventStop | null;
+  checkpointProgressPct: number;
   currentDate: string;
   drawdownFromPeak: number;
   monthlyChangeKrw: number;
+  onContinueCheckpoint: (eventId: string) => void;
   monthlyReturnPct: number;
   raceStatus: RaceStatus;
   selectedMeta: LabAssetMeta;
@@ -1956,6 +2004,7 @@ function RaceAccountPulseCard({
 }) {
   const isLoading = raceStatus === "loading";
   const isComplete = raceStatus === "complete";
+  const isCheckpoint = Boolean(activeEvent);
   const isDrop = monthlyChangeKrw < 0;
   const isTemptation = value >= PRINCIPAL_KRW * 2 || monthlyReturnPct >= 12;
   const tone: RaceEventTone = activeEvent?.tone ?? (isComplete ? "recovery" : isDrop ? "danger" : isTemptation ? "temptation" : "neutral");
@@ -1995,13 +2044,23 @@ function RaceAccountPulseCard({
           : "최종 결과보다 어려운 건 이 흔들림을 한 달씩 살아내는 일입니다.";
 
   return (
-    <div className={`mt-3 rounded-[24px] border px-4 py-4 ${toneClass.container}`}>
+    <div
+      className={`mt-3 border px-4 transition-all duration-300 ${
+        isCheckpoint
+          ? `rounded-[30px] border-2 py-5 shadow-[0_18px_44px_rgba(15,23,42,0.16)] ${toneClass.container}`
+          : `rounded-[24px] py-4 ${toneClass.container}`
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className={`text-[11px] font-black uppercase tracking-[0.18em] ${toneClass.eyebrow}`}>
-            {currentDate ? formatMonth(currentDate) : "레이스 준비"}
+            {isCheckpoint ? "이 장면은 그냥 지나가지 않습니다" : currentDate ? formatMonth(currentDate) : "레이스 준비"}
           </div>
-          <h3 className="mt-1 text-xl font-black leading-tight tracking-[-0.06em] text-slate-950">
+          <h3
+            className={`mt-1 font-black leading-tight tracking-[-0.06em] text-slate-950 ${
+              isCheckpoint ? "text-2xl" : "text-xl"
+            }`}
+          >
             {title}
           </h3>
         </div>
@@ -2009,12 +2068,38 @@ function RaceAccountPulseCard({
           {activeEvent ? "정지" : isComplete ? "완료" : isDrop ? "하락" : isTemptation ? "유혹" : "진행"}
         </div>
       </div>
-      <div className={`mt-3 text-[1.75rem] font-black leading-none tracking-[-0.08em] ${toneClass.value}`}>
+      <div
+        className={`mt-3 font-black leading-none tracking-[-0.08em] ${toneClass.value} ${
+          isCheckpoint ? "text-[2.25rem]" : "text-[1.75rem]"
+        }`}
+      >
         {moneyLabel}
       </div>
       <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
         {description}
       </p>
+      {activeEvent ? (
+        <div className="mt-4 rounded-[22px] border border-slate-200 bg-white px-3 py-3 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] font-black leading-5 text-slate-500">
+              잠시 후 자동으로 이어집니다. 지금 이해했다면 바로 넘겨도 됩니다.
+            </div>
+            <button
+              className="shrink-0 rounded-[16px] bg-slate-950 px-4 py-2.5 text-xs font-black text-[#f8fafc] shadow-[0_10px_24px_rgba(15,23,42,0.18)] active:scale-95"
+              onClick={() => onContinueCheckpoint(activeEvent.id)}
+              type="button"
+            >
+              계속 달리기
+            </button>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full rounded-full bg-slate-950 transition-[width] duration-100"
+              style={{ width: `${checkpointProgressPct}%` }}
+            />
+          </div>
+        </div>
+      ) : null}
       <div className="mt-3 grid grid-cols-3 gap-2">
         <RacePulseMetric label="평가금액" value={formatKrw(value)} />
         <RacePulseMetric label="이번 달" value={formatPct(monthlyReturnPct)} warning={monthlyChangeKrw < 0} />
@@ -2024,9 +2109,11 @@ function RaceAccountPulseCard({
           warning={drawdownFromPeak < 0}
         />
       </div>
-      <div className="mt-3 rounded-[18px] bg-white/68 px-3 py-2 text-[11px] font-bold leading-5 text-slate-500">
-        {selectedMeta.name}, 금은 실제 과거 데이터 기준입니다. 예금은 연 3.04% 복리 기준으로 비교합니다.
-      </div>
+      {!activeEvent ? (
+        <div className="mt-3 rounded-[18px] bg-white/68 px-3 py-2 text-[11px] font-bold leading-5 text-slate-500">
+          {selectedMeta.name}, 금은 실제 과거 데이터 기준입니다. 예금은 연 3.04% 복리 기준으로 비교합니다.
+        </div>
+      ) : null}
     </div>
   );
 }
