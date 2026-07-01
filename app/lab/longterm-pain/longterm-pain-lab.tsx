@@ -571,8 +571,8 @@ const TAB_OPTIONS: Array<{ id: AssetTab; label: string }> = [
 
 const BOTTOM_TABS: Array<{ icon: typeof Home; id: BottomTab; label: string }> = [
   { icon: Home, id: "home", label: "홈" },
-  { icon: Search, id: "search", label: "탐색" },
-  { icon: Radio, id: "live", label: "실험" },
+  { icon: Search, id: "search", label: "자산" },
+  { icon: Radio, id: "live", label: "오늘" },
   { icon: Bookmark, id: "saved", label: "기록" },
 ];
 
@@ -705,6 +705,17 @@ function formatPct(value: number) {
   }
 
   return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function formatMultiple(value: number) {
+  if (!Number.isFinite(value)) {
+    return "0.0배";
+  }
+
+  return `${value.toLocaleString("ko-KR", {
+    maximumFractionDigits: value >= 10 ? 1 : 2,
+    minimumFractionDigits: value >= 10 ? 1 : 2,
+  })}배`;
 }
 
 function formatMonth(date: string) {
@@ -1474,7 +1485,6 @@ export function LongtermPainLab() {
           <div className="space-y-5">
             <Header />
             <Hero
-              onOpenSearch={() => setActiveBottomTab("search")}
               onStart={() => void startRace()}
               selectedMeta={selectedMeta}
             />
@@ -1485,7 +1495,7 @@ export function LongtermPainLab() {
             ) : null}
             <div ref={raceSectionRef}>
               {raceStatus === "idle" ? (
-                <EmptyRaceGuide onOpenSearch={() => setActiveBottomTab("search")} />
+                <EmptyRaceGuide />
               ) : (
                 <RaceStage
                   analysis={analysis}
@@ -1549,31 +1559,31 @@ function Header() {
 }
 
 function Hero({
-  onOpenSearch,
   onStart,
   selectedMeta,
 }: {
-  onOpenSearch: () => void;
   onStart: () => void;
   selectedMeta: LabAssetMeta;
 }) {
   return (
-    <SectionCard className="overflow-hidden">
-      <div className="text-[12px] font-black uppercase tracking-[0.24em] text-blue-500">시뮬레이션 시작</div>
-      <h1 className="mt-3 text-[2.3rem] font-black leading-[1.02] tracking-[-0.09em] text-slate-950">
-        10년 전 오늘 샀다면,
+    <SectionCard className="overflow-hidden p-5">
+      <div className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-black text-blue-600">
+        1,000만 원 · 실제 10년 데이터
+      </div>
+      <h1 className="mt-3 text-[2.25rem] font-black leading-[1.02] tracking-[-0.09em] text-slate-950">
+        샀다면 얼마였고,
         <br />
-        끝까지 버텼을까요?
+        버틸 수 있었을까?
       </h1>
-      <p className="mt-4 text-[15px] font-semibold leading-7 text-slate-600">
-        결과만 보면 투자만큼 쉬운 게 없습니다. 진짜 문제는 그 돈이 불어나는 시간을
-        맨몸으로 견뎌내는 일입니다.
+      <p className="mt-3 text-[15px] font-semibold leading-7 text-slate-600">
+        과거 수익률만 보여주지 않습니다. 그 돈이 불어나는 동안 계좌가 얼마나 흔들렸는지까지
+        같이 봅니다.
       </p>
 
-      <div className="mt-6 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
-        <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">지금 주목받는 실험</div>
-        <div className="mt-3 flex items-start justify-between gap-3">
+      <div className="mt-5 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+        <div className="flex items-start justify-between gap-3">
           <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">오늘의 기본 실험</div>
             <div className="text-2xl font-black tracking-[-0.06em] text-slate-950">
               {selectedMeta.name}
             </div>
@@ -1581,50 +1591,45 @@ function Hero({
               {selectedMeta.ticker} · {selectedMeta.theme}
             </div>
           </div>
-          <button
-            className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700"
-            onClick={onOpenSearch}
-            type="button"
-          >
-            종목 변경
-          </button>
+          <div className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-500 shadow-sm">
+            기본값
+          </div>
         </div>
-        <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
+        <p className="mt-3 line-clamp-2 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
       </div>
 
       <button
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-[22px] bg-slate-950 px-5 py-4 text-[15px] font-black text-[#f8fafc] shadow-[0_18px_38px_rgba(15,23,42,0.22)]"
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-[22px] bg-slate-950 px-5 py-4 text-[15px] font-black text-[#f8fafc] shadow-[0_18px_38px_rgba(15,23,42,0.22)]"
         onClick={onStart}
         type="button"
       >
-        원금 1,000만 원으로 시작하기
+        10년 레이스 시작하기
         <ChevronRight size={18} />
       </button>
+      <p className="mt-3 text-center text-xs font-bold text-slate-400">
+        다른 종목은 하단 자산 탭에서 고를 수 있습니다.
+      </p>
     </SectionCard>
   );
 }
 
-function EmptyRaceGuide({ onOpenSearch }: { onOpenSearch: () => void }) {
+function EmptyRaceGuide() {
   return (
     <SectionCard>
       <div className="flex items-center gap-2 text-sm font-black text-slate-500">
         <LineChart size={17} />
-        아직 열리지 않은 미래
+        결과는 아직 잠겨 있습니다
       </div>
       <p className="mt-3 text-lg font-black leading-7 tracking-[-0.05em] text-slate-950">
-        시뮬레이션을 끝까지 완료해야 결과가 공개됩니다.
+        먼저 10년 레이스를 끝까지 달려야 합니다.
       </p>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        레그렛제로는 정답을 먼저 보여주지 않습니다. 최종 수익률을 먼저 보면
-        나도 벌었겠다는 착각에 빠지기 때문입니다.
+        최종 수익률을 먼저 보면 나도 벌었겠다는 착각에 빠집니다. 레그렛제로는 결과보다
+        흔들리는 시간을 먼저 보여줍니다.
       </p>
-      <button
-        className="mt-4 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700"
-        onClick={onOpenSearch}
-        type="button"
-      >
-        종목 선택하러 가기
-      </button>
+      <div className="mt-4 rounded-[20px] bg-slate-50 px-4 py-3 text-xs font-black text-slate-500">
+        다른 종목은 하단 자산 탭에서 선택합니다.
+      </div>
     </SectionCard>
   );
 }
@@ -1665,10 +1670,10 @@ function RaceStage({
                 : "시뮬레이션 완료"}
           </div>
           <h2 className="mt-2 text-2xl font-black tracking-[-0.07em] text-slate-950">
-            {selectedMeta.name} vs 은행 예금 vs 금
+            {selectedMeta.name}의 10년 레이스
           </h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-            예금은 복리 기준, 자산과 금은 실제 과거 시장 데이터입니다.
+            자산과 금은 실제 과거 데이터, 예금은 연 3.04% 복리 기준입니다.
             {raceBuild ? ` 시뮬레이션 구간: ${formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate)}` : ""}
           </p>
         </div>
@@ -1678,8 +1683,8 @@ function RaceStage({
           currentPoint={currentPoint}
           data={visibleData}
           fullData={raceBuild?.points ?? []}
-          headerSubtitle="최종 결과는 레이스가 끝난 뒤에 공개됩니다."
-          headerTitle="한 달 한 달, 내 자산의 실제 흔들림입니다"
+          headerSubtitle="최종 금액은 레이스가 끝난 뒤 공개됩니다."
+          headerTitle="10년의 흔들림을 먼저 봅니다"
           isLoading={raceStatus === "loading" || !raceBuild}
           principalKrw={PRINCIPAL_KRW}
         />
@@ -1726,23 +1731,122 @@ function ResultSummary({
   analysis: PainAnalysis;
   selectedMeta: LabAssetMeta;
 }) {
+  const depositValue = analysis.finalValue - analysis.bankGap;
+  const goldValue = analysis.finalValue - analysis.goldGap;
+  const rows = [
+    {
+      badge: "선택 자산",
+      label: selectedMeta.name,
+      multiple: analysis.finalValue / PRINCIPAL_KRW,
+      tone: "primary",
+      value: analysis.finalValue,
+    },
+    {
+      badge: "기준선",
+      label: "정기예금",
+      multiple: depositValue / PRINCIPAL_KRW,
+      tone: "muted",
+      value: depositValue,
+    },
+    {
+      badge: "보조 기준",
+      label: "금",
+      multiple: goldValue / PRINCIPAL_KRW,
+      tone: "gold",
+      value: goldValue,
+    },
+  ]
+    .sort((left, right) => right.value - left.value)
+    .map((row, index) => ({ ...row, rank: `${index + 1}위` }));
+
   return (
-    <SectionCard>
-      <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-500">타임머신 도착</div>
-      <h2 className="mt-3 text-[2rem] font-black leading-[1.08] tracking-[-0.08em] text-slate-950">
-        10년 전 {selectedMeta.name}에 넣은
+    <SectionCard className="overflow-hidden">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-500">결과 리포트</div>
+        <div className="rounded-full bg-slate-50 px-3 py-1 text-[11px] font-black text-slate-500">
+          {formatDateRange(analysis.resolvedStartDate, analysis.resolvedEndDate)}
+        </div>
+      </div>
+      <h2 className="mt-3 text-[2.05rem] font-black leading-[1.05] tracking-[-0.08em] text-slate-950">
+        1,000만 원이
         <br />
-        1,000만 원은 {formatKrw(analysis.finalValue)}
+        {formatKrw(analysis.finalValue)}
       </h2>
       <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-        중요한 건 이 화려한 숫자가 아닙니다. 사정없이 흔들리는 화면을 보면서도,
-        당신은 매도 버튼을 참아낼 수 있었을까요?
+        돈은 이렇게 불어났습니다. 이제부터 봐야 할 건 이 숫자를 얻기까지 버텼어야 할 시간입니다.
       </p>
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <MetricCard label="은행 예금 대비" value={formatKrw(analysis.bankGap)} />
-        <MetricCard label="금 대비" value={formatKrw(analysis.goldGap)} />
-        <MetricCard label="누적 수익률" value={formatPct(analysis.assetReturnPct)} />
-        <MetricCard label="실전 데이터 기간" value={formatDateRange(analysis.resolvedStartDate, analysis.resolvedEndDate)} />
+
+      <div className="mt-5 overflow-hidden rounded-[26px] border border-slate-200 bg-slate-50">
+        <div className="grid grid-cols-[1fr_auto] border-b border-slate-200 px-4 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+          <span>비교 대상</span>
+          <span>최종 금액</span>
+        </div>
+        <div className="divide-y divide-slate-200">
+          {rows.map((row) => (
+            <div
+              className={`grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-4 ${
+                row.tone === "primary"
+                  ? "bg-slate-950"
+                  : row.tone === "gold"
+                    ? "bg-amber-50 text-slate-950"
+                    : "bg-white text-slate-950"
+              }`}
+              key={row.label}
+            >
+              <div>
+                <div
+                  className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-black ${
+                    row.tone === "primary"
+                      ? "bg-white/12 text-slate-200"
+                      : row.tone === "gold"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-slate-100 text-slate-500"
+                  }`}
+                >
+                  {row.rank} · {row.badge}
+                </div>
+                <div
+                  className={`mt-2 text-base font-black tracking-[-0.04em] ${
+                    row.tone === "primary" ? "" : "text-slate-950"
+                  }`}
+                  style={row.tone === "primary" ? { color: "#f8fafc" } : undefined}
+                >
+                  {row.label}
+                </div>
+                <div className={`mt-1 text-xs font-bold ${row.tone === "primary" ? "text-slate-300" : "text-slate-500"}`}>
+                  원금 대비 {formatMultiple(row.multiple)}
+                </div>
+              </div>
+              <div
+                className={`text-right text-lg font-black tracking-[-0.05em] ${
+                  row.tone === "primary" ? "" : "text-slate-950"
+                }`}
+                style={row.tone === "primary" ? { color: "#f8fafc" } : undefined}
+              >
+                {formatKrw(row.value)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-[22px] border border-blue-100 bg-blue-50 px-3 py-3">
+          <div className="text-[11px] font-black text-blue-500">예금보다 더 남은 돈</div>
+          <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
+            {formatKrw(analysis.bankGap)}
+          </div>
+        </div>
+        <div className="rounded-[22px] border border-amber-100 bg-amber-50 px-3 py-3">
+          <div className="text-[11px] font-black text-amber-600">금보다 더 남은 돈</div>
+          <div className="mt-1 text-lg font-black tracking-[-0.05em] text-slate-950">
+            {formatKrw(analysis.goldGap)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-[22px] bg-slate-50 px-4 py-3 text-sm font-black text-slate-700">
+        누적 수익률 {formatPct(analysis.assetReturnPct)}
       </div>
     </SectionCard>
   );
@@ -1937,10 +2041,21 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
 
   return (
     <SectionCard className="pb-7">
-      <div className="text-sm font-black text-slate-950">3. 월별 멘탈 리플레이</div>
-      <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-        차트는 결과를 보여줍니다. 멘탈 리플레이는 당신이 중간에 왜 팔고 싶어졌을지를
-        한 달씩 보여줍니다.
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">멘탈 리플레이</div>
+          <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.07em] text-slate-950">
+            수익률 뒤에 숨은
+            <br />
+            120번의 흔들림
+          </h2>
+        </div>
+        <div className="rounded-full bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-500">
+          월별 지도
+        </div>
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
+        색 타일을 누르면 그 달에 왜 팔고 싶었는지 바로 열립니다.
       </p>
 
       <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 px-3 py-3">
