@@ -646,7 +646,7 @@ export function RaceChart({
         ref={plotRef}
         className={`surface-plot order-1 relative overflow-hidden ${
           compact
-            ? `${checkpointActive ? "h-[232px]" : "h-[286px]"} rounded-[22px]`
+            ? `${checkpointActive ? "h-[198px]" : "h-[228px]"} rounded-[20px]`
             : "h-[280px] rounded-[24px] sm:h-[400px] sm:rounded-[26px]"
         }`}
       >

@@ -1755,6 +1755,9 @@ export function LongtermPainLab() {
     setRaceViewMode("manual");
     setActiveRaceEventId(null);
     setRaceCheckpointProgress(0);
+    window.requestAnimationFrame(() => {
+      raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }, []);
 
   const seekRaceIndex = useCallback(
@@ -2121,7 +2124,7 @@ function RaceStage({
 
   return (
     <div className="space-y-5">
-      <SectionCard className="p-3">
+      <SectionCard className="p-2.5">
         <RaceTimeRail
           currentDate={currentDate}
           eventCount={raceEventStops.length}
@@ -2194,7 +2197,6 @@ function RaceStage({
           raceStatus={raceStatus}
           raceViewMode={raceViewMode}
           currentBasisKrw={currentBasisKrw}
-          selectedMeta={selectedMeta}
           value={selectedValue}
           visiblePeak={visiblePeak}
         />
@@ -2263,26 +2265,26 @@ function RaceExploreControls({
       : "아직 보지 않은 미래는 열어두지 않습니다. 지나간 달만 되감아 보면서 그 순간의 계좌를 다시 확인하세요.";
 
   return (
-    <div className="mb-3 rounded-[22px] border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+    <div className="mb-2 rounded-[18px] border border-slate-200 bg-white px-3 py-2.5 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
       {isManual ? (
         <div>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-500">
                 멈춘 시점
               </div>
-              <div className="mt-1 text-lg font-black tracking-[-0.06em] text-slate-950">
+              <div className="mt-0.5 text-base font-black tracking-[-0.06em] text-slate-950">
                 {currentMonthLabel}
               </div>
             </div>
-            <div className="rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-black text-slate-500">
+            <div className="rounded-full bg-slate-50 px-2.5 py-1.5 text-[10px] font-black text-slate-500">
               {currentPositionLabel}
             </div>
           </div>
 
           <input
             aria-label="월별 레이스 지점 선택"
-            className="mt-3 w-full accent-slate-950"
+            className="mt-2 w-full accent-slate-950"
             max={availableMaxIndex}
             min={0}
             onChange={(event) => onSeekRaceIndex(Number(event.currentTarget.value))}
@@ -2291,9 +2293,9 @@ function RaceExploreControls({
             value={safeCurrentIndex}
           />
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="mt-2 grid grid-cols-3 gap-1.5">
             <button
-              className="rounded-[17px] border border-slate-200 bg-slate-50 px-2 py-2.5 text-[11px] font-black text-slate-600 disabled:opacity-35"
+              className="rounded-[14px] border border-slate-200 bg-slate-50 px-2 py-2 text-[10px] font-black text-slate-600 disabled:opacity-35"
               disabled={!previousEvent}
               onClick={() => previousEvent && onSeekRaceIndex(previousEvent.index)}
               type="button"
@@ -2301,14 +2303,14 @@ function RaceExploreControls({
               이전 장면
             </button>
             <button
-              className="rounded-[17px] bg-slate-950 px-2 py-2.5 text-[11px] font-black text-[#f8fafc] shadow-sm"
+              className="rounded-[14px] bg-slate-950 px-2 py-2 text-[10px] font-black text-[#f8fafc] shadow-sm"
               onClick={onResumeAutoRace}
               type="button"
             >
               자동으로 계속
             </button>
             <button
-              className="rounded-[17px] border border-slate-200 bg-slate-50 px-2 py-2.5 text-[11px] font-black text-slate-600 disabled:opacity-35"
+              className="rounded-[14px] border border-slate-200 bg-slate-50 px-2 py-2 text-[10px] font-black text-slate-600 disabled:opacity-35"
               disabled={!nextEvent}
               onClick={() => nextEvent && onSeekRaceIndex(nextEvent.index)}
               type="button"
@@ -2317,19 +2319,19 @@ function RaceExploreControls({
             </button>
           </div>
 
-          <div className="mt-3 rounded-[17px] bg-slate-50 px-3 py-2 text-[11px] font-bold leading-5 text-slate-500">
+          <div className="mt-2 line-clamp-1 rounded-[14px] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold leading-4 text-slate-500">
             {helperText}
           </div>
         </div>
       ) : (
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-[18px] bg-slate-50 px-3 py-2.5">
-          <div className="text-[11px] font-bold leading-5 text-slate-500">
+        <div className="flex items-center justify-between gap-2 rounded-[16px] bg-slate-50 px-2.5 py-2">
+          <div className="line-clamp-2 text-[10px] font-bold leading-4 text-slate-500">
             {raceStatus === "complete"
               ? "완주했습니다. 이제 전체 10년을 원하는 달로 되감아 볼 수 있습니다."
               : "자동으로 달리는 중입니다. 궁금한 순간엔 차트나 버튼을 눌러 멈춰보세요."}
           </div>
           <button
-            className="shrink-0 rounded-[15px] bg-white px-3 py-2 text-[11px] font-black text-slate-700 shadow-sm"
+            className="shrink-0 rounded-[13px] bg-white px-2.5 py-2 text-[10px] font-black text-slate-700 shadow-sm"
             onClick={onEnterManualExplore}
             type="button"
           >
@@ -2379,28 +2381,28 @@ function RaceTimeRail({
     : `중요 장면 ${eventCount}개 감지`;
 
   return (
-    <div className="mb-3 rounded-[22px] border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+    <div className="mb-2 rounded-[18px] border border-slate-200 bg-white px-3 py-2.5 shadow-[0_8px_20px_rgba(15,23,42,0.05)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
             <Clock3 size={14} />
             {statusLabel}
           </div>
-          <div className="mt-1 truncate text-lg font-black tracking-[-0.06em] text-slate-950">
+          <div className="mt-0.5 truncate text-base font-black tracking-[-0.06em] text-slate-950">
             {selectedName} 10년 레이스
           </div>
-          <div className="mt-0.5 text-[11px] font-bold text-slate-400">
+          <div className="mt-0.5 truncate text-[10px] font-bold text-slate-400">
             {rangeLabel || "실제 월별 데이터 기준"} · {eventSummary}
           </div>
         </div>
-        <div className="shrink-0 rounded-[18px] bg-slate-950 px-3 py-2 text-right text-[#f8fafc] shadow-sm">
-          <div className="text-[10px] font-black text-white/45">현재 시점</div>
-          <div className="mt-0.5 text-sm font-black tracking-[-0.04em]">
+        <div className="shrink-0 rounded-[15px] bg-slate-950 px-2.5 py-2 text-right text-[#f8fafc] shadow-sm">
+          <div className="text-[9px] font-black text-white/45">현재 시점</div>
+          <div className="mt-0.5 text-xs font-black tracking-[-0.04em]">
             {currentDate ? formatMonth(currentDate) : "--"}
           </div>
         </div>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
         <div
           className={`h-full rounded-full transition-all duration-300 ${
             isPaused ? "bg-amber-400" : "bg-blue-500"
@@ -2423,7 +2425,6 @@ function RaceAccountPulseCard({
   monthlyReturnPct,
   raceStatus,
   raceViewMode,
-  selectedMeta,
   value,
   visiblePeak,
 }: {
@@ -2437,7 +2438,6 @@ function RaceAccountPulseCard({
   monthlyReturnPct: number;
   raceStatus: RaceStatus;
   raceViewMode: RaceViewMode;
-  selectedMeta: LabAssetMeta;
   value: number;
   visiblePeak: number;
 }) {
@@ -2493,54 +2493,54 @@ function RaceAccountPulseCard({
 
   return (
     <div
-      className={`mt-3 border px-4 transition-all duration-300 ${
+      className={`mt-2 border px-3 transition-all duration-300 ${
         isCheckpoint
-          ? `rounded-[30px] border-2 py-5 shadow-[0_18px_44px_rgba(15,23,42,0.16)] ${toneClass.container}`
-          : `rounded-[24px] py-4 ${toneClass.container}`
+          ? `rounded-[24px] border-2 py-3 shadow-[0_14px_34px_rgba(15,23,42,0.14)] ${toneClass.container}`
+          : `rounded-[20px] py-3 ${toneClass.container}`
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div>
-          <div className={`text-[11px] font-black uppercase tracking-[0.18em] ${toneClass.eyebrow}`}>
+          <div className={`text-[10px] font-black uppercase tracking-[0.16em] ${toneClass.eyebrow}`}>
             {isCheckpoint ? "이 장면은 그냥 지나가지 않습니다" : currentDate ? formatMonth(currentDate) : "레이스 준비"}
           </div>
           <h3
-            className={`mt-1 font-black leading-tight tracking-[-0.06em] text-slate-950 ${
-              isCheckpoint ? "text-2xl" : "text-xl"
+            className={`mt-0.5 line-clamp-1 font-black leading-tight tracking-[-0.06em] text-slate-950 ${
+              isCheckpoint ? "text-xl" : "text-lg"
             }`}
           >
             {title}
           </h3>
         </div>
-        <div className={`rounded-full px-3 py-1.5 text-xs font-black ${toneClass.badge}`}>
+        <div className={`shrink-0 rounded-full px-2.5 py-1.5 text-[10px] font-black ${toneClass.badge}`}>
           {activeEvent ? "정지" : isManual ? "탐색" : isComplete ? "완료" : isDrop ? "하락" : isTemptation ? "유혹" : "진행"}
         </div>
       </div>
       <div
-        className={`mt-3 font-black leading-none tracking-[-0.08em] ${toneClass.value} ${
-          isCheckpoint ? "text-[2.25rem]" : "text-[1.75rem]"
+        className={`mt-2 font-black leading-none tracking-[-0.08em] ${toneClass.value} ${
+          isCheckpoint ? "text-[1.75rem]" : "text-[1.5rem]"
         }`}
       >
         {moneyLabel}
       </div>
-      <p className="mt-3 text-sm font-bold leading-6 text-slate-600">
+      <p className="mt-2 line-clamp-2 text-xs font-bold leading-5 text-slate-600">
         {description}
       </p>
       {activeEvent ? (
-        <div className="mt-4 rounded-[22px] border border-slate-200 bg-white px-3 py-3 shadow-sm">
+        <div className="mt-2 rounded-[18px] border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] font-black leading-5 text-slate-500">
+            <div className="text-[10px] font-black leading-4 text-slate-500">
               잠시 후 자동으로 이어집니다. 지금 이해했다면 바로 넘겨도 됩니다.
             </div>
             <button
-              className="shrink-0 rounded-[16px] bg-slate-950 px-4 py-2.5 text-xs font-black text-[#f8fafc] shadow-[0_10px_24px_rgba(15,23,42,0.18)] active:scale-95"
+              className="shrink-0 rounded-[14px] bg-slate-950 px-3 py-2 text-[10px] font-black text-[#f8fafc] shadow-[0_10px_24px_rgba(15,23,42,0.18)] active:scale-95"
               onClick={() => onContinueCheckpoint(activeEvent.id)}
               type="button"
             >
               계속 달리기
             </button>
           </div>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
             <div
               className="h-full rounded-full bg-slate-950 transition-[width] duration-100"
               style={{ width: `${checkpointProgressPct}%` }}
@@ -2548,7 +2548,7 @@ function RaceAccountPulseCard({
           </div>
         </div>
       ) : null}
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
         <RacePulseMetric label="평가금액" value={formatKrw(value)} />
         <RacePulseMetric label="이번 달" value={formatPct(monthlyReturnPct)} warning={monthlyChangeKrw < 0} />
         <RacePulseMetric
@@ -2557,11 +2557,6 @@ function RaceAccountPulseCard({
           warning={drawdownFromPeak < 0}
         />
       </div>
-      {!activeEvent ? (
-        <div className="mt-3 rounded-[18px] bg-white/68 px-3 py-2 text-[11px] font-bold leading-5 text-slate-500">
-          {selectedMeta.name}, 금은 실제 과거 데이터 기준입니다. 예금은 연 3.04% 복리 기준으로 비교합니다.
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -2576,9 +2571,9 @@ function RacePulseMetric({
   warning?: boolean;
 }) {
   return (
-    <div className="rounded-[17px] bg-white/78 px-2.5 py-2 shadow-sm">
-      <div className="text-[10px] font-black text-slate-400">{label}</div>
-      <div className={`mt-1 truncate text-xs font-black tracking-[-0.03em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
+    <div className="rounded-[14px] bg-white/78 px-2 py-1.5 shadow-sm">
+      <div className="text-[9px] font-black text-slate-400">{label}</div>
+      <div className={`mt-0.5 truncate text-[11px] font-black tracking-[-0.03em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
         {value}
       </div>
     </div>
