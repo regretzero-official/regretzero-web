@@ -33,7 +33,6 @@ import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-da
 type AssetTab = "all" | "kospi" | "nasdaq100" | "sp500" | "etf" | "coin";
 type BottomTab = "home" | "search" | "live" | "saved";
 type InvestmentMode = "lump" | "monthly";
-type RaceStartMode = "auto" | "guided";
 type RaceStatus = "complete" | "idle" | "loading" | "racing";
 type RaceViewMode = "auto" | "manual";
 type EmotionTone = "panic" | "recovery" | "sideways" | "temptation" | "underwater";
@@ -1566,7 +1565,6 @@ export function LongtermPainLab() {
   const [monthlyContributionInput, setMonthlyContributionInput] = useState(
     formatAmountInput(DEFAULT_MONTHLY_CONTRIBUTION_KRW),
   );
-  const [raceStartMode, setRaceStartMode] = useState<RaceStartMode>("auto");
   const [activeInvestmentPlan, setActiveInvestmentPlan] = useState<ActiveInvestmentPlan>({
     mode: "lump",
     principalKrw: DEFAULT_PRINCIPAL_KRW,
@@ -1624,7 +1622,7 @@ export function LongtermPainLab() {
   );
 
   const startRace = useCallback(
-    async (assetId?: ComparisonAssetId, startMode: RaceStartMode = raceStartMode) => {
+    async (assetId?: ComparisonAssetId) => {
       const nextAssetId = assetId ?? selectedAssetId;
       const nextPlan = pendingInvestmentPlan;
       const inputAmountKrw = getPlanInputAmount(nextPlan);
@@ -1642,7 +1640,7 @@ export function LongtermPainLab() {
       setRaceError("");
       setRaceStatus("loading");
       setRaceViewMode("auto");
-      setCheckpointStopsEnabled(startMode === "guided");
+      setCheckpointStopsEnabled(false);
       setVisibleCount(0);
       setAutoStartIndex(0);
       setRaceFurthestIndex(0);
@@ -1665,7 +1663,7 @@ export function LongtermPainLab() {
         setRaceError(error instanceof Error ? error.message : "레이스를 시작하지 못했습니다.");
       }
     },
-    [pendingInvestmentPlan, raceStartMode, selectedAssetId],
+    [pendingInvestmentPlan, selectedAssetId],
   );
 
   useEffect(() => {
@@ -1800,7 +1798,6 @@ export function LongtermPainLab() {
   );
 
   const resumeAutoRace = useCallback(() => resumeRaceFromCurrent(false), [resumeRaceFromCurrent]);
-  const resumeGuidedRace = useCallback(() => resumeRaceFromCurrent(true), [resumeRaceFromCurrent]);
 
   const labAssetIds = useMemo(() => getLabAssetIds(), []);
   const filteredAssets = useMemo(() => {
@@ -1833,12 +1830,10 @@ export function LongtermPainLab() {
               lumpSumInput={lumpSumInput}
               monthlyContributionInput={monthlyContributionInput}
               onStart={() => void startRace()}
-              raceStartMode={raceStartMode}
               selectedMeta={selectedMeta}
               setInvestmentMode={setInvestmentMode}
               setLumpSumInput={(value) => setLumpSumInput(normalizeKrwInput(value))}
               setMonthlyContributionInput={(value) => setMonthlyContributionInput(normalizeKrwInput(value))}
-              setRaceStartMode={setRaceStartMode}
             />
             {raceError ? (
               <div className="rounded-[24px] border border-rose-200 bg-white px-4 py-4 text-sm font-semibold leading-6 text-rose-600">
@@ -1859,7 +1854,6 @@ export function LongtermPainLab() {
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
                   onResumeAutoRace={resumeAutoRace}
-                  onResumeGuidedRace={resumeGuidedRace}
                   onSeekRaceIndex={seekRaceIndex}
                   checkpointStopsEnabled={checkpointStopsEnabled}
                   investmentPlan={activeInvestmentPlan}
@@ -1928,23 +1922,19 @@ function Hero({
   lumpSumInput,
   monthlyContributionInput,
   onStart,
-  raceStartMode,
   selectedMeta,
   setInvestmentMode,
   setLumpSumInput,
   setMonthlyContributionInput,
-  setRaceStartMode,
 }: {
   investmentMode: InvestmentMode;
   lumpSumInput: string;
   monthlyContributionInput: string;
   onStart: () => void;
-  raceStartMode: RaceStartMode;
   selectedMeta: LabAssetMeta;
   setInvestmentMode: (mode: InvestmentMode) => void;
   setLumpSumInput: (value: string) => void;
   setMonthlyContributionInput: (value: string) => void;
-  setRaceStartMode: (mode: RaceStartMode) => void;
 }) {
   const amountLabel = investmentMode === "monthly" ? "매달 적립액" : "한 번에 투자금";
   const amountValue = investmentMode === "monthly" ? monthlyContributionInput : lumpSumInput;
@@ -1953,7 +1943,6 @@ function Hero({
     investmentMode === "monthly"
       ? `매달 ${formatKrw(parseKrwInput(monthlyContributionInput))}씩`
       : `${formatKrw(parseKrwInput(lumpSumInput))} 한 번에`;
-  const ctaLabel = raceStartMode === "guided" ? "멈춰가며 직접 탐색하기" : "자동으로 끝까지 달리기";
 
   return (
     <SectionCard className="overflow-hidden p-5">
@@ -2025,47 +2014,16 @@ function Hero({
         </label>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <button
-          className={`rounded-[18px] border px-3 py-3 text-left transition ${
-            raceStartMode === "auto"
-              ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
-              : "border-slate-200 bg-slate-50 text-slate-500"
-          }`}
-          onClick={() => setRaceStartMode("auto")}
-          type="button"
-        >
-          <div className="text-sm font-black">자동 감상</div>
-          <div className={`mt-1 text-[11px] font-bold ${raceStartMode === "auto" ? "text-slate-300" : "text-slate-400"}`}>
-            멈추지 않고 완주
-          </div>
-        </button>
-        <button
-          className={`rounded-[18px] border px-3 py-3 text-left transition ${
-            raceStartMode === "guided"
-              ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
-              : "border-slate-200 bg-slate-50 text-slate-500"
-          }`}
-          onClick={() => setRaceStartMode("guided")}
-          type="button"
-        >
-          <div className="text-sm font-black">직접 탐색</div>
-          <div className={`mt-1 text-[11px] font-bold ${raceStartMode === "guided" ? "text-slate-300" : "text-slate-400"}`}>
-            중요 장면에서 정지
-          </div>
-        </button>
-      </div>
-
       <button
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-[22px] bg-slate-950 px-5 py-4 text-[15px] font-black text-[#f8fafc] shadow-[0_18px_38px_rgba(15,23,42,0.22)]"
         onClick={onStart}
         type="button"
       >
-        {ctaLabel}
+        자동으로 10년 레이스 보기
         <ChevronRight size={18} />
       </button>
       <p className="mt-3 text-center text-xs font-bold text-slate-400">
-        다른 종목은 하단 자산 탭에서 고를 수 있습니다.
+        레이스 도중 차트를 누르면 그 순간부터 멈춰서 돌려볼 수 있습니다.
       </p>
     </SectionCard>
   );
@@ -2104,7 +2062,6 @@ function RaceStage({
   onOpenSearch,
   onRestart,
   onResumeAutoRace,
-  onResumeGuidedRace,
   onSeekRaceIndex,
   raceAssets,
   raceBuild,
@@ -2127,7 +2084,6 @@ function RaceStage({
   onOpenSearch: () => void;
   onRestart: () => void;
   onResumeAutoRace: () => void;
-  onResumeGuidedRace: () => void;
   onSeekRaceIndex: (index: number) => void;
   raceAssets: RaceChartAsset[];
   raceBuild: RaceBuildResult | null;
@@ -2159,6 +2115,9 @@ function RaceStage({
       ? Math.min(100, Math.max(0, (currentIndex / (raceBuild.points.length - 1)) * 100))
       : 0;
   const currentDate = currentPoint?.date ?? raceBuild?.resolvedStartDate ?? "";
+  const canPauseByTouch = raceStatus === "racing" && raceViewMode === "auto" && !activeRaceEvent;
+  const basisLabel =
+    investmentPlan.mode === "monthly" ? "1.0배 = 그 시점까지 넣은 돈" : `1.0배 = ${formatKrw(inputAmountKrw)}`;
 
   return (
     <div className="space-y-5">
@@ -2179,19 +2138,19 @@ function RaceStage({
           currentPoint={currentPoint}
           onEnterManualExplore={onEnterManualExplore}
           onResumeAutoRace={onResumeAutoRace}
-          onResumeGuidedRace={onResumeGuidedRace}
           onSeekRaceIndex={onSeekRaceIndex}
-          checkpointStopsEnabled={checkpointStopsEnabled}
           raceBuild={raceBuild}
           raceEventStops={raceEventStops}
           raceFurthestIndex={raceFurthestIndex}
           raceStatus={raceStatus}
           raceViewMode={raceViewMode}
         />
-        <div className="relative">
+        <div
+          className={`relative ${canPauseByTouch ? "cursor-pointer" : ""}`}
+        >
           <RaceChart
             assets={raceAssets}
-            basisLabel="1.0배 = 1,000만원"
+            basisLabel={basisLabel}
             checkpointActive={Boolean(activeRaceEvent)}
             compact
             currentPoint={currentPoint}
@@ -2210,6 +2169,18 @@ function RaceStage({
                 체크포인트 · {formatMonth(activeRaceEvent.date)}
               </div>
             </>
+          ) : null}
+          {canPauseByTouch ? (
+            <button
+              aria-label="차트 멈춰보기"
+              className="absolute inset-0 z-30 rounded-[24px] text-left outline-none focus-visible:ring-2 focus-visible:ring-slate-950/30"
+              onClick={onEnterManualExplore}
+              type="button"
+            >
+              <span className="absolute right-3 top-3 rounded-full border border-white/70 bg-white/85 px-3 py-1.5 text-[11px] font-black text-slate-600 shadow-sm backdrop-blur">
+                차트 터치로 멈춤
+              </span>
+            </button>
           ) : null}
         </div>
         <RaceAccountPulseCard
@@ -2250,12 +2221,10 @@ function RaceStage({
 }
 
 function RaceExploreControls({
-  checkpointStopsEnabled,
   currentIndex,
   currentPoint,
   onEnterManualExplore,
   onResumeAutoRace,
-  onResumeGuidedRace,
   onSeekRaceIndex,
   raceBuild,
   raceEventStops,
@@ -2263,12 +2232,10 @@ function RaceExploreControls({
   raceStatus,
   raceViewMode,
 }: {
-  checkpointStopsEnabled: boolean;
   currentIndex: number;
   currentPoint: RacePoint | null;
   onEnterManualExplore: () => void;
   onResumeAutoRace: () => void;
-  onResumeGuidedRace: () => void;
   onSeekRaceIndex: (index: number) => void;
   raceBuild: RaceBuildResult | null;
   raceEventStops: RaceEventStop[];
@@ -2290,7 +2257,6 @@ function RaceExploreControls({
   const totalRaceMonths = Math.max(0, raceBuild.points.length - 1);
   const currentPositionLabel = `${Math.min(safeCurrentIndex, totalRaceMonths)} / ${totalRaceMonths}개월`;
   const isManual = raceViewMode === "manual";
-  const isGuidedRace = !isManual && checkpointStopsEnabled;
   const helperText =
     raceStatus === "complete"
       ? "완주한 뒤에는 전체 10년을 마음대로 훑어볼 수 있습니다. 어디서 흔들렸을지 하나씩 눌러보세요."
@@ -2298,33 +2264,12 @@ function RaceExploreControls({
 
   return (
     <div className="mb-3 rounded-[22px] border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
-      <div className="grid grid-cols-2 gap-2 rounded-[18px] bg-slate-100 p-1">
-        <button
-          className={`rounded-[15px] px-3 py-2 text-xs font-black transition ${
-            !isManual && !checkpointStopsEnabled ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
-          }`}
-          onClick={onResumeAutoRace}
-          type="button"
-        >
-          자동 완주
-        </button>
-        <button
-          className={`rounded-[15px] px-3 py-2 text-xs font-black transition ${
-            isManual || checkpointStopsEnabled ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
-          }`}
-          onClick={onEnterManualExplore}
-          type="button"
-        >
-          직접 탐색
-        </button>
-      </div>
-
       {isManual ? (
-        <div className="mt-3">
+        <div>
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
-                직접 탐색 중
+                멈춘 시점
               </div>
               <div className="mt-1 text-lg font-black tracking-[-0.06em] text-slate-950">
                 {currentMonthLabel}
@@ -2357,10 +2302,10 @@ function RaceExploreControls({
             </button>
             <button
               className="rounded-[17px] bg-slate-950 px-2 py-2.5 text-[11px] font-black text-[#f8fafc] shadow-sm"
-              onClick={onResumeGuidedRace}
+              onClick={onResumeAutoRace}
               type="button"
             >
-              여기서 재생
+              자동으로 계속
             </button>
             <button
               className="rounded-[17px] border border-slate-200 bg-slate-50 px-2 py-2.5 text-[11px] font-black text-slate-600 disabled:opacity-35"
@@ -2379,16 +2324,16 @@ function RaceExploreControls({
       ) : (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-[18px] bg-slate-50 px-3 py-2.5">
           <div className="text-[11px] font-bold leading-5 text-slate-500">
-            {isGuidedRace
-              ? "중요 장면에서 잠깐 멈추며 계좌의 흔들림을 짚어봅니다."
-              : "자동 완주는 멈추지 않고 끝까지 달립니다. 보고 싶은 달은 직접 탐색에서 멈춰보세요."}
+            {raceStatus === "complete"
+              ? "완주했습니다. 이제 전체 10년을 원하는 달로 되감아 볼 수 있습니다."
+              : "자동으로 달리는 중입니다. 궁금한 순간엔 차트나 버튼을 눌러 멈춰보세요."}
           </div>
           <button
             className="shrink-0 rounded-[15px] bg-white px-3 py-2 text-[11px] font-black text-slate-700 shadow-sm"
             onClick={onEnterManualExplore}
             type="button"
           >
-            멈춰보기
+            {raceStatus === "complete" ? "되감아보기" : "멈춰보기"}
           </button>
         </div>
       )}
