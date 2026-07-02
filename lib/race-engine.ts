@@ -216,6 +216,26 @@ function minDate(dates: string[]) {
   return [...dates].sort((left, right) => left.localeCompare(right))[0]!;
 }
 
+function buildCanonicalMonthlyTimeline(startDate: string, endDate: string) {
+  const timeline = new Set<string>([startDate, endDate]);
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  let monthOffset = 1;
+
+  while (true) {
+    const monthlyAnchor = addMonths(start, monthOffset);
+
+    if (monthlyAnchor >= end) {
+      break;
+    }
+
+    timeline.add(formatLocalDate(monthlyAnchor));
+    monthOffset += 1;
+  }
+
+  return [...timeline].sort((left, right) => left.localeCompare(right));
+}
+
 function applyPriceSeriesResolution(
   points: AssetPricePoint[],
   resolution: RaceResolution | "auto",
@@ -692,23 +712,26 @@ export function buildRaceData(
   const commonStartDate = maxDate(resolvedStartCandidates.filter((date): date is string => Boolean(date)));
   const commonEndDate = minDate(resolvedEndCandidates.filter((date): date is string => Boolean(date)));
 
-  const timeline = Array.from(
-    new Set([
-      commonStartDate,
-      commonEndDate,
-      ...assetIds.flatMap((assetId) =>
-        buildAssetPriceSeries(
-          assetId,
-          bundle,
-          commonStartDate,
-          commonEndDate,
-          resolution,
-        ).map((point) => point.date),
-      ),
-    ]),
-  )
-    .filter((date) => date >= commonStartDate && date <= commonEndDate)
-    .sort((left, right) => left.localeCompare(right));
+  const timeline =
+    resolution === "monthly"
+      ? buildCanonicalMonthlyTimeline(commonStartDate, commonEndDate)
+      : Array.from(
+          new Set([
+            commonStartDate,
+            commonEndDate,
+            ...assetIds.flatMap((assetId) =>
+              buildAssetPriceSeries(
+                assetId,
+                bundle,
+                commonStartDate,
+                commonEndDate,
+                resolution,
+              ).map((point) => point.date),
+            ),
+          ]),
+        )
+          .filter((date) => date >= commonStartDate && date <= commonEndDate)
+          .sort((left, right) => left.localeCompare(right));
 
   const points = timeline.flatMap((date, index) => {
     const point: RacePoint = {

@@ -160,6 +160,91 @@ describe("race-engine deposit integration", () => {
     expect(Number(race.points[race.points.length - 1]?.deposit ?? 0)).toBeGreaterThan(10_000_000);
   });
 
+  it("keeps monthly race timelines on a canonical monthly grid", () => {
+    const misalignedBundle: MarketBundle = {
+      seriesByAsset: {
+        gold: {
+          daily: [
+            { close: 10, date: "2020-01-15" },
+            { close: 11, date: "2020-01-30" },
+            { close: 12, date: "2020-02-27" },
+            { close: 13, date: "2020-03-12" },
+          ],
+          meta: {
+            currency: "USD",
+            priceBasis: "close",
+            provider: "yahoo-finance",
+            resolvedEndDate: "2020-03-12",
+            resolvedStartDate: "2020-01-15",
+            ticker: "GOLD",
+          },
+          monthly: [],
+          stats: {
+            firstClose: 10,
+            firstDate: "2020-01-15",
+            lastClose: 13,
+            lastDate: "2020-03-12",
+            maxDrawdownDate: "2020-01-15",
+            maxDrawdownPct: 0,
+            returnPct: 30,
+          },
+        },
+        qqq: {
+          daily: [
+            { close: 100, date: "2020-01-15" },
+            { close: 105, date: "2020-01-31" },
+            { close: 110, date: "2020-02-28" },
+            { close: 115, date: "2020-03-13" },
+          ],
+          meta: {
+            currency: "USD",
+            priceBasis: "adjusted_close",
+            provider: "yahoo-finance",
+            resolvedEndDate: "2020-03-13",
+            resolvedStartDate: "2020-01-15",
+            ticker: "QQQ",
+          },
+          monthly: [],
+          stats: {
+            firstClose: 100,
+            firstDate: "2020-01-15",
+            lastClose: 115,
+            lastDate: "2020-03-13",
+            maxDrawdownDate: "2020-01-15",
+            maxDrawdownPct: 0,
+            returnPct: 15,
+          },
+        },
+      },
+      source: "live",
+      usdkrw: {
+        ...usdSeries,
+        daily: [
+          { close: 1200, date: "2020-01-15" },
+          { close: 1210, date: "2020-01-29" },
+          { close: 1220, date: "2020-02-26" },
+          { close: 1230, date: "2020-03-13" },
+        ],
+        monthly: [],
+      },
+    };
+
+    const race = buildRaceData(
+      ["qqq", "gold", "deposit"],
+      misalignedBundle,
+      1_000_000,
+      "2020-01-15",
+      "2020-03-15",
+      "monthly",
+    );
+
+    expect(race.points.map((point) => point.date)).toEqual([
+      "2020-01-15",
+      "2020-02-15",
+      "2020-03-12",
+    ]);
+  });
+
   it("supports start-point calculations for deposit", () => {
     const result = buildStartPointResult(
       "deposit",

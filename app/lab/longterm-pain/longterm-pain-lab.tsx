@@ -1309,7 +1309,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     resolvedStartDate: build.resolvedStartDate,
     startValue,
     underATHMonths,
-    underATHPercent: Math.round((underATHMonths / points.length) * 100),
+    underATHPercent: Math.round((underATHMonths / Math.max(1, points.length - 1)) * 100),
     underPrincipalMonths,
   };
 }
@@ -2035,7 +2035,8 @@ function RaceExploreControls({
   const nextEvent =
     raceEventStops.find((event) => event.index > safeCurrentIndex && event.index <= availableMaxIndex) ?? null;
   const currentMonthLabel = currentPoint ? formatMonth(currentPoint.date) : formatMonth(raceBuild.resolvedStartDate);
-  const currentPositionLabel = `${Math.min(safeCurrentIndex + 1, raceBuild.points.length)} / ${raceBuild.points.length}개월`;
+  const totalRaceMonths = Math.max(0, raceBuild.points.length - 1);
+  const currentPositionLabel = `${Math.min(safeCurrentIndex, totalRaceMonths)} / ${totalRaceMonths}개월`;
   const isManual = raceViewMode === "manual";
   const helperText =
     raceStatus === "complete"
@@ -2553,12 +2554,12 @@ function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
           warning
         />
         <MetricCard
-          label="본전 아래에서 한숨 쉬며 보낸 시간"
+          label="전고점 아래에서 한숨 쉬며 보낸 시간"
           value={`${analysis.underATHMonths}개월`}
           warning
         />
         <MetricCard
-          label="원금까지 깨져 망했다고 느꼈을 기간"
+          label="원금 1,000만원 아래로 깨진 기간"
           value={`${analysis.underPrincipalMonths}개월`}
           warning={analysis.underPrincipalMonths > 0}
         />
@@ -2814,7 +2815,7 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         </div>
       </div>
       <p className="mt-3 text-sm font-semibold leading-6 text-slate-500">
-        전체 120개월을 다 보기 전에, 실제로 손이 매도 버튼으로 갔을 법한 달부터 짚어봅니다.
+        전체 월별 지도를 다 보기 전에, 실제로 손이 매도 버튼으로 갔을 법한 달부터 짚어봅니다.
       </p>
 
       <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 px-3 py-3">
@@ -2925,7 +2926,7 @@ function EmotionMap({ analysis }: { analysis: PainAnalysis }) {
         onClick={() => setShowFullMap((open) => !open)}
         type="button"
       >
-        {showFullMap ? "전체 120개월 지도 접기" : "전체 120개월 지도 펼치기"}
+        {showFullMap ? "전체 월별 지도 접기" : "전체 월별 지도 펼치기"}
       </button>
 
       {showFullMap ? (
