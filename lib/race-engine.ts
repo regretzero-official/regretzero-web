@@ -894,24 +894,7 @@ export function buildMonthlyContributionRaceData(
     throw new Error("적립식 비교에는 최소 한 번 이상의 납입 구간이 필요합니다.");
   }
 
-  const timeline = Array.from(
-    new Set([
-      commonStartDate,
-      commonEndDate,
-      ...contributionDates,
-      ...assetIds.flatMap((assetId) =>
-        buildAssetPriceSeries(
-          assetId,
-          bundle,
-          commonStartDate,
-          commonEndDate,
-          "monthly",
-        ).map((point) => point.date),
-      ),
-    ]),
-  )
-    .filter((date) => date >= commonStartDate && date <= commonEndDate)
-    .sort((left, right) => left.localeCompare(right));
+  const timeline = buildCanonicalMonthlyTimeline(commonStartDate, commonEndDate);
 
   const points = timeline.flatMap((date, index) => {
     const totalInvestedKrw = getTotalInvestedAtDate(

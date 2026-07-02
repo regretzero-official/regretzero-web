@@ -22,6 +22,7 @@ import {
 } from "@/lib/home-content";
 import {
   buildRaceData,
+  buildMonthlyContributionRaceData,
   getRequestedDateRange,
   type MarketBundle,
   type RaceBuildResult,
@@ -31,6 +32,8 @@ import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-da
 
 type AssetTab = "all" | "kospi" | "nasdaq100" | "sp500" | "etf" | "coin";
 type BottomTab = "home" | "search" | "live" | "saved";
+type InvestmentMode = "lump" | "monthly";
+type RaceStartMode = "auto" | "guided";
 type RaceStatus = "complete" | "idle" | "loading" | "racing";
 type RaceViewMode = "auto" | "manual";
 type EmotionTone = "panic" | "recovery" | "sideways" | "temptation" | "underwater";
@@ -72,6 +75,7 @@ interface EmotionMonth {
   eventType: EmotionEventType;
   futureMasked: boolean;
   impulseLabel: string;
+  investedBasisKrw: number;
   label: string;
   marker: string;
   missedAmount: number;
@@ -97,7 +101,9 @@ interface PainAnalysis {
   bearMoments: Array<{ date: string; dropPct: number; value: number }>;
   emotionMonths: EmotionMonth[];
   finalValue: number;
+  finalInvestedKrw: number;
   goldGap: number;
+  investmentMode: InvestmentMode;
   longestRecoveryMonths: number;
   maxDrawdownDate: string;
   maxDrawdownPct: number;
@@ -109,6 +115,16 @@ interface PainAnalysis {
   underATHPercent: number;
   underPrincipalMonths: number;
 }
+
+type ActiveInvestmentPlan =
+  | {
+      mode: "lump";
+      principalKrw: number;
+    }
+  | {
+      mode: "monthly";
+      monthlyContributionKrw: number;
+    };
 
 type RaceEventTone = "danger" | "neutral" | "recovery" | "temptation";
 
@@ -122,7 +138,8 @@ interface RaceEventStop {
   tone: RaceEventTone;
 }
 
-const PRINCIPAL_KRW = DEFAULT_AMOUNT;
+const DEFAULT_PRINCIPAL_KRW = DEFAULT_AMOUNT;
+const DEFAULT_MONTHLY_CONTRIBUTION_KRW = 300_000;
 const RACE_ACTIVE_DURATION_MS = 20_000;
 const RACE_EVENT_PAUSE_MS = 5_500;
 
@@ -629,6 +646,29 @@ function isSyntheticAsset(assetId: ComparisonAssetId) {
   return assetId === "deposit";
 }
 
+function formatAmountInput(value: number) {
+  return Math.max(0, Math.round(value)).toLocaleString("ko-KR");
+}
+
+function parseKrwInput(value: string) {
+  const digits = value.replace(/[^\d]/g, "");
+  return digits ? Number(digits) : 0;
+}
+
+function normalizeKrwInput(value: string) {
+  const amount = parseKrwInput(value);
+  return amount > 0 ? amount.toLocaleString("ko-KR") : "";
+}
+
+function getPlanInputAmount(plan: ActiveInvestmentPlan) {
+  return plan.mode === "monthly" ? plan.monthlyContributionKrw : plan.principalKrw;
+}
+
+function getPointInvestmentBasis(point: RacePoint | null | undefined, fallbackKrw: number) {
+  const totalInvested = Number(point?.totalInvestedKrw ?? 0);
+  return totalInvested > 0 ? totalInvested : fallbackKrw;
+}
+
 async function requestHistoricalSeries(
   ticker: MarketDataTicker,
   startDate: string,
@@ -649,7 +689,7 @@ async function requestHistoricalSeries(
   return payload as HistoricalSeriesResponse;
 }
 
-async function loadRaceBuild(assetId: ComparisonAssetId) {
+async function loadRaceBuild(assetId: ComparisonAssetId, plan: ActiveInvestmentPlan) {
   const selectedAsset = assetCatalog[assetId];
 
   if (!selectedAsset?.isAvailable || !selectedAsset.marketTicker) {
@@ -689,7 +729,17 @@ async function loadRaceBuild(assetId: ComparisonAssetId) {
     usdkrw,
   };
 
-  return buildRaceData(assetIds, bundle, PRINCIPAL_KRW, dateRange.start, dateRange.end, "monthly");
+  if (plan.mode === "monthly") {
+    return buildMonthlyContributionRaceData(
+      assetIds,
+      bundle,
+      plan.monthlyContributionKrw,
+      dateRange.start,
+      dateRange.end,
+    );
+  }
+
+  return buildRaceData(assetIds, bundle, plan.principalKrw, dateRange.start, dateRange.end, "monthly");
 }
 
 function formatKrw(value: number) {
@@ -1144,16 +1194,22 @@ function getEmotionVerdict(month: EmotionMonth) {
   return "조용한 달도 장기투자의 일부입니다. 아무 일도 없어 보이는 시간이 쌓여야, 나중에 한 번의 큰 움직임을 온전히 가져갈 수 있습니다.";
 }
 
-function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): PainAnalysis | null {
+function buildPainAnalysis(
+  build: RaceBuildResult,
+  assetId: ComparisonAssetId,
+  plan: ActiveInvestmentPlan,
+): PainAnalysis | null {
   if (build.points.length < 2) {
     return null;
   }
 
   const points = build.points;
+  const fallbackBasisKrw = getPlanInputAmount(plan);
   const startPoint = points[0]!;
   const finalPoint = points[points.length - 1]!;
-  const startValue = getValue(startPoint, assetId);
+  const startValue = getPointInvestmentBasis(startPoint, fallbackBasisKrw);
   const finalValue = getValue(finalPoint, assetId);
+  const finalInvestedKrw = getPointInvestmentBasis(finalPoint, fallbackBasisKrw);
   let peak = startValue;
   let maxDrawdownPct = 0;
   let maxDrawdownDate = startPoint.date;
@@ -1165,6 +1221,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
 
   points.forEach((point, index) => {
     const value = getValue(point, assetId);
+    const investedBasisKrw = getPointInvestmentBasis(point, fallbackBasisKrw);
 
     if (value >= peak) {
       peak = value;
@@ -1175,7 +1232,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
       currentUnderATHStreak += 1;
     }
 
-    if (value < startValue) {
+    if (value < investedBasisKrw) {
       underPrincipalMonths += 1;
     }
 
@@ -1196,7 +1253,10 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
 
   const milestones = [2, 5, 10, 20]
     .map((multiple): PainMilestone | null => {
-      const point = points.find((item) => getValue(item, assetId) >= startValue * multiple);
+      const point = points.find((item) => {
+        const investedBasisKrw = getPointInvestmentBasis(item, fallbackBasisKrw);
+        return getValue(item, assetId) >= investedBasisKrw * multiple;
+      });
       if (!point) {
         return null;
       }
@@ -1212,12 +1272,13 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     .filter((item): item is PainMilestone => Boolean(item));
 
   const worstDrops = [...monthlyDrops].sort((left, right) => left.dropPct - right.dropPct).slice(0, 3);
-  const finalReturnPct = startValue > 0 ? (finalValue / startValue - 1) * 100 : 0;
+  const finalReturnPct = finalInvestedKrw > 0 ? (finalValue / finalInvestedKrw - 1) * 100 : 0;
   let emotionPeak = startValue;
   let monthsSinceEmotionPeak = 0;
   const rawEmotionMonths = points.map((point, index) => {
     const value = getValue(point, assetId);
     const previousValue = index > 0 ? getValue(points[index - 1]!, assetId) : startValue;
+    const investedBasisKrw = getPointInvestmentBasis(point, fallbackBasisKrw);
     const monthlyReturnPct = previousValue > 0 ? (value / previousValue - 1) * 100 : 0;
     const previousPeak = emotionPeak;
     const previousPeakWaitMonths = monthsSinceEmotionPeak;
@@ -1232,7 +1293,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     }
 
     const drawdownPct = emotionPeak > 0 ? (value / emotionPeak - 1) * 100 : 0;
-    const totalReturnPct = startValue > 0 ? (value / startValue - 1) * 100 : 0;
+    const totalReturnPct = investedBasisKrw > 0 ? (value / investedBasisKrw - 1) * 100 : 0;
     const emotion = getEmotionEvent({
       drawdownPct,
       isAth,
@@ -1254,6 +1315,7 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
       eventType: emotion.eventType,
       futureMasked: false,
       impulseLabel: emotion.impulseLabel,
+      investedBasisKrw,
       label: emotion.label,
       marker: emotion.marker,
       missedAmount: Math.max(0, finalValue - value),
@@ -1301,7 +1363,9 @@ function buildPainAnalysis(build: RaceBuildResult, assetId: ComparisonAssetId): 
     bearMoments: worstDrops,
     emotionMonths,
     finalValue,
+    finalInvestedKrw,
     goldGap: finalValue - getValue(finalPoint, "gold"),
+    investmentMode: plan.mode,
     longestRecoveryMonths,
     maxDrawdownDate,
     maxDrawdownPct,
@@ -1359,7 +1423,7 @@ function buildRaceEventStops(analysis: PainAnalysis | null): RaceEventStop[] {
       moneyLabel: isDrop
         ? `${formatKrw(absChange)} 사라짐`
         : month.totalReturnPct >= 100
-          ? `원금 대비 ${formatMultiple(month.value / PRINCIPAL_KRW)}`
+          ? `투입금 대비 ${formatMultiple(month.value / month.investedBasisKrw)}`
           : `${formatKrw(absChange)} 증가`,
       title: fallbackTitle ?? month.label,
       tone: getEventTone(month),
@@ -1497,12 +1561,23 @@ export function LongtermPainLab() {
   const [activeBottomTab, setActiveBottomTab] = useState<BottomTab>("home");
   const [assetTab, setAssetTab] = useState<AssetTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [investmentMode, setInvestmentMode] = useState<InvestmentMode>("lump");
+  const [lumpSumInput, setLumpSumInput] = useState(formatAmountInput(DEFAULT_PRINCIPAL_KRW));
+  const [monthlyContributionInput, setMonthlyContributionInput] = useState(
+    formatAmountInput(DEFAULT_MONTHLY_CONTRIBUTION_KRW),
+  );
+  const [raceStartMode, setRaceStartMode] = useState<RaceStartMode>("auto");
+  const [activeInvestmentPlan, setActiveInvestmentPlan] = useState<ActiveInvestmentPlan>({
+    mode: "lump",
+    principalKrw: DEFAULT_PRINCIPAL_KRW,
+  });
   const [selectedAssetId, setSelectedAssetId] = useState<ComparisonAssetId>("nvda");
   const [searchSelectedAssetId, setSearchSelectedAssetId] = useState<ComparisonAssetId>("nvda");
   const [raceBuild, setRaceBuild] = useState<RaceBuildResult | null>(null);
   const [raceError, setRaceError] = useState("");
   const [raceStatus, setRaceStatus] = useState<RaceStatus>("idle");
   const [raceViewMode, setRaceViewMode] = useState<RaceViewMode>("auto");
+  const [checkpointStopsEnabled, setCheckpointStopsEnabled] = useState(false);
   const [visibleCount, setVisibleCount] = useState(0);
   const [autoStartIndex, setAutoStartIndex] = useState(0);
   const [raceFurthestIndex, setRaceFurthestIndex] = useState(0);
@@ -1511,6 +1586,19 @@ export function LongtermPainLab() {
   const [raceCheckpointProgress, setRaceCheckpointProgress] = useState(0);
 
   const selectedMeta = getMeta(selectedAssetId);
+  const pendingInvestmentPlan = useMemo<ActiveInvestmentPlan>(() => {
+    if (investmentMode === "monthly") {
+      return {
+        mode: "monthly",
+        monthlyContributionKrw: parseKrwInput(monthlyContributionInput),
+      };
+    }
+
+    return {
+      mode: "lump",
+      principalKrw: parseKrwInput(lumpSumInput),
+    };
+  }, [investmentMode, lumpSumInput, monthlyContributionInput]);
   const currentPoint = raceBuild?.points[Math.max(0, visibleCount - 1)] ?? null;
   const visibleData = raceBuild ? raceBuild.points.slice(0, Math.max(1, visibleCount)) : [];
   const raceAssets = useMemo<RaceChartAsset[]>(
@@ -1526,8 +1614,8 @@ export function LongtermPainLab() {
     [selectedAssetId, selectedMeta],
   );
   const analysis = useMemo(
-    () => (raceBuild ? buildPainAnalysis(raceBuild, selectedAssetId) : null),
-    [raceBuild, selectedAssetId],
+    () => (raceBuild ? buildPainAnalysis(raceBuild, selectedAssetId, activeInvestmentPlan) : null),
+    [activeInvestmentPlan, raceBuild, selectedAssetId],
   );
   const raceEventStops = useMemo(() => buildRaceEventStops(analysis), [analysis]);
   const activeRaceEvent = useMemo(
@@ -1536,15 +1624,25 @@ export function LongtermPainLab() {
   );
 
   const startRace = useCallback(
-    async (assetId?: ComparisonAssetId) => {
+    async (assetId?: ComparisonAssetId, startMode: RaceStartMode = raceStartMode) => {
       const nextAssetId = assetId ?? selectedAssetId;
+      const nextPlan = pendingInvestmentPlan;
+      const inputAmountKrw = getPlanInputAmount(nextPlan);
+
+      if (inputAmountKrw <= 0) {
+        setRaceError("투자금은 1원 이상 입력해야 합니다.");
+        return;
+      }
+
       setActiveBottomTab("home");
       setSelectedAssetId(nextAssetId);
       setSearchSelectedAssetId(nextAssetId);
+      setActiveInvestmentPlan(nextPlan);
       setRaceBuild(null);
       setRaceError("");
       setRaceStatus("loading");
       setRaceViewMode("auto");
+      setCheckpointStopsEnabled(startMode === "guided");
       setVisibleCount(0);
       setAutoStartIndex(0);
       setRaceFurthestIndex(0);
@@ -1557,7 +1655,7 @@ export function LongtermPainLab() {
       });
 
       try {
-        const build = await loadRaceBuild(nextAssetId);
+        const build = await loadRaceBuild(nextAssetId, nextPlan);
         setRaceBuild(build);
         setVisibleCount(1);
         setRaceFurthestIndex(0);
@@ -1567,7 +1665,7 @@ export function LongtermPainLab() {
         setRaceError(error instanceof Error ? error.message : "레이스를 시작하지 못했습니다.");
       }
     },
-    [selectedAssetId],
+    [pendingInvestmentPlan, raceStartMode, selectedAssetId],
   );
 
   useEffect(() => {
@@ -1581,9 +1679,9 @@ export function LongtermPainLab() {
     const lastPointIndex = Math.max(1, raceBuild.points.length - 1);
     const startIndex = Math.min(Math.max(0, autoStartIndex), lastPointIndex);
     const startActiveMs = (startIndex / lastPointIndex) * RACE_ACTIVE_DURATION_MS;
-    const eventStops = raceEventStops.filter(
-      (stop) => stop.index > startIndex && stop.index < raceBuild.points.length - 1,
-    );
+    const eventStops = checkpointStopsEnabled
+      ? raceEventStops.filter((stop) => stop.index > startIndex && stop.index < raceBuild.points.length - 1)
+      : [];
     const totalPauseMs = eventStops.length * RACE_EVENT_PAUSE_MS;
     const totalDurationMs = Math.max(0, RACE_ACTIVE_DURATION_MS - startActiveMs) + totalPauseMs;
 
@@ -1646,7 +1744,7 @@ export function LongtermPainLab() {
 
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [autoStartIndex, raceBuild, raceEventStops, raceStatus, raceViewMode, selectedAssetId]);
+  }, [autoStartIndex, checkpointStopsEnabled, raceBuild, raceEventStops, raceStatus, raceViewMode, selectedAssetId]);
 
   const continueRaceFromCheckpoint = useCallback((eventId: string) => {
     skipRacePauseRef.current = eventId;
@@ -1679,23 +1777,30 @@ export function LongtermPainLab() {
     [raceBuild, raceFurthestIndex, raceStatus],
   );
 
-  const resumeAutoRace = useCallback(() => {
-    if (!raceBuild) {
-      return;
-    }
+  const resumeRaceFromCurrent = useCallback(
+    (withCheckpoints: boolean) => {
+      if (!raceBuild) {
+        return;
+      }
 
-    const lastIndex = Math.max(0, raceBuild.points.length - 1);
-    const currentIndex = Math.min(lastIndex, Math.max(0, visibleCount - 1));
-    const startIndex = currentIndex >= lastIndex ? 0 : currentIndex;
+      const lastIndex = Math.max(0, raceBuild.points.length - 1);
+      const currentIndex = Math.min(lastIndex, Math.max(0, visibleCount - 1));
+      const startIndex = currentIndex >= lastIndex ? 0 : currentIndex;
 
-    skipRacePauseRef.current = null;
-    setActiveRaceEventId(null);
-    setRaceCheckpointProgress(0);
-    setAutoStartIndex(startIndex);
-    setVisibleCount(startIndex + 1);
-    setRaceViewMode("auto");
-    setRaceStatus("racing");
-  }, [raceBuild, visibleCount]);
+      skipRacePauseRef.current = null;
+      setActiveRaceEventId(null);
+      setRaceCheckpointProgress(0);
+      setAutoStartIndex(startIndex);
+      setCheckpointStopsEnabled(withCheckpoints);
+      setVisibleCount(startIndex + 1);
+      setRaceViewMode("auto");
+      setRaceStatus("racing");
+    },
+    [raceBuild, visibleCount],
+  );
+
+  const resumeAutoRace = useCallback(() => resumeRaceFromCurrent(false), [resumeRaceFromCurrent]);
+  const resumeGuidedRace = useCallback(() => resumeRaceFromCurrent(true), [resumeRaceFromCurrent]);
 
   const labAssetIds = useMemo(() => getLabAssetIds(), []);
   const filteredAssets = useMemo(() => {
@@ -1724,8 +1829,16 @@ export function LongtermPainLab() {
           <div className="space-y-5">
             <Header />
             <Hero
+              investmentMode={investmentMode}
+              lumpSumInput={lumpSumInput}
+              monthlyContributionInput={monthlyContributionInput}
               onStart={() => void startRace()}
+              raceStartMode={raceStartMode}
               selectedMeta={selectedMeta}
+              setInvestmentMode={setInvestmentMode}
+              setLumpSumInput={(value) => setLumpSumInput(normalizeKrwInput(value))}
+              setMonthlyContributionInput={(value) => setMonthlyContributionInput(normalizeKrwInput(value))}
+              setRaceStartMode={setRaceStartMode}
             />
             {raceError ? (
               <div className="rounded-[24px] border border-rose-200 bg-white px-4 py-4 text-sm font-semibold leading-6 text-rose-600">
@@ -1746,7 +1859,10 @@ export function LongtermPainLab() {
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
                   onResumeAutoRace={resumeAutoRace}
+                  onResumeGuidedRace={resumeGuidedRace}
                   onSeekRaceIndex={seekRaceIndex}
+                  checkpointStopsEnabled={checkpointStopsEnabled}
+                  investmentPlan={activeInvestmentPlan}
                   raceAssets={raceAssets}
                   raceBuild={raceBuild}
                   raceEventStops={raceEventStops}
@@ -1778,11 +1894,11 @@ export function LongtermPainLab() {
         {activeBottomTab === "live" ? <LiveIdeas onStartRace={(assetId) => void startRace(assetId)} /> : null}
 
         {activeBottomTab === "saved" ? (
-          <SavedView
-            analysis={analysis}
-            lastCompletedAssetId={lastCompletedAssetId}
-            onStartRace={(assetId) => void startRace(assetId)}
-          />
+            <SavedView
+              analysis={analysis}
+              lastCompletedAssetId={lastCompletedAssetId}
+              onStartRace={(assetId) => void startRace(assetId)}
+            />
         ) : null}
       </main>
 
@@ -1808,16 +1924,41 @@ function Header() {
 }
 
 function Hero({
+  investmentMode,
+  lumpSumInput,
+  monthlyContributionInput,
   onStart,
+  raceStartMode,
   selectedMeta,
+  setInvestmentMode,
+  setLumpSumInput,
+  setMonthlyContributionInput,
+  setRaceStartMode,
 }: {
+  investmentMode: InvestmentMode;
+  lumpSumInput: string;
+  monthlyContributionInput: string;
   onStart: () => void;
+  raceStartMode: RaceStartMode;
   selectedMeta: LabAssetMeta;
+  setInvestmentMode: (mode: InvestmentMode) => void;
+  setLumpSumInput: (value: string) => void;
+  setMonthlyContributionInput: (value: string) => void;
+  setRaceStartMode: (mode: RaceStartMode) => void;
 }) {
+  const amountLabel = investmentMode === "monthly" ? "매달 적립액" : "한 번에 투자금";
+  const amountValue = investmentMode === "monthly" ? monthlyContributionInput : lumpSumInput;
+  const amountSetter = investmentMode === "monthly" ? setMonthlyContributionInput : setLumpSumInput;
+  const amountSummary =
+    investmentMode === "monthly"
+      ? `매달 ${formatKrw(parseKrwInput(monthlyContributionInput))}씩`
+      : `${formatKrw(parseKrwInput(lumpSumInput))} 한 번에`;
+  const ctaLabel = raceStartMode === "guided" ? "멈춰가며 직접 탐색하기" : "자동으로 끝까지 달리기";
+
   return (
     <SectionCard className="overflow-hidden p-5">
       <div className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-black text-blue-600">
-        1,000만 원 · 실제 10년 데이터
+        {amountSummary} · 실제 10년 데이터
       </div>
       <h1 className="mt-3 text-[2.25rem] font-black leading-[1.02] tracking-[-0.09em] text-slate-950">
         샀다면 얼마였고,
@@ -1847,12 +1988,80 @@ function Hero({
         <p className="mt-3 line-clamp-2 text-sm font-semibold leading-6 text-slate-600">{selectedMeta.oneLiner}</p>
       </div>
 
+      <div className="mt-4 rounded-[26px] border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="grid grid-cols-2 gap-1 rounded-[18px] bg-slate-100 p-1">
+          <button
+            className={`rounded-[14px] px-3 py-2 text-xs font-black transition ${
+              investmentMode === "lump" ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
+            }`}
+            onClick={() => setInvestmentMode("lump")}
+            type="button"
+          >
+            한 번에 투자
+          </button>
+          <button
+            className={`rounded-[14px] px-3 py-2 text-xs font-black transition ${
+              investmentMode === "monthly" ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
+            }`}
+            onClick={() => setInvestmentMode("monthly")}
+            type="button"
+          >
+            매달 적립
+          </button>
+        </div>
+        <label className="mt-3 block">
+          <span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">{amountLabel}</span>
+          <div className="mt-1 flex items-center rounded-[18px] border border-slate-200 bg-slate-50 px-3 py-2">
+            <input
+              className="min-w-0 flex-1 bg-transparent text-xl font-black tracking-[-0.05em] text-slate-950 outline-none"
+              inputMode="numeric"
+              onChange={(event) => amountSetter(event.currentTarget.value)}
+              placeholder={investmentMode === "monthly" ? "300,000" : "10,000,000"}
+              type="text"
+              value={amountValue}
+            />
+            <span className="ml-2 text-sm font-black text-slate-400">원</span>
+          </div>
+        </label>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button
+          className={`rounded-[18px] border px-3 py-3 text-left transition ${
+            raceStartMode === "auto"
+              ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
+              : "border-slate-200 bg-slate-50 text-slate-500"
+          }`}
+          onClick={() => setRaceStartMode("auto")}
+          type="button"
+        >
+          <div className="text-sm font-black">자동 감상</div>
+          <div className={`mt-1 text-[11px] font-bold ${raceStartMode === "auto" ? "text-slate-300" : "text-slate-400"}`}>
+            멈추지 않고 완주
+          </div>
+        </button>
+        <button
+          className={`rounded-[18px] border px-3 py-3 text-left transition ${
+            raceStartMode === "guided"
+              ? "border-slate-950 bg-slate-950 text-[#f8fafc]"
+              : "border-slate-200 bg-slate-50 text-slate-500"
+          }`}
+          onClick={() => setRaceStartMode("guided")}
+          type="button"
+        >
+          <div className="text-sm font-black">직접 탐색</div>
+          <div className={`mt-1 text-[11px] font-bold ${raceStartMode === "guided" ? "text-slate-300" : "text-slate-400"}`}>
+            중요 장면에서 정지
+          </div>
+        </button>
+      </div>
+
       <button
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-[22px] bg-slate-950 px-5 py-4 text-[15px] font-black text-[#f8fafc] shadow-[0_18px_38px_rgba(15,23,42,0.22)]"
         onClick={onStart}
         type="button"
       >
-        10년 레이스 시작하기
+        {ctaLabel}
         <ChevronRight size={18} />
       </button>
       <p className="mt-3 text-center text-xs font-bold text-slate-400">
@@ -1887,12 +2096,15 @@ function RaceStage({
   activeRaceEvent,
   analysis,
   checkpointProgressPct,
+  checkpointStopsEnabled,
   currentPoint,
+  investmentPlan,
   onContinueCheckpoint,
   onEnterManualExplore,
   onOpenSearch,
   onRestart,
   onResumeAutoRace,
+  onResumeGuidedRace,
   onSeekRaceIndex,
   raceAssets,
   raceBuild,
@@ -1907,12 +2119,15 @@ function RaceStage({
   activeRaceEvent: RaceEventStop | null;
   analysis: PainAnalysis | null;
   checkpointProgressPct: number;
+  checkpointStopsEnabled: boolean;
   currentPoint: RacePoint | null;
+  investmentPlan: ActiveInvestmentPlan;
   onContinueCheckpoint: (eventId: string) => void;
   onEnterManualExplore: () => void;
   onOpenSearch: () => void;
   onRestart: () => void;
   onResumeAutoRace: () => void;
+  onResumeGuidedRace: () => void;
   onSeekRaceIndex: (index: number) => void;
   raceAssets: RaceChartAsset[];
   raceBuild: RaceBuildResult | null;
@@ -1925,7 +2140,9 @@ function RaceStage({
   visibleData: RacePoint[];
 }) {
   const isComplete = raceStatus === "complete" && analysis;
-  const selectedValue = currentPoint ? getValue(currentPoint, selectedAssetId) : PRINCIPAL_KRW;
+  const inputAmountKrw = getPlanInputAmount(investmentPlan);
+  const currentBasisKrw = getPointInvestmentBasis(currentPoint, inputAmountKrw);
+  const selectedValue = currentPoint ? getValue(currentPoint, selectedAssetId) : currentBasisKrw;
   const previousPoint = visibleData.length > 1 ? visibleData[visibleData.length - 2]! : null;
   const previousValue = previousPoint ? getValue(previousPoint, selectedAssetId) : selectedValue;
   const monthlyChangeKrw = selectedValue - previousValue;
@@ -1934,8 +2151,8 @@ function RaceStage({
   const visiblePeak = raceBuild
     ? raceBuild.points
         .slice(0, Math.max(1, currentIndex + 1))
-        .reduce((peak, point) => Math.max(peak, getValue(point, selectedAssetId)), PRINCIPAL_KRW)
-    : PRINCIPAL_KRW;
+        .reduce((peak, point) => Math.max(peak, getValue(point, selectedAssetId)), currentBasisKrw)
+    : currentBasisKrw;
   const drawdownFromPeak = selectedValue - visiblePeak;
   const progressPct =
     raceBuild && raceBuild.points.length > 1
@@ -1951,6 +2168,7 @@ function RaceStage({
           eventCount={raceEventStops.length}
           isPaused={Boolean(activeRaceEvent)}
           progressPct={progressPct}
+          checkpointStopsEnabled={checkpointStopsEnabled}
           raceStatus={raceStatus}
           raceViewMode={raceViewMode}
           rangeLabel={raceBuild ? formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate) : ""}
@@ -1961,7 +2179,9 @@ function RaceStage({
           currentPoint={currentPoint}
           onEnterManualExplore={onEnterManualExplore}
           onResumeAutoRace={onResumeAutoRace}
+          onResumeGuidedRace={onResumeGuidedRace}
           onSeekRaceIndex={onSeekRaceIndex}
+          checkpointStopsEnabled={checkpointStopsEnabled}
           raceBuild={raceBuild}
           raceEventStops={raceEventStops}
           raceFurthestIndex={raceFurthestIndex}
@@ -1980,7 +2200,8 @@ function RaceStage({
             headerSubtitle=""
             headerTitle=""
             isLoading={raceStatus === "loading" || !raceBuild}
-            principalKrw={PRINCIPAL_KRW}
+            principalKrw={inputAmountKrw}
+            valueBasis={investmentPlan.mode === "monthly" ? "invested" : "initial"}
           />
           {activeRaceEvent ? (
             <>
@@ -2001,6 +2222,7 @@ function RaceStage({
           monthlyReturnPct={monthlyReturnPct}
           raceStatus={raceStatus}
           raceViewMode={raceViewMode}
+          currentBasisKrw={currentBasisKrw}
           selectedMeta={selectedMeta}
           value={selectedValue}
           visiblePeak={visiblePeak}
@@ -2028,10 +2250,12 @@ function RaceStage({
 }
 
 function RaceExploreControls({
+  checkpointStopsEnabled,
   currentIndex,
   currentPoint,
   onEnterManualExplore,
   onResumeAutoRace,
+  onResumeGuidedRace,
   onSeekRaceIndex,
   raceBuild,
   raceEventStops,
@@ -2039,10 +2263,12 @@ function RaceExploreControls({
   raceStatus,
   raceViewMode,
 }: {
+  checkpointStopsEnabled: boolean;
   currentIndex: number;
   currentPoint: RacePoint | null;
   onEnterManualExplore: () => void;
   onResumeAutoRace: () => void;
+  onResumeGuidedRace: () => void;
   onSeekRaceIndex: (index: number) => void;
   raceBuild: RaceBuildResult | null;
   raceEventStops: RaceEventStop[];
@@ -2064,6 +2290,7 @@ function RaceExploreControls({
   const totalRaceMonths = Math.max(0, raceBuild.points.length - 1);
   const currentPositionLabel = `${Math.min(safeCurrentIndex, totalRaceMonths)} / ${totalRaceMonths}개월`;
   const isManual = raceViewMode === "manual";
+  const isGuidedRace = !isManual && checkpointStopsEnabled;
   const helperText =
     raceStatus === "complete"
       ? "완주한 뒤에는 전체 10년을 마음대로 훑어볼 수 있습니다. 어디서 흔들렸을지 하나씩 눌러보세요."
@@ -2074,16 +2301,16 @@ function RaceExploreControls({
       <div className="grid grid-cols-2 gap-2 rounded-[18px] bg-slate-100 p-1">
         <button
           className={`rounded-[15px] px-3 py-2 text-xs font-black transition ${
-            !isManual ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
+            !isManual && !checkpointStopsEnabled ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
           }`}
           onClick={onResumeAutoRace}
           type="button"
         >
-          자동 감상
+          자동 완주
         </button>
         <button
           className={`rounded-[15px] px-3 py-2 text-xs font-black transition ${
-            isManual ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
+            isManual || checkpointStopsEnabled ? "bg-slate-950 text-[#f8fafc] shadow-sm" : "text-slate-500"
           }`}
           onClick={onEnterManualExplore}
           type="button"
@@ -2130,7 +2357,7 @@ function RaceExploreControls({
             </button>
             <button
               className="rounded-[17px] bg-slate-950 px-2 py-2.5 text-[11px] font-black text-[#f8fafc] shadow-sm"
-              onClick={onResumeAutoRace}
+              onClick={onResumeGuidedRace}
               type="button"
             >
               여기서 재생
@@ -2152,7 +2379,9 @@ function RaceExploreControls({
       ) : (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-[18px] bg-slate-50 px-3 py-2.5">
           <div className="text-[11px] font-bold leading-5 text-slate-500">
-            지나간 달을 다시 보고 싶으면 직접 탐색으로 멈출 수 있습니다.
+            {isGuidedRace
+              ? "중요 장면에서 잠깐 멈추며 계좌의 흔들림을 짚어봅니다."
+              : "자동 완주는 멈추지 않고 끝까지 달립니다. 보고 싶은 달은 직접 탐색에서 멈춰보세요."}
           </div>
           <button
             className="shrink-0 rounded-[15px] bg-white px-3 py-2 text-[11px] font-black text-slate-700 shadow-sm"
@@ -2168,6 +2397,7 @@ function RaceExploreControls({
 }
 
 function RaceTimeRail({
+  checkpointStopsEnabled,
   currentDate,
   eventCount,
   isPaused,
@@ -2177,6 +2407,7 @@ function RaceTimeRail({
   rangeLabel,
   selectedName,
 }: {
+  checkpointStopsEnabled: boolean;
   currentDate: string;
   eventCount: number;
   isPaused: boolean;
@@ -2195,7 +2426,12 @@ function RaceTimeRail({
         ? "레이스 완료"
         : isPaused
           ? "중요 장면 정지"
-          : "레이스 진행 중";
+        : checkpointStopsEnabled
+          ? "직접 탐색 레이스"
+          : "자동 완주 중";
+  const eventSummary = checkpointStopsEnabled
+    ? `중요 장면 ${eventCount}번 정지`
+    : `중요 장면 ${eventCount}개 감지`;
 
   return (
     <div className="mb-3 rounded-[22px] border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
@@ -2209,7 +2445,7 @@ function RaceTimeRail({
             {selectedName} 10년 레이스
           </div>
           <div className="mt-0.5 text-[11px] font-bold text-slate-400">
-            {rangeLabel || "실제 월별 데이터 기준"} · 중요 장면 {eventCount}번 정지
+            {rangeLabel || "실제 월별 데이터 기준"} · {eventSummary}
           </div>
         </div>
         <div className="shrink-0 rounded-[18px] bg-slate-950 px-3 py-2 text-right text-[#f8fafc] shadow-sm">
@@ -2235,6 +2471,7 @@ function RaceAccountPulseCard({
   activeEvent,
   checkpointProgressPct,
   currentDate,
+  currentBasisKrw,
   drawdownFromPeak,
   monthlyChangeKrw,
   onContinueCheckpoint,
@@ -2248,6 +2485,7 @@ function RaceAccountPulseCard({
   activeEvent: RaceEventStop | null;
   checkpointProgressPct: number;
   currentDate: string;
+  currentBasisKrw: number;
   drawdownFromPeak: number;
   monthlyChangeKrw: number;
   onContinueCheckpoint: (eventId: string) => void;
@@ -2263,7 +2501,7 @@ function RaceAccountPulseCard({
   const isComplete = raceStatus === "complete" && !isManual;
   const isCheckpoint = Boolean(activeEvent);
   const isDrop = monthlyChangeKrw < 0;
-  const isTemptation = value >= PRINCIPAL_KRW * 2 || monthlyReturnPct >= 12;
+  const isTemptation = value >= currentBasisKrw * 2 || monthlyReturnPct >= 12;
   const tone: RaceEventTone = activeEvent?.tone ?? (isComplete ? "recovery" : isDrop ? "danger" : isTemptation ? "temptation" : "neutral");
   const toneClass = getRacePulseToneClasses(tone);
   const title = activeEvent
@@ -2292,7 +2530,7 @@ function RaceAccountPulseCard({
       : isDrop
         ? `${formatKrw(Math.abs(monthlyChangeKrw))} 사라짐`
         : isTemptation
-          ? `원금 대비 ${formatMultiple(value / PRINCIPAL_KRW)}`
+          ? `투입금 대비 ${formatMultiple(value / currentBasisKrw)}`
           : `${formatKrw(Math.abs(monthlyChangeKrw))} 움직임`;
   const description = activeEvent
     ? activeEvent.description
@@ -2447,25 +2685,27 @@ function ResultSummary({
 }) {
   const depositValue = analysis.finalValue - analysis.bankGap;
   const goldValue = analysis.finalValue - analysis.goldGap;
+  const basisLabel = analysis.investmentMode === "monthly" ? "총 납입금" : "투자금";
+  const multipleLabel = analysis.investmentMode === "monthly" ? "총 납입금 대비" : "투자금 대비";
   const rows = [
     {
       badge: "선택 자산",
       label: selectedMeta.name,
-      multiple: analysis.finalValue / PRINCIPAL_KRW,
+      multiple: analysis.finalValue / analysis.finalInvestedKrw,
       tone: "primary",
       value: analysis.finalValue,
     },
     {
       badge: "기준선",
       label: "정기예금",
-      multiple: depositValue / PRINCIPAL_KRW,
+      multiple: depositValue / analysis.finalInvestedKrw,
       tone: "muted",
       value: depositValue,
     },
     {
       badge: "보조 기준",
       label: "금",
-      multiple: goldValue / PRINCIPAL_KRW,
+      multiple: goldValue / analysis.finalInvestedKrw,
       tone: "gold",
       value: goldValue,
     },
@@ -2482,7 +2722,7 @@ function ResultSummary({
         </div>
       </div>
       <h2 className="mt-3 text-[2.05rem] font-black leading-[1.05] tracking-[-0.08em] text-slate-950">
-        1,000만 원이
+        {basisLabel} {formatKrw(analysis.finalInvestedKrw)}이
         <br />
         {formatKrw(analysis.finalValue)}
       </h2>
@@ -2528,7 +2768,7 @@ function ResultSummary({
                   {row.label}
                 </div>
                 <div className={`mt-1 text-xs font-bold ${row.tone === "primary" ? "text-slate-300" : "text-slate-500"}`}>
-                  원금 대비 {formatMultiple(row.multiple)}
+                  {multipleLabel} {formatMultiple(row.multiple)}
                 </div>
               </div>
               <div
@@ -2567,6 +2807,11 @@ function ResultSummary({
 }
 
 function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
+  const principalHelp =
+    analysis.investmentMode === "monthly"
+      ? "그 시점까지 매달 넣은 총 납입금보다 평가금액이 낮았던 달만 셉니다. 적립식에서는 원금 기준이 매달 늘어납니다."
+      : "처음 넣은 투자금보다 평가금액이 낮았던 달만 셉니다. 말 그대로 진짜 원금 손실 구간입니다.";
+
   return (
     <SectionCard>
       <div className="flex items-center gap-2 text-sm font-black text-rose-500">
@@ -2587,8 +2832,8 @@ function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
           warning
         />
         <MetricCard
-          help="처음 넣은 1,000만원보다 평가금액이 낮았던 달만 셉니다. 말 그대로 진짜 원금 손실 구간입니다."
-          label="원금 1,000만원 아래로 깨진 기간"
+          help={principalHelp}
+          label="투입 원금 아래로 깨진 기간"
           value={`${analysis.underPrincipalMonths}개월`}
           warning={analysis.underPrincipalMonths > 0}
         />
@@ -2719,7 +2964,7 @@ function getEmotionHighlightTitle(month: EmotionMonth) {
   }
 
   if (month.eventType === "milestone") {
-    return `첫 ${formatMultiple(month.value / PRINCIPAL_KRW)}의 익절 유혹`;
+    return `첫 ${formatMultiple(month.value / month.investedBasisKrw)}의 익절 유혹`;
   }
 
   if (month.peakBreakout) {
