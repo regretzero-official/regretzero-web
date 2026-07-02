@@ -7,8 +7,12 @@ import {
   CircleHelp,
   Home,
   LineChart,
+  Pause,
+  Play,
   Radio,
   Search,
+  SkipBack,
+  SkipForward,
   TrendingDown,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -1581,7 +1585,6 @@ export function LongtermPainLab() {
   const [raceFurthestIndex, setRaceFurthestIndex] = useState(0);
   const [lastCompletedAssetId, setLastCompletedAssetId] = useState<ComparisonAssetId | null>(null);
   const [activeRaceEventId, setActiveRaceEventId] = useState<string | null>(null);
-  const [raceCheckpointProgress, setRaceCheckpointProgress] = useState(0);
 
   const selectedMeta = getMeta(selectedAssetId);
   const pendingInvestmentPlan = useMemo<ActiveInvestmentPlan>(() => {
@@ -1645,7 +1648,6 @@ export function LongtermPainLab() {
       setAutoStartIndex(0);
       setRaceFurthestIndex(0);
       setActiveRaceEventId(null);
-      setRaceCheckpointProgress(0);
       skipRacePauseRef.current = null;
 
       window.requestAnimationFrame(() => {
@@ -1658,6 +1660,11 @@ export function LongtermPainLab() {
         setVisibleCount(1);
         setRaceFurthestIndex(0);
         setRaceStatus("racing");
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        });
       } catch (error) {
         setRaceStatus("idle");
         setRaceError(error instanceof Error ? error.message : "레이스를 시작하지 못했습니다.");
@@ -1689,7 +1696,6 @@ export function LongtermPainLab() {
       let consumedPauseMs = 0;
       let activeElapsedMs = startActiveMs + elapsed;
       let pausedEvent: RaceEventStop | null = null;
-      let checkpointProgress = 0;
 
       for (const stop of eventStops) {
         const stopTimeMs = (stop.index / lastPointIndex) * RACE_ACTIVE_DURATION_MS;
@@ -1712,7 +1718,6 @@ export function LongtermPainLab() {
 
           activeElapsedMs = stopTimeMs;
           pausedEvent = stop;
-          checkpointProgress = ((elapsed - pauseStartMs) / RACE_EVENT_PAUSE_MS) * 100;
           break;
         }
 
@@ -1725,7 +1730,6 @@ export function LongtermPainLab() {
       setVisibleCount(nextIndex + 1);
       setRaceFurthestIndex((previousIndex) => Math.max(previousIndex, nextIndex));
       setActiveRaceEventId(pausedEvent?.id ?? null);
-      setRaceCheckpointProgress(Math.min(100, Math.max(0, checkpointProgress)));
 
       if (elapsed < totalDurationMs) {
         frameId = requestAnimationFrame(tick);
@@ -1735,7 +1739,6 @@ export function LongtermPainLab() {
       setVisibleCount(raceBuild.points.length);
       setRaceFurthestIndex(lastPointIndex);
       setActiveRaceEventId(null);
-      setRaceCheckpointProgress(0);
       setRaceStatus("complete");
       setLastCompletedAssetId(selectedAssetId);
     };
@@ -1744,17 +1747,10 @@ export function LongtermPainLab() {
     return () => cancelAnimationFrame(frameId);
   }, [autoStartIndex, checkpointStopsEnabled, raceBuild, raceEventStops, raceStatus, raceViewMode, selectedAssetId]);
 
-  const continueRaceFromCheckpoint = useCallback((eventId: string) => {
-    skipRacePauseRef.current = eventId;
-    setActiveRaceEventId(null);
-    setRaceCheckpointProgress(0);
-  }, []);
-
   const enterManualExplore = useCallback(() => {
     skipRacePauseRef.current = null;
     setRaceViewMode("manual");
     setActiveRaceEventId(null);
-    setRaceCheckpointProgress(0);
     window.requestAnimationFrame(() => {
       raceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -1772,7 +1768,6 @@ export function LongtermPainLab() {
       skipRacePauseRef.current = null;
       setRaceViewMode("manual");
       setActiveRaceEventId(null);
-      setRaceCheckpointProgress(0);
       setVisibleCount(nextIndex + 1);
     },
     [raceBuild, raceFurthestIndex, raceStatus],
@@ -1790,7 +1785,6 @@ export function LongtermPainLab() {
 
       skipRacePauseRef.current = null;
       setActiveRaceEventId(null);
-      setRaceCheckpointProgress(0);
       setAutoStartIndex(startIndex);
       setCheckpointStopsEnabled(withCheckpoints);
       setVisibleCount(startIndex + 1);
@@ -1851,8 +1845,6 @@ export function LongtermPainLab() {
                   activeRaceEvent={activeRaceEvent}
                   analysis={analysis}
                   currentPoint={currentPoint}
-                  checkpointProgressPct={raceCheckpointProgress}
-                  onContinueCheckpoint={continueRaceFromCheckpoint}
                   onEnterManualExplore={enterManualExplore}
                   onOpenSearch={() => setActiveBottomTab("search")}
                   onRestart={() => void startRace(selectedAssetId)}
@@ -2056,11 +2048,9 @@ function EmptyRaceGuide() {
 function RaceStage({
   activeRaceEvent,
   analysis,
-  checkpointProgressPct,
   checkpointStopsEnabled,
   currentPoint,
   investmentPlan,
-  onContinueCheckpoint,
   onEnterManualExplore,
   onOpenSearch,
   onRestart,
@@ -2078,11 +2068,9 @@ function RaceStage({
 }: {
   activeRaceEvent: RaceEventStop | null;
   analysis: PainAnalysis | null;
-  checkpointProgressPct: number;
   checkpointStopsEnabled: boolean;
   currentPoint: RacePoint | null;
   investmentPlan: ActiveInvestmentPlan;
-  onContinueCheckpoint: (eventId: string) => void;
   onEnterManualExplore: () => void;
   onOpenSearch: () => void;
   onRestart: () => void;
@@ -2121,6 +2109,12 @@ function RaceStage({
   const canPauseByTouch = raceStatus === "racing" && raceViewMode === "auto" && !activeRaceEvent;
   const basisLabel =
     investmentPlan.mode === "monthly" ? "1.0배 = 그 시점까지 넣은 돈" : `1.0배 = ${formatKrw(inputAmountKrw)}`;
+  const lastRaceIndex = Math.max(0, (raceBuild?.points.length ?? 1) - 1);
+  const availableMaxIndex = raceStatus === "complete" ? lastRaceIndex : Math.min(raceFurthestIndex, lastRaceIndex);
+  const safeCurrentIndex = Math.min(currentIndex, availableMaxIndex);
+  const previousEvent = [...raceEventStops].reverse().find((event) => event.index < safeCurrentIndex) ?? null;
+  const nextEvent = raceEventStops.find((event) => event.index > safeCurrentIndex && event.index <= availableMaxIndex) ?? null;
+  const showChartControls = Boolean(raceBuild) && raceStatus !== "loading";
 
   return (
     <div className="space-y-5">
@@ -2135,18 +2129,6 @@ function RaceStage({
           raceViewMode={raceViewMode}
           rangeLabel={raceBuild ? formatDateRange(raceBuild.resolvedStartDate, raceBuild.resolvedEndDate) : ""}
           selectedName={selectedMeta.name}
-        />
-        <RaceExploreControls
-          currentIndex={currentIndex}
-          currentPoint={currentPoint}
-          onEnterManualExplore={onEnterManualExplore}
-          onResumeAutoRace={onResumeAutoRace}
-          onSeekRaceIndex={onSeekRaceIndex}
-          raceBuild={raceBuild}
-          raceEventStops={raceEventStops}
-          raceFurthestIndex={raceFurthestIndex}
-          raceStatus={raceStatus}
-          raceViewMode={raceViewMode}
         />
         <div
           className={`relative ${canPauseByTouch ? "cursor-pointer" : ""}`}
@@ -2180,23 +2162,58 @@ function RaceStage({
               onClick={onEnterManualExplore}
               type="button"
             >
-              <span className="absolute right-3 top-3 rounded-full border border-white/70 bg-white/85 px-3 py-1.5 text-[11px] font-black text-slate-600 shadow-sm backdrop-blur">
-                차트 터치로 멈춤
+              <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/88 text-slate-700 shadow-sm backdrop-blur">
+                <Pause size={15} fill="currentColor" />
               </span>
             </button>
           ) : null}
+          {showChartControls && raceViewMode === "manual" ? (
+            <div className="absolute inset-x-3 bottom-3 z-40 rounded-[18px] border border-white/70 bg-white/88 px-2.5 py-2 shadow-[0_12px_30px_rgba(15,23,42,0.16)] backdrop-blur">
+              <input
+                aria-label="월별 레이스 지점 선택"
+                className="block h-5 w-full accent-slate-950"
+                max={availableMaxIndex}
+                min={0}
+                onChange={(event) => onSeekRaceIndex(Number(event.currentTarget.value))}
+                onInput={(event) => onSeekRaceIndex(Number(event.currentTarget.value))}
+                type="range"
+                value={safeCurrentIndex}
+              />
+              <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                <button
+                  aria-label="이전 중요 장면"
+                  className="flex h-8 items-center justify-center rounded-[14px] border border-slate-200 bg-white text-slate-700 shadow-sm disabled:opacity-30"
+                  disabled={!previousEvent}
+                  onClick={() => previousEvent && onSeekRaceIndex(previousEvent.index)}
+                  type="button"
+                >
+                  <SkipBack size={15} fill="currentColor" />
+                </button>
+                <button
+                  aria-label="자동으로 계속"
+                  className="flex h-8 items-center justify-center rounded-[14px] bg-slate-950 text-[#f8fafc] shadow-sm"
+                  onClick={onResumeAutoRace}
+                  type="button"
+                >
+                  <Play size={15} fill="currentColor" />
+                </button>
+                <button
+                  aria-label="다음 중요 장면"
+                  className="flex h-8 items-center justify-center rounded-[14px] border border-slate-200 bg-white text-slate-700 shadow-sm disabled:opacity-30"
+                  disabled={!nextEvent}
+                  onClick={() => nextEvent && onSeekRaceIndex(nextEvent.index)}
+                  type="button"
+                >
+                  <SkipForward size={15} fill="currentColor" />
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
         <RaceAccountPulseCard
-          activeEvent={activeRaceEvent}
-          checkpointProgressPct={checkpointProgressPct}
-          currentDate={currentDate}
           drawdownFromPeak={drawdownFromPeak}
           monthlyChangeKrw={monthlyChangeKrw}
-          onContinueCheckpoint={onContinueCheckpoint}
           monthlyReturnPct={monthlyReturnPct}
-          raceStatus={raceStatus}
-          raceViewMode={raceViewMode}
-          currentBasisKrw={currentBasisKrw}
           value={selectedValue}
           visiblePeak={visiblePeak}
         />
@@ -2218,127 +2235,6 @@ function RaceStage({
           />
         </>
       ) : null}
-    </div>
-  );
-}
-
-function RaceExploreControls({
-  currentIndex,
-  currentPoint,
-  onEnterManualExplore,
-  onResumeAutoRace,
-  onSeekRaceIndex,
-  raceBuild,
-  raceEventStops,
-  raceFurthestIndex,
-  raceStatus,
-  raceViewMode,
-}: {
-  currentIndex: number;
-  currentPoint: RacePoint | null;
-  onEnterManualExplore: () => void;
-  onResumeAutoRace: () => void;
-  onSeekRaceIndex: (index: number) => void;
-  raceBuild: RaceBuildResult | null;
-  raceEventStops: RaceEventStop[];
-  raceFurthestIndex: number;
-  raceStatus: RaceStatus;
-  raceViewMode: RaceViewMode;
-}) {
-  if (!raceBuild || raceStatus === "loading") {
-    return null;
-  }
-
-  const lastIndex = Math.max(0, raceBuild.points.length - 1);
-  const availableMaxIndex = raceStatus === "complete" ? lastIndex : Math.min(raceFurthestIndex, lastIndex);
-  const safeCurrentIndex = Math.min(currentIndex, availableMaxIndex);
-  const previousEvent = [...raceEventStops].reverse().find((event) => event.index < safeCurrentIndex) ?? null;
-  const nextEvent =
-    raceEventStops.find((event) => event.index > safeCurrentIndex && event.index <= availableMaxIndex) ?? null;
-  const currentMonthLabel = currentPoint ? formatMonth(currentPoint.date) : formatMonth(raceBuild.resolvedStartDate);
-  const totalRaceMonths = Math.max(0, raceBuild.points.length - 1);
-  const currentPositionLabel = `${Math.min(safeCurrentIndex, totalRaceMonths)} / ${totalRaceMonths}개월`;
-  const isManual = raceViewMode === "manual";
-  const helperText =
-    raceStatus === "complete"
-      ? "완주한 뒤에는 전체 10년을 마음대로 훑어볼 수 있습니다. 어디서 흔들렸을지 하나씩 눌러보세요."
-      : "아직 보지 않은 미래는 열어두지 않습니다. 지나간 달만 되감아 보면서 그 순간의 계좌를 다시 확인하세요.";
-
-  return (
-    <div className="mb-2 rounded-[18px] border border-slate-200 bg-white px-3 py-2.5 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
-      {isManual ? (
-        <div>
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-500">
-                멈춘 시점
-              </div>
-              <div className="mt-0.5 text-base font-black tracking-[-0.06em] text-slate-950">
-                {currentMonthLabel}
-              </div>
-            </div>
-            <div className="rounded-full bg-slate-50 px-2.5 py-1.5 text-[10px] font-black text-slate-500">
-              {currentPositionLabel}
-            </div>
-          </div>
-
-          <input
-            aria-label="월별 레이스 지점 선택"
-            className="mt-2 w-full accent-slate-950"
-            max={availableMaxIndex}
-            min={0}
-            onChange={(event) => onSeekRaceIndex(Number(event.currentTarget.value))}
-            onInput={(event) => onSeekRaceIndex(Number(event.currentTarget.value))}
-            type="range"
-            value={safeCurrentIndex}
-          />
-
-          <div className="mt-2 grid grid-cols-3 gap-1.5">
-            <button
-              className="rounded-[14px] border border-slate-200 bg-slate-50 px-2 py-2 text-[10px] font-black text-slate-600 disabled:opacity-35"
-              disabled={!previousEvent}
-              onClick={() => previousEvent && onSeekRaceIndex(previousEvent.index)}
-              type="button"
-            >
-              이전 장면
-            </button>
-            <button
-              className="rounded-[14px] bg-slate-950 px-2 py-2 text-[10px] font-black text-[#f8fafc] shadow-sm"
-              onClick={onResumeAutoRace}
-              type="button"
-            >
-              자동으로 계속
-            </button>
-            <button
-              className="rounded-[14px] border border-slate-200 bg-slate-50 px-2 py-2 text-[10px] font-black text-slate-600 disabled:opacity-35"
-              disabled={!nextEvent}
-              onClick={() => nextEvent && onSeekRaceIndex(nextEvent.index)}
-              type="button"
-            >
-              다음 장면
-            </button>
-          </div>
-
-          <div className="mt-2 line-clamp-1 rounded-[14px] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold leading-4 text-slate-500">
-            {helperText}
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between gap-2 rounded-[16px] bg-slate-50 px-2.5 py-2">
-          <div className="line-clamp-2 text-[10px] font-bold leading-4 text-slate-500">
-            {raceStatus === "complete"
-              ? "완주했습니다. 이제 전체 10년을 원하는 달로 되감아 볼 수 있습니다."
-              : "자동으로 달리는 중입니다. 궁금한 순간엔 차트나 버튼을 눌러 멈춰보세요."}
-          </div>
-          <button
-            className="shrink-0 rounded-[13px] bg-white px-2.5 py-2 text-[10px] font-black text-slate-700 shadow-sm"
-            onClick={onEnterManualExplore}
-            type="button"
-          >
-            {raceStatus === "complete" ? "되감아보기" : "멈춰보기"}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -2415,148 +2311,27 @@ function RaceTimeRail({
 }
 
 function RaceAccountPulseCard({
-  activeEvent,
-  checkpointProgressPct,
-  currentDate,
-  currentBasisKrw,
   drawdownFromPeak,
   monthlyChangeKrw,
-  onContinueCheckpoint,
   monthlyReturnPct,
-  raceStatus,
-  raceViewMode,
   value,
   visiblePeak,
 }: {
-  activeEvent: RaceEventStop | null;
-  checkpointProgressPct: number;
-  currentDate: string;
-  currentBasisKrw: number;
   drawdownFromPeak: number;
   monthlyChangeKrw: number;
-  onContinueCheckpoint: (eventId: string) => void;
   monthlyReturnPct: number;
-  raceStatus: RaceStatus;
-  raceViewMode: RaceViewMode;
   value: number;
   visiblePeak: number;
 }) {
-  const isLoading = raceStatus === "loading";
-  const isManual = raceViewMode === "manual";
-  const isComplete = raceStatus === "complete" && !isManual;
-  const isCheckpoint = Boolean(activeEvent);
-  const isDrop = monthlyChangeKrw < 0;
-  const isTemptation = value >= currentBasisKrw * 2 || monthlyReturnPct >= 12;
-  const tone: RaceEventTone = activeEvent?.tone ?? (isComplete ? "recovery" : isDrop ? "danger" : isTemptation ? "temptation" : "neutral");
-  const toneClass = getRacePulseToneClasses(tone);
-  const title = activeEvent
-    ? activeEvent.title
-    : isLoading
-      ? "10년 전 가격을 불러오는 중"
-      : isManual
-        ? isDrop
-          ? "직접 고른 하락 구간"
-          : isTemptation
-            ? "직접 고른 익절 유혹 구간"
-            : "선택한 달의 계좌 상태"
-      : isComplete
-        ? "레이스가 끝났습니다"
-      : isDrop
-        ? "돈이 사라지는 달"
-        : isTemptation
-          ? "팔고 싶은 수익 구간"
-          : "계좌가 흔들리는 중";
-  const moneyLabel = activeEvent
-    ? activeEvent.moneyLabel
-    : isLoading
-      ? "잠시만 기다려 주세요"
-      : isComplete
-        ? formatKrw(value)
-      : isDrop
-        ? `${formatKrw(Math.abs(monthlyChangeKrw))} 사라짐`
-        : isTemptation
-          ? `투입금 대비 ${formatMultiple(value / currentBasisKrw)}`
-          : `${formatKrw(Math.abs(monthlyChangeKrw))} 움직임`;
-  const description = activeEvent
-    ? activeEvent.description
-    : isLoading
-      ? "결과를 먼저 보여주지 않고, 실제 월별 흐름부터 준비합니다."
-      : isManual
-        ? "슬라이더로 고른 월입니다. 이 시점의 평가금액과 흔들림을 따로 확인합니다."
-      : isComplete
-        ? "최종 금액은 아래 표로 정리했습니다. 이제 중요한 건 이 결과를 얻기까지 버텼어야 할 시간입니다."
-      : isDrop
-        ? "방금 전까지 벌었다고 믿었던 돈이 계좌에서 빠져나가는 중입니다."
-        : isTemptation
-          ? "여기서 팔면 이긴 것처럼 보입니다. 그래서 더 위험합니다."
-          : "최종 결과보다 어려운 건 이 흔들림을 한 달씩 살아내는 일입니다.";
-
   return (
-    <div
-      className={`mt-2 border px-3 transition-all duration-300 ${
-        isCheckpoint
-          ? `rounded-[24px] border-2 py-3 shadow-[0_14px_34px_rgba(15,23,42,0.14)] ${toneClass.container}`
-          : `rounded-[20px] py-3 ${toneClass.container}`
-      }`}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <div className={`text-[10px] font-black uppercase tracking-[0.16em] ${toneClass.eyebrow}`}>
-            {isCheckpoint ? "이 장면은 그냥 지나가지 않습니다" : currentDate ? formatMonth(currentDate) : "레이스 준비"}
-          </div>
-          <h3
-            className={`mt-0.5 line-clamp-1 font-black leading-tight tracking-[-0.06em] text-slate-950 ${
-              isCheckpoint ? "text-xl" : "text-lg"
-            }`}
-          >
-            {title}
-          </h3>
-        </div>
-        <div className={`shrink-0 rounded-full px-2.5 py-1.5 text-[10px] font-black ${toneClass.badge}`}>
-          {activeEvent ? "정지" : isManual ? "탐색" : isComplete ? "완료" : isDrop ? "하락" : isTemptation ? "유혹" : "진행"}
-        </div>
-      </div>
-      <div
-        className={`mt-2 font-black leading-none tracking-[-0.08em] ${toneClass.value} ${
-          isCheckpoint ? "text-[1.75rem]" : "text-[1.5rem]"
-        }`}
-      >
-        {moneyLabel}
-      </div>
-      <p className="mt-2 line-clamp-2 text-xs font-bold leading-5 text-slate-600">
-        {description}
-      </p>
-      {activeEvent ? (
-        <div className="mt-2 rounded-[18px] border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-[10px] font-black leading-4 text-slate-500">
-              잠시 후 자동으로 이어집니다. 지금 이해했다면 바로 넘겨도 됩니다.
-            </div>
-            <button
-              className="shrink-0 rounded-[14px] bg-slate-950 px-3 py-2 text-[10px] font-black text-[#f8fafc] shadow-[0_10px_24px_rgba(15,23,42,0.18)] active:scale-95"
-              onClick={() => onContinueCheckpoint(activeEvent.id)}
-              type="button"
-            >
-              계속 달리기
-            </button>
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
-            <div
-              className="h-full rounded-full bg-slate-950 transition-[width] duration-100"
-              style={{ width: `${checkpointProgressPct}%` }}
-            />
-          </div>
-        </div>
-      ) : null}
-      <div className="mt-2 grid grid-cols-3 gap-1.5">
-        <RacePulseMetric label="평가금액" value={formatKrw(value)} />
-        <RacePulseMetric label="이번 달" value={formatPct(monthlyReturnPct)} warning={monthlyChangeKrw < 0} />
-        <RacePulseMetric
-          label="고점 대비"
-          value={drawdownFromPeak < 0 ? `-${formatKrw(Math.abs(drawdownFromPeak))}` : formatKrw(Math.max(visiblePeak - value, 0))}
-          warning={drawdownFromPeak < 0}
-        />
-      </div>
+    <div className="mt-2 grid grid-cols-3 gap-1.5">
+      <RacePulseMetric label="평가금액" value={formatKrw(value)} />
+      <RacePulseMetric label="이번 달" value={formatPct(monthlyReturnPct)} warning={monthlyChangeKrw < 0} />
+      <RacePulseMetric
+        label="고점 대비"
+        value={drawdownFromPeak < 0 ? `-${formatKrw(Math.abs(drawdownFromPeak))}` : formatKrw(Math.max(visiblePeak - value, 0))}
+        warning={drawdownFromPeak < 0}
+      />
     </div>
   );
 }
@@ -2571,49 +2346,13 @@ function RacePulseMetric({
   warning?: boolean;
 }) {
   return (
-    <div className="rounded-[14px] bg-white/78 px-2 py-1.5 shadow-sm">
-      <div className="text-[9px] font-black text-slate-400">{label}</div>
-      <div className={`mt-0.5 truncate text-[11px] font-black tracking-[-0.03em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
+    <div className="rounded-[18px] border border-slate-200 bg-white px-2.5 py-2.5 shadow-[0_8px_20px_rgba(15,23,42,0.05)]">
+      <div className="text-[10px] font-black text-slate-400">{label}</div>
+      <div className={`mt-1 truncate text-[15px] font-black tracking-[-0.06em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
         {value}
       </div>
     </div>
   );
-}
-
-function getRacePulseToneClasses(tone: RaceEventTone) {
-  if (tone === "danger") {
-    return {
-      badge: "bg-rose-100 text-rose-700",
-      container: "border-rose-100 bg-rose-50",
-      eyebrow: "text-rose-500",
-      value: "text-rose-600",
-    };
-  }
-
-  if (tone === "temptation") {
-    return {
-      badge: "bg-amber-100 text-amber-700",
-      container: "border-amber-100 bg-amber-50",
-      eyebrow: "text-amber-600",
-      value: "text-amber-700",
-    };
-  }
-
-  if (tone === "recovery") {
-    return {
-      badge: "bg-emerald-100 text-emerald-700",
-      container: "border-emerald-100 bg-emerald-50",
-      eyebrow: "text-emerald-600",
-      value: "text-emerald-700",
-    };
-  }
-
-  return {
-    badge: "bg-slate-100 text-slate-600",
-    container: "border-slate-200 bg-slate-50",
-    eyebrow: "text-blue-500",
-    value: "text-slate-950",
-  };
 }
 
 function ResultSummary({
