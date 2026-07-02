@@ -4,6 +4,7 @@ import {
   Bookmark,
   ChevronRight,
   Clock3,
+  CircleHelp,
   Home,
   LineChart,
   Radio,
@@ -1447,20 +1448,45 @@ function SectionCard({
 }
 
 function MetricCard({
+  help,
   label,
   value,
   warning,
 }: {
+  help?: string;
   label: string;
   value: string;
   warning?: boolean;
 }) {
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
   return (
-    <div className={`rounded-[22px] border px-4 py-4 ${warning ? "border-rose-100 bg-rose-50" : "border-slate-200 bg-slate-50"}`}>
-      <div className="text-xs font-semibold text-slate-500">{label}</div>
+    <div
+      className={`relative rounded-[22px] border px-4 py-4 ${
+        warning ? "border-rose-100 bg-rose-50" : "border-slate-200 bg-slate-50"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-xs font-semibold leading-5 text-slate-500">{label}</div>
+        {help ? (
+          <button
+            aria-label={`${label} 기준 설명 보기`}
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm active:scale-95"
+            onClick={() => setIsHelpOpen((open) => !open)}
+            type="button"
+          >
+            <CircleHelp size={14} strokeWidth={2.4} />
+          </button>
+        ) : null}
+      </div>
       <div className={`mt-2 text-xl font-black tracking-[-0.05em] ${warning ? "text-rose-600" : "text-slate-950"}`}>
         {value}
       </div>
+      {help && isHelpOpen ? (
+        <div className="absolute right-3 top-11 z-20 max-w-[250px] rounded-[18px] border border-slate-200 bg-white px-3 py-2.5 text-[11px] font-bold leading-5 text-slate-600 shadow-[0_16px_36px_rgba(15,23,42,0.16)]">
+          {help}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -2549,21 +2575,25 @@ function PainDashboard({ analysis }: { analysis: PainAnalysis }) {
       </div>
       <div className="mt-4 grid gap-3">
         <MetricCard
+          help="투자 기간 중 이미 찍었던 최고 평가금액에서 가장 크게 밀린 비율입니다. 원금 대비 손실이 아니라, 고점에서 계좌가 얼마나 무너졌는지를 봅니다."
           label="계좌가 가장 처참하게 녹아내린 순간"
           value={formatPct(analysis.maxDrawdownPct)}
           warning
         />
         <MetricCard
+          help="평가금액이 그 시점까지의 전고점보다 낮았던 달 수입니다. 원금 아래로 내려간 기간과는 다른 지표입니다."
           label="전고점 아래에서 한숨 쉬며 보낸 시간"
           value={`${analysis.underATHMonths}개월`}
           warning
         />
         <MetricCard
+          help="처음 넣은 1,000만원보다 평가금액이 낮았던 달만 셉니다. 말 그대로 진짜 원금 손실 구간입니다."
           label="원금 1,000만원 아래로 깨진 기간"
           value={`${analysis.underPrincipalMonths}개월`}
           warning={analysis.underPrincipalMonths > 0}
         />
         <MetricCard
+          help="전고점을 찍은 뒤 다시 그 고점을 회복하기까지 걸린 가장 긴 연속 기간입니다. 장기투자에서 가장 지루하고 위험한 기다림입니다."
           label="물린 뒤 탈출하기까지 가장 긴 기다림"
           value={`${analysis.longestRecoveryMonths}개월`}
           warning
