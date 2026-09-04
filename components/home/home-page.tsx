@@ -4,10 +4,14 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Archive,
+  ChartNoAxesCombined,
+  Clock3,
   HelpCircle,
   Info,
+  RefreshCw,
   Rocket,
   Swords,
+  TrendingDown,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -26,6 +30,10 @@ import type { DetailChartContext } from "@/features/detail-chart/types";
 import { formatCrisisPeriodLabel } from "@/features/detail-chart/utils/buildDetailChartSeries";
 import { ControlledAppMenu } from "@/components/app-menu";
 import { NoProfitTimetableCard } from "@/components/home/no-profit-timetable-card";
+import {
+  HomeCompanySearch,
+  type CompanyMarketFilter,
+} from "@/components/home/home-company-search";
 import { ProStartExplorerChart } from "@/components/home/pro-start-explorer-chart";
 import { RaceChart, type RaceChartAsset } from "@/components/home/race-chart";
 import {
@@ -79,6 +87,13 @@ import {
   type SingleAssetSimulationResult,
 } from "@/lib/race-engine";
 import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-data";
+import { MARKET_CAP_COMPANIES } from "@/lib/market-cap-universe";
+import {
+  buildResultShareText,
+  buildResultShareUrl,
+  buildSoloReplayAssetIds,
+  type ResultShareRow,
+} from "@/lib/result-share";
 import {
   readSavedAssetCombos,
   readSavedFutureScenarios,
@@ -116,7 +131,7 @@ type RaceStatus = "complete" | "idle" | "loading" | "paused" | "racing";
 type AmountMode = "custom" | "preset";
 type InvestmentMode = "lump-sum" | "monthly";
 type PrimaryNavKey = "assets" | "compare" | "more" | "saved";
-type SoloFlowStep = "amount" | "pick" | "race" | "result";
+type SoloFlowStep = "amount" | "confirm" | "pick" | "race" | "result" | "style";
 type SoloHorizonMode = "recent10y" | "since-listing";
 type HomeScenarioMode = "compare" | "solo";
 
@@ -127,219 +142,6 @@ const SOLO_PRINCIPAL_RACE_ASSET: RaceChartAsset = {
   shortLabel: "예금",
 };
 const SOLO_DEPOSIT_BENCHMARK_ANNUAL_RATE = 0.0304;
-
-interface ReferralCardCopy {
-  badge: string;
-  benefit: string;
-  fomo: string;
-  name: string;
-  url: string;
-}
-
-const REFERRAL_LINKS = {
-  // 토스증권 계좌 개설 및 주식 선물 이벤트 공식 모바일 딥링크 규격
-  TOSS_SECURITIES:
-    process.env.NEXT_PUBLIC_REFERRAL_TOSS_SECURITIES_URL ??
-    "https://toss.im/_m/securities_account_open?ref=MOCK_PARTNER_ID",
-  // 글로벌 1위 코인 거래소 바이낸스 공식 레퍼럴 회원가입 규격
-  BINANCE_CRYPTO:
-    process.env.NEXT_PUBLIC_REFERRAL_BINANCE_CRYPTO_URL ??
-    "https://accounts.binance.com/register?ref=MOCK_REFERRAL_CODE",
-  // 메이저 가상자산 선물거래소 바이비트 공식 초대 규격
-  BYBIT_CRYPTO:
-    process.env.NEXT_PUBLIC_REFERRAL_BYBIT_CRYPTO_URL ??
-    "https://www.bybit.com/invite?ref=MOCK_INVITE_CODE",
-} as const;
-
-const REFERRAL_DEFAULT_URL =
-  process.env.NEXT_PUBLIC_REFERRAL_DEFAULT_URL ?? REFERRAL_LINKS.TOSS_SECURITIES;
-const REFERRAL_STOCK_URL = process.env.NEXT_PUBLIC_REFERRAL_STOCK_URL ?? REFERRAL_LINKS.TOSS_SECURITIES;
-const REFERRAL_CRYPTO_URL =
-  process.env.NEXT_PUBLIC_REFERRAL_CRYPTO_URL ?? REFERRAL_LINKS.BINANCE_CRYPTO;
-const REFERRAL_ETF_URL = process.env.NEXT_PUBLIC_REFERRAL_ETF_URL ?? REFERRAL_STOCK_URL;
-
-const REFERRAL_DEFAULT: ReferralCardCopy = {
-  badge: "NEXT 10 YEARS",
-  benefit:
-    "Regretzero는 매수 추천을 하지 않습니다. 다만 실제로 시작한다면 수수료, 환율, 자동 적립 같은 조건부터 차분히 비교해보세요.",
-  fomo:
-    "지나간 타이밍은 바꿀 수 없지만, 다음 10년을 준비하는 방식은 오늘부터 바꿀 수 있습니다.",
-  name: "금융 혜택",
-  url: REFERRAL_DEFAULT_URL,
-};
-
-const REFERRAL_MAP: Partial<Record<ComparisonAssetId, ReferralCardCopy>> = {
-  aapl: {
-    badge: "US STOCKS",
-    benefit:
-      "해외 주식은 종목만큼 환율과 거래 비용도 중요합니다. 시작 전 수수료와 소수점 투자 혜택을 먼저 비교해보세요.",
-    fomo:
-      "Apple 같은 글로벌 대형주는 결과보다 오래 들고 갈 수 있는 조건을 먼저 확인해야 합니다.",
-    name: "해외 주식",
-    url: REFERRAL_STOCK_URL,
-  },
-  btc: {
-    badge: "CRYPTO ACCESS",
-    benefit:
-      "디지털 자산은 변동성이 큰 만큼 거래 수수료, 보관 방식, 입출금 조건을 먼저 확인하는 것이 중요합니다.",
-    fomo:
-      "비트코인의 지난 기록은 강렬했지만, 다음 선택은 수익률보다 감당 가능한 변동성부터 봐야 합니다.",
-    name: "디지털 자산",
-    url: REFERRAL_CRYPTO_URL,
-  },
-  eth: {
-    badge: "CRYPTO ACCESS",
-    benefit:
-      "디지털 자산은 변동성이 큰 만큼 거래 수수료, 보관 방식, 입출금 조건을 먼저 확인하는 것이 중요합니다.",
-    fomo:
-      "이더리움의 지난 기록은 흥미롭지만, 앞으로의 선택은 내가 버틸 수 있는 조건에서 시작해야 합니다.",
-    name: "디지털 자산",
-    url: REFERRAL_CRYPTO_URL,
-  },
-  msft: {
-    badge: "US STOCKS",
-    benefit:
-      "해외 주식은 종목만큼 환율과 거래 비용도 중요합니다. 시작 전 수수료와 소수점 투자 혜택을 먼저 비교해보세요.",
-    fomo:
-      "Microsoft 같은 글로벌 대형주는 결과보다 오래 들고 갈 수 있는 조건을 먼저 확인해야 합니다.",
-    name: "해외 주식",
-    url: REFERRAL_STOCK_URL,
-  },
-  nvda: {
-    badge: "US STOCKS",
-    benefit:
-      "해외 주식은 종목만큼 환율과 거래 비용도 중요합니다. 시작 전 수수료와 소수점 투자 혜택을 먼저 비교해보세요.",
-    fomo:
-      "NVIDIA의 지난 10년은 강렬했지만, 다음 10년은 내가 꾸준히 실행할 수 있는 환경부터 만들어야 합니다.",
-    name: "해외 주식",
-    url: REFERRAL_STOCK_URL,
-  },
-  qqq: {
-    badge: "ETF START",
-    benefit:
-      "ETF는 여러 기업을 한 번에 담는 방식입니다. 정기 적립, 환율, 수수료 조건을 비교하면 시작 부담을 줄일 수 있습니다.",
-    fomo:
-      "나스닥100 ETF처럼 오래 보는 자산은 타이밍보다 꾸준히 이어갈 수 있는 구조가 더 중요합니다.",
-    name: "ETF",
-    url: REFERRAL_ETF_URL,
-  },
-  smh: {
-    badge: "ETF START",
-    benefit:
-      "테마 ETF는 업종 흐름을 한 번에 볼 수 있지만 변동성도 큽니다. 거래 비용과 적립 방식부터 확인해보세요.",
-    fomo:
-      "반도체 ETF의 지난 흐름은 컸지만, 다음 선택은 흔들림을 감당할 수 있는 방식이어야 합니다.",
-    name: "ETF",
-    url: REFERRAL_ETF_URL,
-  },
-  soxl: {
-    badge: "HIGH VOLATILITY",
-    benefit:
-      "레버리지 ETF는 손익 변동이 매우 큽니다. 실제 투자 전 상품 구조와 수수료, 장기 보유 리스크를 반드시 확인하세요.",
-    fomo:
-      "SOXL 같은 고변동 상품은 결과보다 중간 과정의 흔들림을 감당할 수 있는지가 먼저입니다.",
-    name: "레버리지 ETF",
-    url: REFERRAL_ETF_URL,
-  },
-  tsla: {
-    badge: "US STOCKS",
-    benefit:
-      "해외 주식은 종목만큼 환율과 거래 비용도 중요합니다. 시작 전 수수료와 소수점 투자 혜택을 먼저 비교해보세요.",
-    fomo:
-      "Tesla의 지난 기회는 지나갔지만, 다음 10년을 준비하는 습관은 지금부터 만들 수 있습니다.",
-    name: "해외 주식",
-    url: REFERRAL_STOCK_URL,
-  },
-};
-
-function getReferralCardData(assetId: ComparisonAssetId | null | undefined) {
-  return (assetId ? REFERRAL_MAP[assetId] : null) ?? REFERRAL_DEFAULT;
-}
-
-function ReferralCtaCard({
-  copy,
-  onMissingUrl,
-  placement,
-}: {
-  copy: ReferralCardCopy;
-  onMissingUrl: () => void;
-  placement: "receipt" | "volatility";
-}) {
-  const title =
-    placement === "receipt"
-      ? "내 후회 영수증 다음에 바로 확인할 실행 조건"
-      : "변동성을 제어하는 분산 적립식 투자 가이드";
-  const helper =
-    placement === "receipt"
-      ? "영수증은 과거의 기록이고, 이 카드는 다음 10년을 준비할 때 따져볼 조건입니다."
-      : "결과가 컸던 자산일수록 한 번에 맞히기보다 수수료, 환율, 적립 방식을 먼저 비교해보세요.";
-
-  return (
-    <div className="mt-5 overflow-hidden rounded-[24px] border border-slate-100 bg-white px-5 py-5 shadow-[0_18px_48px_rgba(15,23,42,0.07)]">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-600">
-            {copy.badge}
-          </div>
-          <div className="mt-2 text-[1.08rem] font-bold leading-7 tracking-[-0.04em] text-slate-950">
-            {title}
-          </div>
-          <div className="mt-2 text-sm font-semibold leading-6 text-slate-800">{copy.fomo}</div>
-          <div className="mt-2 text-sm leading-6 text-slate-600">{copy.benefit}</div>
-          <div className="mt-2 text-xs leading-5 text-slate-400">{helper}</div>
-        </div>
-        <div className="hidden rounded-full border border-slate-100 bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-500 sm:block">
-          제휴
-        </div>
-      </div>
-      <a
-        aria-label={`${copy.name} 제휴 혜택 확인하기`}
-        className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-5 text-center text-sm font-bold tracking-[-0.02em] text-white shadow-lg shadow-slate-950/10 transition hover:bg-slate-800"
-        href={copy.url}
-        onClick={(event) => {
-          if (copy.url && copy.url !== "#") {
-            return;
-          }
-
-          event.preventDefault();
-          onMissingUrl();
-        }}
-        rel="noopener noreferrer sponsored"
-        target="_blank"
-      >
-        {copy.name} 혜택 확인하기
-      </a>
-      <div className="mt-3 text-[11px] leading-5 text-slate-400">
-        광고·제휴 링크가 포함될 수 있습니다. 과거 기록은 미래 수익을 보장하지 않으며,
-        실제 투자 판단은 본인 책임입니다.
-      </div>
-    </div>
-  );
-}
-
-function buildOgShareUrl({
-  assetLabel,
-  finalValueLabel,
-  gapLabel,
-  investedLabel,
-  waitingMonths,
-}: {
-  assetLabel: string;
-  finalValueLabel: string;
-  gapLabel: string;
-  investedLabel: string;
-  waitingMonths: number;
-}) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("ogAsset", assetLabel);
-  url.searchParams.set("ogAmount", investedLabel);
-  url.searchParams.set("ogFinal", finalValueLabel);
-  url.searchParams.set("ogGap", gapLabel);
-  url.searchParams.set("ogWait", `${waitingMonths}`);
-  url.searchParams.set("utm_source", "share");
-  url.searchParams.set("utm_medium", "result_card");
-  return url.toString();
-}
 
 function calculateSoloDepositBenchmarkValue(
   principalKrw: number,
@@ -428,12 +230,12 @@ const ASSET_FILTERS: Array<{
   {
     id: "us-stock",
     label: "미국",
-    matches: (asset) => asset.category === "미국주식",
+    matches: (asset) => asset.companyMarket === "US",
   },
   {
     id: "kr-stock",
     label: "한국",
-    matches: (asset) => asset.category === "한국주식",
+    matches: (asset) => asset.companyMarket === "KR",
   },
   {
     id: "other",
@@ -613,15 +415,15 @@ const ASSET_BROWSER_SECTION_DEFS: Array<{
   },
   {
     id: "us-stocks",
-    title: "미국 인기 주식",
-    helper: "많이 찾는 미국 주식.",
-    matches: (asset) => asset.category === "미국주식",
+    title: "미국 시총 100",
+    helper: "2026.07.10 종가 기준.",
+    matches: (asset) => asset.companyMarket === "US",
   },
   {
     id: "kr-stocks",
-    title: "한국 대표 주식",
-    helper: "익숙한 한국 주식.",
-    matches: (asset) => asset.category === "한국주식",
+    title: "한국 시총 100",
+    helper: "2026.07.10 종가 기준.",
+    matches: (asset) => asset.companyMarket === "KR",
   },
   {
     id: "etf",
@@ -732,42 +534,55 @@ const HOME_DIRECT_PICK_DAILY_POOL_IDS: ComparisonAssetId[] = [
   "133690",
 ];
 
+const BEGINNER_PRIMARY_ASSETS: Array<{
+  id: ComparisonAssetId;
+  label: string;
+  hint: string;
+}> = [
+  { id: "voo", label: "S&P500", hint: "미국 대표 500" },
+  { id: "005930", label: "삼성전자", hint: "한국 대표주" },
+  { id: "qqq", label: "QQQ", hint: "미국 기술 ETF" },
+  { id: "tsla", label: "테슬라", hint: "전기차·성장" },
+  { id: "gold", label: "금", hint: "안전자산" },
+  { id: "btc", label: "비트코인", hint: "디지털 자산" },
+];
+
 const SOLO_QUICK_ASSET_IDS: ComparisonAssetId[] = [
+  "voo",
   "005930",
-  "nvda",
+  "qqq",
   "tsla",
+  "gold",
   "btc",
-  "000660",
+  "nvda",
   "aapl",
   "msft",
-  "gold",
+  "000660",
   "seoul_apt",
-  "qqq",
-  "soxl",
-  "silver",
+  "eth",
 ];
 
 const HOME_FLOW_COPY = {
-  allAssetsHint: "익숙한 이름부터 시작하세요.",
-  amountDescription: "같은 금액으로 맞춰봅니다.",
-  amountTitle: "금액을 정해볼까요?",
-  assetDescription: "궁금한 자산 두 개를 고르세요.",
-  assetTitle: "두 자산을 고르세요",
-  beginnerDescription: "무엇을 보는 사이트인지, 어떻게 쓰는지 먼저 짚어드릴게요.",
+  allAssetsHint: "이름이나 티커로 찾아보기",
+  amountDescription: "부담 없는 금액으로 시작해도 괜찮아요.",
+  amountTitle: "얼마를 넣었다고 볼까요?",
+  assetDescription: "궁금한 걸 하나만 골라도 충분해요.",
+  assetTitle: "무엇을 골라볼까요?",
+  beginnerDescription: "과거 숫자로, 그때 샀다면 어땠을지 같이 봐요.",
   beginnerTitle: "처음이라면 여기부터",
-  emptySelection: "아직 선택한 자산이 없습니다.",
-  heroDescription: "같은 돈으로 시작한 자산들의 10년을 차트로 돌려봅니다.",
-  heroEyebrow: "REGRETZERO",
-  heroTitle: "10년 전 샀다면,\n지금 얼마가 되었을까요?",
-  heroCta: "10년 전으로 가보기",
-  quickAssetDescription: "평소 궁금했던 자산 두 개를 선택하세요.",
-  quickAssetTitle: "어떤 자산의 10년이 궁금한가요?",
-  raceDescription: "누가 이겼는지보다, 언제부터 갈라졌는지가 중요합니다.",
-  raceTitle: "길이 갈라지는 순간",
-  recommendedDescription: "모두가 아는 자산으로 먼저 감을 잡아보세요.",
-  recommendedTitle: "10년 전으로 돌려보는 대표 비교",
-  resultDescription: "마지막 숫자보다, 그 숫자까지 지나온 시간이 더 오래 남습니다.",
-  resultTitle: "끝까지 들고 있었다면",
+  emptySelection: "아직 고른 게 없어요.",
+  heroDescription: "10년 전에 100만원을 넣었다면, 지금은 얼마가 되었을까요?",
+  heroEyebrow: "그때 살걸",
+  heroTitle: "그때 살걸",
+  heroCta: "한번 볼까요?",
+  quickAssetDescription: "잘 알려진 것부터 눌러보세요.",
+  quickAssetTitle: "어디에 넣었다고 볼까요?",
+  raceDescription: "돈이 어떻게 달려왔는지 같이 봐요.",
+  raceTitle: "달려가는 동안",
+  recommendedDescription: "익숙한 것부터 감을 잡아보세요.",
+  recommendedTitle: "먼저 이걸로 볼까요?",
+  resultDescription: "숫자보다, 그 사이 지나온 시간이 더 중요해요.",
+  resultTitle: "그래서 지금은",
 } as const;
 
 const MAIN_COMPARISON_ASSET_LIMIT = MIN_COMPARISON_ASSETS;
@@ -2013,7 +1828,11 @@ function getAssetBrowserCategoryLabel(asset: AssetOption) {
 }
 
 function normalizeAssetSearchQuery(query: string) {
-  return query.trim().toLowerCase();
+  return query
+    .trim()
+    .normalize("NFKC")
+    .toLocaleLowerCase("ko-KR")
+    .replace(/[\s._/()-]+/g, "");
 }
 
 function assetMatchesSearch(asset: AssetOption, query: string) {
@@ -2022,7 +1841,7 @@ function assetMatchesSearch(asset: AssetOption, query: string) {
   }
 
   const normalizedQuery = normalizeAssetSearchQuery(query);
-  const searchSource = [
+  const searchFields = [
     asset.id,
     asset.label,
     asset.shortLabel,
@@ -2032,10 +1851,9 @@ function assetMatchesSearch(asset: AssetOption, query: string) {
     ...asset.searchTerms,
   ]
     .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+    .map((value) => normalizeAssetSearchQuery(String(value)));
 
-  return searchSource.includes(normalizedQuery);
+  return searchFields.some((field) => field.includes(normalizedQuery));
 }
 
 function getAmountInfoText(asset: AssetOption) {
@@ -2234,6 +2052,62 @@ function clampDate(date: string, minDate: string, maxDate: string) {
   return date;
 }
 
+interface SharedReplayScenario {
+  assetIds: ComparisonAssetId[];
+  endDate: string;
+  inputKrw: number;
+  investmentMode: InvestmentMode;
+  startDate: string;
+}
+
+function readSharedReplayScenario(searchParams: { get: (key: string) => string | null }) {
+  if (searchParams.get("shared") !== "1") {
+    return null;
+  }
+
+  const assetIds = (searchParams.get("assets") ?? "")
+    .split(",")
+    .map((assetId) => assetId.trim())
+    .filter(
+      (assetId): assetId is ComparisonAssetId =>
+        Boolean(assetId && assetCatalog[assetId]?.isAvailable),
+    )
+    .filter((assetId, index, values) => values.indexOf(assetId) === index)
+    .slice(0, 2);
+  const rawInputKrw = Number(searchParams.get("input"));
+  const startDate = searchParams.get("start") ?? "";
+  const endDate = searchParams.get("end") ?? "";
+  const availableRange = getRequestedDateRangeForYears(50);
+  const requestedMode = searchParams.get("mode");
+
+  if (
+    assetIds.length === 0 ||
+    !Number.isFinite(rawInputKrw) ||
+    rawInputKrw < 10_000 ||
+    rawInputKrw > 1_000_000_000_000 ||
+    !isValidInputDate(startDate) ||
+    !isValidInputDate(endDate) ||
+    startDate >= endDate ||
+    startDate < availableRange.start ||
+    endDate > availableRange.end
+  ) {
+    return null;
+  }
+
+  const investmentMode: InvestmentMode =
+    requestedMode === "monthly" && assetIds.every(supportsMonthlyContributionAsset)
+      ? "monthly"
+      : "lump-sum";
+
+  return {
+    assetIds,
+    endDate,
+    inputKrw: Math.round(rawInputKrw),
+    investmentMode,
+    startDate,
+  } satisfies SharedReplayScenario;
+}
+
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -2282,6 +2156,151 @@ function wrapCanvasText(
       ctx.fillText(line, x, nextY);
     }
   });
+}
+
+interface ResultShareCardInput {
+  amountLabel: string;
+  dateRangeLabel: string;
+  headline: string;
+  rows: ResultShareRow[];
+}
+
+function truncateCanvasText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+) {
+  if (ctx.measureText(text).width <= maxWidth) {
+    return text;
+  }
+
+  let visibleText = text;
+
+  while (visibleText.length > 1 && ctx.measureText(`${visibleText}…`).width > maxWidth) {
+    visibleText = visibleText.slice(0, -1);
+  }
+
+  return `${visibleText}…`;
+}
+
+function createResultShareCardFile({
+  amountLabel,
+  dateRangeLabel,
+  headline,
+  rows,
+}: ResultShareCardInput) {
+  if (typeof document === "undefined" || typeof File === "undefined") {
+    return null;
+  }
+
+  try {
+    const canvas = document.createElement("canvas");
+    const width = 1200;
+    const height = 630;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      return null;
+    }
+
+    const background = ctx.createLinearGradient(0, 0, width, height);
+    background.addColorStop(0, "#e8f2ff");
+    background.addColorStop(0.55, "#f8fbff");
+    background.addColorStop(1, "#dbeafe");
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.save();
+    ctx.shadowColor = "rgba(15, 23, 42, 0.15)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 16;
+    roundRect(ctx, 44, 36, 1112, 558, 36);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.restore();
+
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "#2563eb";
+    ctx.font = '800 22px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+    ctx.fillText("REGRETZERO · RESULT CARD", 82, 72);
+
+    ctx.fillStyle = "#0f172a";
+    ctx.font = '900 42px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+    ctx.fillText(truncateCanvasText(ctx, headline, 820), 82, 114);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = '600 21px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+    ctx.fillText(`${amountLabel} · ${dateRangeLabel}`, 82, 171);
+
+    const visibleRows = rows.slice(0, 2);
+    const gap = 20;
+    const cardWidth = visibleRows.length > 1 ? 508 : 1036;
+
+    visibleRows.forEach((row, index) => {
+      const x = 82 + index * (cardWidth + gap);
+      roundRect(ctx, x, 216, cardWidth, 244, 26);
+      ctx.fillStyle = index === 0 ? "#eff6ff" : "#f8fafc";
+      ctx.fill();
+      ctx.strokeStyle = index === 0 ? "#bfdbfe" : "#e2e8f0";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = "#2563eb";
+      ctx.font = '800 18px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+      ctx.fillText(visibleRows.length > 1 ? `${index + 1}위` : "RESULT", x + 28, 244);
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = '800 29px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+      ctx.fillText(truncateCanvasText(ctx, row.label, cardWidth - 56), x + 28, 276);
+
+      ctx.font = '900 38px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+      ctx.fillText(truncateCanvasText(ctx, row.finalValueLabel, cardWidth - 56), x + 28, 320);
+
+      ctx.fillStyle = "#475569";
+      ctx.font = '700 20px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+      ctx.fillText(`총수익률 ${row.totalReturnLabel}`, x + 28, 376);
+      ctx.fillText(`최대 낙폭 ${row.maxDrawdownLabel}`, x + 28, 408);
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = '800 20px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+      ctx.fillText(`회복 ${row.recoveryLabel}`, x + cardWidth - 170, 408);
+    });
+
+    roundRect(ctx, 82, 486, 1036, 72, 22);
+    ctx.fillStyle = "#0f172a";
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = '800 23px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+    ctx.fillText("같은 조건으로 내 종목도 직접 돌려보기", 112, 510);
+    ctx.fillStyle = "#93c5fd";
+    ctx.textAlign = "right";
+    ctx.fillText("regretzero.kr  →", 1088, 510);
+    ctx.textAlign = "left";
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = '500 14px "Pretendard", "Apple SD Gothic Neo", sans-serif';
+    ctx.fillText("투자 권유가 아닌 과거 데이터 시뮬레이션입니다.", 82, 570);
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const encodedImage = dataUrl.split(",")[1];
+
+    if (!encodedImage) {
+      return null;
+    }
+
+    const binaryImage = atob(encodedImage);
+    const bytes = new Uint8Array(binaryImage.length);
+
+    for (let index = 0; index < binaryImage.length; index += 1) {
+      bytes[index] = binaryImage.charCodeAt(index);
+    }
+
+    return new File([bytes], "regretzero-result.png", { type: "image/png" });
+  } catch {
+    return null;
+  }
 }
 
 function formatKrwExact(value: number) {
@@ -2879,7 +2898,7 @@ function RecommendedComparisonList({
               key={category.id}
               className={`min-h-9 shrink-0 whitespace-nowrap rounded-full border transition ${
                 isActive
-                  ? "border-slate-900 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white"
+                  ? "border-slate-900 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-[#fff]"
                   : "border-slate-300 bg-white px-3 text-xs font-medium text-slate-600 hover:border-slate-400 hover:text-slate-900"
               }`}
               onClick={() => {
@@ -2946,69 +2965,32 @@ function HomeScenarioGrid({
     <div className={`grid grid-cols-2 gap-2.5 ${twoColumnOnWide ? "xl:grid-cols-2" : ""}`}>
       {scenarios.map((scenario) => {
         const isSolo = scenario.mode === "solo";
-        const actionLabel = isSolo ? "예금 기준 추적" : "맞대결";
+        const ActionIcon = isSolo ? ChartNoAxesCombined : Swords;
+        const actionLabel = isSolo ? "한 종목" : "비교";
 
         return (
           <button
-            className="group relative min-h-[104px] overflow-hidden rounded-[20px] border border-white/8 bg-white/[0.03] px-3.5 py-3.5 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06] hover:shadow-[0_18px_40px_rgba(15,23,42,0.14)]"
+            className="group relative min-h-[92px] overflow-hidden rounded-[20px] border border-white/8 bg-white/[0.03] px-3.5 py-3.5 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06] hover:shadow-[0_18px_40px_rgba(15,23,42,0.14)]"
             key={`${scenario.mode}-${scenario.title}`}
             onClick={() => onSelect(scenario)}
             type="button"
           >
-            <div className="flex h-full flex-col justify-between gap-3">
-              <div>
-                <div className="line-clamp-1 text-[10px] font-semibold tracking-[-0.01em] text-white/44">
-                  {scenario.badge}
+            <div className="flex h-full flex-col justify-between gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-[11px] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]">
+                  <ActionIcon aria-hidden="true" className="h-4 w-4" />
                 </div>
-                <div className="mt-2 break-keep text-[1.02rem] font-semibold leading-5 tracking-[-0.045em] text-white">
-                  {scenario.title}
-                </div>
-                <div className="mt-2 line-clamp-2 text-[11px] leading-4 text-white/48">
-                  {scenario.description}
-                </div>
-              </div>
-              <div className="flex items-center justify-start gap-2">
                 <div className="rounded-full border border-white/8 bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold text-white/46">
                   {actionLabel}
                 </div>
+              </div>
+              <div className="break-keep text-[1.02rem] font-semibold leading-5 tracking-[-0.045em] text-white">
+                {scenario.title}
               </div>
             </div>
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function TrendRankingTicker({
-  matchups,
-  onSelect,
-}: {
-  matchups: SyncedMatchup[];
-  onSelect?: (assetIds: ComparisonAssetId[]) => void;
-}) {
-  const visibleMatchups = matchups.length > 0 ? matchups : buildSyncedMatchupDeck(10);
-  const marqueeChips = [...visibleMatchups, ...visibleMatchups];
-
-  return (
-    <div aria-label="오늘 투자자들이 가장 많이 복기한 매치업" className="overflow-hidden">
-      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-        🔥 오늘 투자자들이 가장 많이 복기한 매치업
-      </div>
-      <div className="rounded-[18px] border border-slate-200 bg-white/70 py-2 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
-        <div className="rz-marquee-track flex w-max gap-2 px-2">
-          {marqueeChips.map((chip, index) => (
-            <button
-              className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold tracking-[-0.02em] text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
-              key={`${chip.id}-${index}`}
-              onClick={() => onSelect?.(chip.assetIds)}
-              type="button"
-            >
-              {chip.rank}위 {chip.label} · 오늘 {chip.viewers.toLocaleString("ko-KR")}명이 복기함
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -3069,7 +3051,7 @@ function IntroGuidedTutorial({
             <button
               className={`min-h-10 rounded-[15px] px-2 text-[11px] font-semibold tracking-[-0.02em] transition ${
                 isActive
-                  ? "bg-[var(--rz-accent)] text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
+                  ? "bg-[var(--rz-accent)] text-[#fff] shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
                   : "text-white/48 hover:bg-white/[0.05] hover:text-white/72"
               }`}
               key={step.id}
@@ -3447,19 +3429,20 @@ function ComplianceNotice({
 
   return (
     <div
-      className={`rounded-[20px] border px-4 py-3 text-xs leading-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ${
+      className={`flex items-center gap-2.5 rounded-[18px] border px-3.5 py-3 text-xs leading-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ${
         isLight
           ? "border-[var(--rz-border)] bg-white/90 text-slate-600"
           : "border-sky-200/25 bg-slate-950/72 text-slate-100/82 shadow-[0_16px_42px_rgba(15,23,42,0.26)]"
       } ${className}`}
     >
-      <span
-        className={`font-semibold ${isLight ? "text-[var(--rz-text-primary)]" : "text-white"}`}
-      >
-        투자 권유가 아닌 과거 시뮬레이션입니다.
+      <Info aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--rz-accent)]" />
+      <span>
+        <strong className={`font-semibold ${isLight ? "text-[var(--rz-text-primary)]" : "text-white"}`}>
+          과거 데이터 기준
+        </strong>
+        {compact ? " · " : " — "}
+        투자 권유가 아니며 미래 수익을 보장하지 않습니다.
       </span>
-      {compact ? " " : <br />}
-      과거 기록은 미래 수익을 보장하지 않으며, 실제 투자 판단은 본인 책임입니다.
     </div>
   );
 }
@@ -3495,7 +3478,6 @@ interface DesktopHomeDashboardProps {
   activeMenuIntent: string | null;
   activePrimaryNavKey: PrimaryNavKey | null;
   canContinueFromAssetSelection: boolean;
-  dailyDirectPickAssets: AssetOption[];
   featuredRivalScenarios: HomeScenario[];
   featuredSoloScenarios: HomeScenario[];
   goToAllAssets: () => void;
@@ -3505,24 +3487,24 @@ interface DesktopHomeDashboardProps {
   goToSavedRecords: () => void;
   isMenuOpen: boolean;
   onAssetToggle: (assetId: ComparisonAssetId) => void;
+  onCompanyBrowserOpen: (payload: {
+    market: CompanyMarketFilter;
+    query: string;
+  }) => void;
   onMoreMenuOpen: () => void;
   onMenuOpenChange: (open: boolean) => void;
   onPresetBrowserOpen: () => void;
   onRivalScenarioShuffle: () => void;
   onScenarioStart: (scenario: HomeScenario) => void;
   onSoloScenarioShuffle: () => void;
-  onTimelineScenarioReplay: (scenario: DynamicTimelineScenario) => void;
   rivalScenarioShuffleKey: number;
   selectedAssetIds: ComparisonAssetId[];
-  selectedAssets: AssetOption[];
-  syncedMatchups: SyncedMatchup[];
 }
 
 function DesktopHomeDashboard({
   activeMenuIntent,
   activePrimaryNavKey,
   canContinueFromAssetSelection,
-  dailyDirectPickAssets,
   featuredRivalScenarios,
   featuredSoloScenarios,
   goToAllAssets,
@@ -3532,22 +3514,16 @@ function DesktopHomeDashboard({
   goToSavedRecords,
   isMenuOpen,
   onAssetToggle,
+  onCompanyBrowserOpen,
   onMoreMenuOpen,
   onMenuOpenChange,
   onPresetBrowserOpen,
   onRivalScenarioShuffle,
   onScenarioStart,
   onSoloScenarioShuffle,
-  onTimelineScenarioReplay,
   rivalScenarioShuffleKey,
   selectedAssetIds,
-  selectedAssets,
-  syncedMatchups,
 }: DesktopHomeDashboardProps) {
-  const selectedSummaryLabel = selectedAssets
-    .map((asset) => getHomeIntroAssetLabel(asset))
-    .join(" · ");
-
   return (
     <section className="hidden min-h-dvh px-6 py-5 lg:block xl:px-8 xl:py-6">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-6">
@@ -3578,119 +3554,67 @@ function DesktopHomeDashboard({
         />
       </header>
 
-      <section className="mx-auto w-full max-w-5xl space-y-8 py-8">
-        <div className="text-center">
-          <div className="mx-auto max-w-3xl px-1 py-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--rz-text-muted)]">
-              REGRETZERO
+      <section className="mx-auto w-full max-w-6xl space-y-8 py-10">
+        <div className="grid items-start gap-10 xl:grid-cols-[0.82fr_1.18fr] xl:gap-14">
+          <div className="px-1 pt-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--rz-border)] bg-white/72 px-3 py-2 text-xs font-semibold text-[var(--rz-text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+              <ChartNoAxesCombined aria-hidden="true" className="h-4 w-4 text-[var(--rz-accent)]" />
+              과거 데이터 시뮬레이션
             </div>
-            <h1 className="mx-auto mt-3 max-w-[720px] text-[3.2rem] font-semibold leading-[0.96] tracking-[-0.08em] text-[var(--rz-text-primary)] xl:text-[4rem]">
-              10년 전 샀다면,
+            <h1 className="mt-6 max-w-[560px] text-[3.65rem] font-semibold leading-[0.94] tracking-[-0.085em] text-[var(--rz-text-primary)] xl:text-[4.4rem]">
+              그 종목,
               <br />
-              지금 얼마가 되었을까요?
+              10년 전 샀다면.
             </h1>
-            <p className="mx-auto mt-5 max-w-[620px] text-base leading-7 text-[var(--rz-text-secondary)] xl:text-lg xl:leading-8">
-              <strong className="font-semibold text-[var(--rz-text-primary)]">그때 샀다면</strong>{" "}
-              얼마가 됐는지, 그리고 그 사이에 얼마나 흔들렸는지 함께 봅니다.
+            <p className="mt-6 max-w-[520px] text-lg leading-8 text-[var(--rz-text-secondary)]">
+              수익, 최대 하락, 회복 기간을 한 번에 봅니다.
             </p>
-            <ComplianceNotice className="mx-auto mt-5 max-w-[680px] text-left" variant="light" />
-            <div className="mx-auto mt-4 max-w-[760px] text-left">
-              <TrendRankingTicker
-                matchups={syncedMatchups}
-                onSelect={(assetIds) =>
-                  onScenarioStart({
-                    assetIds,
-                    badge: "오늘의 복기",
-                    description: "오늘 많이 복기한 조합입니다.",
-                    mode: "compare",
-                    title: getComparisonAssetIdsLabel(assetIds),
-                  })
-                }
-              />
-            </div>
-          </div>
-        </div>
 
-        <div className="surface-card rounded-[34px] px-6 py-6">
-          <div className="flex items-start justify-between gap-5">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/38">
-                직접 선택
-              </div>
-              <div className="mt-2 text-2xl font-semibold tracking-[-0.055em] text-white">
-                원하는 자산을 직접 고르기
-              </div>
-              <div className="mt-2 max-w-[42rem] text-sm leading-6 text-white/56">
-                오늘 많이 보는 대표 자산 12개를 먼저 보여드립니다. 두 개를 고르면 바로 금액 단계로 이어집니다.
-              </div>
-            </div>
-            <button
-              className="btn-secondary min-h-11 shrink-0 rounded-full px-5 text-sm font-semibold text-[var(--rz-text-primary)] transition"
-              onClick={goToAllAssets}
-              type="button"
-            >
-              전체 자산 보기
-            </button>
-          </div>
-
-          <DirectPickAssetGrid
-            assets={dailyDirectPickAssets}
-            className="mt-5 sm:grid-cols-4 xl:grid-cols-6"
-            onAssetToggle={onAssetToggle}
-            selectedAssetIds={selectedAssetIds}
-          />
-
-          <div className="mt-5 rounded-[24px] border border-white/8 bg-white/[0.03] px-4 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                  {canContinueFromAssetSelection ? selectedSummaryLabel : "선택 대기 중"}
-                </div>
-                <div className="mt-1 text-xs leading-5 text-white/46">
-                  {canContinueFromAssetSelection
-                    ? selectedAssetIds.length === 1
-                      ? "하나만 골라도 정기예금 기준으로 먼저 볼 수 있습니다."
-                      : "이제 금액만 정하면 10년 기록을 볼 수 있습니다."
-                    : "위에서 자산 두 개를 고르면 여기에 담깁니다."}
-                </div>
-              </div>
-              {canContinueFromAssetSelection ? (
-                <button
-                  className="btn-accent min-h-11 shrink-0 rounded-full px-5 text-sm font-semibold tracking-[-0.02em] transition"
-                  onClick={goToAmount}
-                  type="button"
+            <div className="mt-7 grid max-w-[520px] grid-cols-3 gap-2">
+              {[
+                { icon: ChartNoAxesCombined, label: "수익" },
+                { icon: TrendingDown, label: "최대 하락" },
+                { icon: Clock3, label: "회복 기간" },
+              ].map(({ icon: Icon, label }) => (
+                <div
+                  className="flex min-h-14 items-center gap-2 rounded-[18px] border border-[var(--rz-border)] bg-white/68 px-3 text-sm font-semibold text-[var(--rz-text-secondary)]"
+                  key={label}
                 >
-                  {selectedAssetIds.length === 1 ? "이 자산만 먼저 보기" : "이 자산으로 계속"}
-                </button>
-              ) : (
-                <div className="shrink-0 rounded-full border border-white/8 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-white/42">
-                  {selectedAssetIds.length}/2
+                  <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--rz-accent)]" />
+                  {label}
                 </div>
-              )}
+              ))}
             </div>
+
+            <ComplianceNotice className="mt-6 max-w-[520px]" compact variant="light" />
           </div>
+
+          <HomeCompanySearch
+            companies={MARKET_CAP_COMPANIES}
+            onContinue={goToAmount}
+            onOpenAll={onCompanyBrowserOpen}
+            onToggle={onAssetToggle}
+            selectedAssetIds={selectedAssetIds}
+            variant="light"
+          />
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
           <div className="surface-card rounded-[30px] px-5 py-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--rz-accent)]">
-                  START
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]">
+                  <ChartNoAxesCombined aria-hidden="true" className="h-5 w-5" />
                 </div>
-                <div className="mt-2 text-xl font-semibold tracking-[-0.05em] text-white">
-                  인기 종목 하나만 보기
-                </div>
-                <div className="mt-1 text-sm leading-6 text-white/54">
-                  익숙한 자산 하나를 눌러 정기예금 흐름과 비교해보세요.
-                </div>
+                <div className="text-xl font-semibold tracking-[-0.05em] text-white">한 종목</div>
               </div>
               <button
-                className="shrink-0 rounded-full border border-white/14 bg-white/[0.08] px-4 py-2 text-sm font-bold text-white transition hover:bg-white/[0.12]"
+                aria-label="다른 종목 보기"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
                 onClick={onSoloScenarioShuffle}
                 type="button"
               >
-                🔄 다른 자산 보기
+                <RefreshCw aria-hidden="true" className="h-4 w-4" />
               </button>
             </div>
             <div className="mt-5">
@@ -3703,32 +3627,28 @@ function DesktopHomeDashboard({
           </div>
 
           <div className="surface-card rounded-[30px] px-5 py-5">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--rz-accent)]">
-                  MATCH
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]">
+                  <Swords aria-hidden="true" className="h-5 w-5" />
                 </div>
-                <div className="mt-2 text-xl font-semibold tracking-[-0.05em] text-white">
-                  라이벌 수익 대결
-                </div>
-                <div className="mt-1 text-sm leading-6 text-white/54">
-                  비교가 선명한 대표 조합 네 개를 먼저 보여드립니다.
-                </div>
+                <div className="text-xl font-semibold tracking-[-0.05em] text-white">종목 비교</div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button
-                  className="rounded-full border border-white/14 bg-white/[0.08] px-4 py-2 text-sm font-bold text-white transition hover:bg-white/[0.12]"
+                  aria-label="다른 비교 보기"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
                   onClick={onRivalScenarioShuffle}
                   type="button"
                 >
-                  🔄 다른 매치 보기
+                  <RefreshCw aria-hidden="true" className="h-4 w-4" />
                 </button>
                 <button
-                  className="border-b border-white pb-0.5 text-sm font-bold text-white transition hover:text-white/78"
+                  className="min-h-10 rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-4 text-sm font-semibold text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
                   onClick={onPresetBrowserOpen}
                   type="button"
                 >
-                  전체 보기
+                  전체
                 </button>
               </div>
             </div>
@@ -3745,18 +3665,12 @@ function DesktopHomeDashboard({
           </div>
         </div>
 
-        <div className="grid gap-4">
-          <DynamicLiveTimeline
-            matchups={syncedMatchups}
-            onReplayScenario={onTimelineScenarioReplay}
-          />
-          <AdSlot
-            className="min-h-[90px]"
-            label="홈 광고"
-            placement="home-desktop-context"
-            slot={process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT}
-          />
-        </div>
+        <AdSlot
+          className="min-h-[90px]"
+          label="홈 광고"
+          placement="home-desktop-context"
+          slot={process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT}
+        />
       </section>
     </section>
   );
@@ -3787,12 +3701,21 @@ export function HomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const menuIntent = searchParams.get("menu");
-  const [flowStep, setFlowStep] = useState<FlowStep>("intro");
+  const sharedReplay = useMemo(
+    () => readSharedReplayScenario(searchParams),
+    [searchParams],
+  );
+  const sharedReplayKey = sharedReplay
+    ? `${sharedReplay.assetIds.join(",")}:${sharedReplay.investmentMode}:${sharedReplay.inputKrw}:${sharedReplay.startDate}:${sharedReplay.endDate}`
+    : "";
+  const [flowStep, setFlowStep] = useState<FlowStep>(sharedReplay ? "amount" : "intro");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedAssetIds, setSelectedAssetIds] = useState<ComparisonAssetId[]>(
-    defaultSelectedAssetIds,
+    sharedReplay?.assetIds ?? defaultSelectedAssetIds,
   );
-  const [assetToast, setAssetToast] = useState("");
+  const [assetToast, setAssetToast] = useState(
+    sharedReplay ? "공유된 조건을 불러왔습니다" : "",
+  );
   const [activeAssetFilter, setActiveAssetFilter] = useState<AssetFilterId>("all");
   const [assetSearchQuery, setAssetSearchQuery] = useState("");
   const [, setIsAssetFilterExpanded] = useState(false);
@@ -3811,31 +3734,52 @@ export function HomePage() {
   const [rivalScenarioShuffleKey, setRivalScenarioShuffleKey] = useState(0);
   const [syncedMatchups] = useState<SyncedMatchup[]>(() => buildSyncedMatchupDeck(10));
   const premiumAccess = AD_SUPPORTED_ACCESS;
-  const [customStartDate, setCustomStartDate] = useState(() => getRequestedDateRange().start);
-  const [customStartDateInput, setCustomStartDateInput] = useState(() => getRequestedDateRange().start);
+  const [customStartDate, setCustomStartDate] = useState(
+    () => sharedReplay?.startDate ?? getRequestedDateRange().start,
+  );
+  const [customStartDateInput, setCustomStartDateInput] = useState(
+    () => sharedReplay?.startDate ?? getRequestedDateRange().start,
+  );
   const [detailChartContext, setDetailChartContext] = useState<DetailChartContext | null>(null);
-  const [activeStartDateRange, setActiveStartDateRange] = useState(() => ({
-    end: getRequestedDateRange().end,
-    isPremiumCustom: false,
-    label: "오늘 기준 10년 비교",
-    start: getRequestedDateRange().start,
-  }));
+  const [activeStartDateRange, setActiveStartDateRange] = useState(() =>
+    sharedReplay
+      ? {
+          end: sharedReplay.endDate,
+          isPremiumCustom: true,
+          label: `${formatDateLabel(sharedReplay.startDate)}부터 비교`,
+          start: sharedReplay.startDate,
+        }
+      : {
+          end: getRequestedDateRange().end,
+          isPremiumCustom: false,
+          label: "오늘 기준 10년 비교",
+          start: getRequestedDateRange().start,
+        },
+  );
   const [raceSpeed, setRaceSpeed] = useState<RaceSpeed>("normal");
   const [raceResolution, setRaceResolution] = useState<RaceResolution>("monthly");
   const [startPointChartResolution, setStartPointChartResolution] = useState<RaceResolution>("monthly");
-  const [amountInput, setAmountInput] = useState(formatManUnitAmountInput(DEFAULT_AMOUNT));
-  const [activePreset, setActivePreset] = useState(DEFAULT_AMOUNT);
-  const [amountMode, setAmountMode] = useState<AmountMode>("preset");
-  const [isCustomAmountOpen, setIsCustomAmountOpen] = useState(false);
-  const [investmentMode, setInvestmentMode] = useState<InvestmentMode>("lump-sum");
+  const [amountInput, setAmountInput] = useState(
+    formatManUnitAmountInput(sharedReplay?.inputKrw ?? DEFAULT_AMOUNT),
+  );
+  const [activePreset, setActivePreset] = useState(sharedReplay?.inputKrw ?? DEFAULT_AMOUNT);
+  const [amountMode, setAmountMode] = useState<AmountMode>(sharedReplay ? "custom" : "preset");
+  const [isCustomAmountOpen, setIsCustomAmountOpen] = useState(Boolean(sharedReplay));
+  const [investmentMode, setInvestmentMode] = useState<InvestmentMode>(
+    sharedReplay?.investmentMode ?? "lump-sum",
+  );
   const [monthlyContributionInput, setMonthlyContributionInput] = useState(
-    formatManUnitAmountInput(DEFAULT_MONTHLY_CONTRIBUTION),
+    formatManUnitAmountInput(sharedReplay?.inputKrw ?? DEFAULT_MONTHLY_CONTRIBUTION),
   );
   const [activeMonthlyContributionPreset, setActiveMonthlyContributionPreset] = useState(
-    DEFAULT_MONTHLY_CONTRIBUTION,
+    sharedReplay?.inputKrw ?? DEFAULT_MONTHLY_CONTRIBUTION,
   );
-  const [monthlyContributionMode, setMonthlyContributionMode] = useState<AmountMode>("preset");
-  const [isCustomMonthlyContributionOpen, setIsCustomMonthlyContributionOpen] = useState(false);
+  const [monthlyContributionMode, setMonthlyContributionMode] = useState<AmountMode>(
+    sharedReplay ? "custom" : "preset",
+  );
+  const [isCustomMonthlyContributionOpen, setIsCustomMonthlyContributionOpen] = useState(
+    Boolean(sharedReplay),
+  );
   const [isAmountAssetInfoOpen, setIsAmountAssetInfoOpen] = useState(false);
   const [marketBundle, setMarketBundle] = useState<MarketBundle | null>(null);
   const [isMarketLoading, setIsMarketLoading] = useState(true);
@@ -3853,6 +3797,7 @@ export function HomePage() {
   const [soloAssetId, setSoloAssetId] = useState<ComparisonAssetId | null>(null);
   const [soloAmountInput, setSoloAmountInput] = useState(formatManUnitAmountInput(DEFAULT_AMOUNT));
   const [soloHorizonMode, setSoloHorizonMode] = useState<SoloHorizonMode>("recent10y");
+  const [soloInvestmentMode, setSoloInvestmentMode] = useState<InvestmentMode>("lump-sum");
   const [soloMarketBundle, setSoloMarketBundle] = useState<MarketBundle | null>(null);
   const [isSoloMarketLoading, setIsSoloMarketLoading] = useState(false);
   const [soloLoadError, setSoloLoadError] = useState("");
@@ -3865,6 +3810,7 @@ export function HomePage() {
   const soloProgressRef = useRef(0);
   const hasTrackedHomeViewRef = useRef(false);
   const handledMenuIntentRef = useRef<string | null>(null);
+  const handledSharedReplayKeyRef = useRef(sharedReplayKey);
   const lastTimelineRecordKeyRef = useRef<string | null>(null);
   const customStartPickerRef = useRef<HTMLInputElement | null>(null);
   const customAmountInputRef = useRef<HTMLInputElement | null>(null);
@@ -3876,16 +3822,56 @@ export function HomePage() {
       soloHorizonMode === "since-listing"
         ? {
             end: raceDateRange.end,
-            label: "상장일부터 홀딩",
+            label: "처음부터",
             start: extendedDateRange.start,
           }
         : {
             end: raceDateRange.end,
-            label: "최근 10년 복리 대조",
+            label: "최근 10년",
             start: raceDateRange.start,
           },
     [extendedDateRange.start, raceDateRange.end, raceDateRange.start, soloHorizonMode],
   );
+
+  useEffect(() => {
+    if (!sharedReplay) {
+      handledSharedReplayKeyRef.current = "";
+      return;
+    }
+
+    if (handledSharedReplayKeyRef.current === sharedReplayKey) {
+      return;
+    }
+
+    handledSharedReplayKeyRef.current = sharedReplayKey;
+    const formattedInput = formatManUnitAmountInput(sharedReplay.inputKrw);
+    setSelectedAssetIds(sharedReplay.assetIds);
+    setCustomStartDate(sharedReplay.startDate);
+    setCustomStartDateInput(sharedReplay.startDate);
+    setActiveStartDateRange({
+      end: sharedReplay.endDate,
+      isPremiumCustom: true,
+      label: `${formatDateLabel(sharedReplay.startDate)}부터 비교`,
+      start: sharedReplay.startDate,
+    });
+    setAmountInput(formattedInput);
+    setActivePreset(sharedReplay.inputKrw);
+    setAmountMode("custom");
+    setIsCustomAmountOpen(true);
+    setMonthlyContributionInput(formattedInput);
+    setActiveMonthlyContributionPreset(sharedReplay.inputKrw);
+    setMonthlyContributionMode("custom");
+    setIsCustomMonthlyContributionOpen(true);
+    setInvestmentMode(sharedReplay.investmentMode);
+    setRaceStatus("idle");
+    setVisibleCount(1);
+    setDetailChartContext(null);
+    setShowAllAssets(false);
+    setIsPresetBrowserOpen(false);
+    setShareFeedback("");
+    setAssetToast("공유된 조건을 불러왔습니다");
+    setFlowStep("amount");
+  }, [sharedReplay, sharedReplayKey]);
 
   useEffect(() => {
     setDailyDirectPickAssetIds(buildDailyDirectPickAssetIds());
@@ -4038,8 +4024,14 @@ export function HomePage() {
     const seenAssetIds = new Set<ComparisonAssetId>(
       activeAssetFilter === "all" ? displayedPopularBrowserAssetIds : [],
     );
+    const sectionDefinitions =
+      activeAssetFilter === "us-stock"
+        ? ASSET_BROWSER_SECTION_DEFS.filter((section) => section.id === "us-stocks")
+        : activeAssetFilter === "kr-stock"
+          ? ASSET_BROWSER_SECTION_DEFS.filter((section) => section.id === "kr-stocks")
+          : ASSET_BROWSER_SECTION_DEFS;
 
-    return ASSET_BROWSER_SECTION_DEFS.map((section) => {
+    return sectionDefinitions.map((section) => {
       const assetIds = availableBrowserAssetIds.filter((assetId) => {
         if (seenAssetIds.has(assetId)) {
           return false;
@@ -4058,8 +4050,11 @@ export function HomePage() {
       if (activeAssetFilter !== "all" && !activeBrowserFilter.matches(asset)) {
         return false;
       }
-
         return assetMatchesSearch(asset, normalizedAssetSearchQuery);
+      }).sort((leftId, rightId) => {
+        const leftRank = assetCatalog[leftId].marketCapRank ?? Number.MAX_SAFE_INTEGER;
+        const rightRank = assetCatalog[rightId].marketCapRank ?? Number.MAX_SAFE_INTEGER;
+        return leftRank - rightRank;
       });
 
       assetIds.forEach((assetId) => seenAssetIds.add(assetId));
@@ -4815,8 +4810,8 @@ export function HomePage() {
   const amountPrimaryCtaLabel = isMarketLoading
     ? "데이터 준비 중..."
     : isMonthlyInvestmentMode
-      ? `월 ${formattedMonthlyContributionValue}으로 레이스 시작`
-      : `${formattedAmountValue}으로 레이스 시작`;
+      ? `월 ${formattedMonthlyContributionValue}으로 달려보기`
+      : `${formattedAmountValue}으로 달려보기`;
   const assetPickerSummary = selectedAssets
     .map((asset) => asset.shortLabel ?? asset.label)
     .join(" · ");
@@ -4952,43 +4947,6 @@ export function HomePage() {
           recoveryMonths: raceCompletionSummary.recoveryMonths,
         })
       : HOME_FLOW_COPY.resultDescription;
-  const resultReferralAssetId = raceCompletionSummary?.assetId ?? resultRows[0]?.assetId;
-  const resultReferralAsset = resultReferralAssetId ? assetCatalog[resultReferralAssetId] : null;
-  const resultReferralMetrics = resultReferralAssetId
-    ? resultAssetMetrics[resultReferralAssetId]
-    : null;
-  const depositMetrics = resultAssetMetrics.deposit;
-  const annualizedGapPct =
-    resultReferralMetrics?.annualizedReturnPct != null && depositMetrics?.annualizedReturnPct != null
-      ? resultReferralMetrics.annualizedReturnPct - depositMetrics.annualizedReturnPct
-      : null;
-  const totalReturnGapPct =
-    resultReferralMetrics && depositMetrics
-      ? resultReferralMetrics.totalReturnPct - depositMetrics.totalReturnPct
-      : null;
-  const referralGapLabel =
-    annualizedGapPct != null
-      ? `연평균 ${formatMetricPercent(annualizedGapPct)}`
-      : totalReturnGapPct != null
-        ? `총수익률 ${formatMetricPercent(totalReturnGapPct)}`
-        : "장기 흐름";
-  const resultReferralBase = getReferralCardData(resultReferralAssetId);
-  const resultReferral: ReferralCardCopy =
-    resultReferralAsset?.category === "코인"
-      ? {
-          ...resultReferralBase,
-          benefit:
-            "디지털 자산은 한 번에 맞히는 것보다 수수료, 보관 방식, 자동 적립 조건을 먼저 정리하는 것이 중요합니다.",
-          fomo:
-            "최대 낙폭의 인내를 방어하려면, 다음 선택은 디지털 자산을 감당 가능한 금액과 주기로 나누는 방식부터 봐야 합니다.",
-        }
-      : {
-          ...resultReferralBase,
-          benefit:
-            "다음 10년을 준비한다면 수수료, 환율, 소수점 투자, 자동 적립 조건을 먼저 비교해보세요.",
-          fomo: `시중은행 정기예금 대비 ${referralGapLabel} 격차를 메우는 단단한 자산 교환은 조건 확인에서 시작됩니다.`,
-        };
-
   useEffect(() => {
     if (flowStep !== "result" || !raceCompletionSummary || selectedAssetIds.length < 2) {
       return;
@@ -5836,6 +5794,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     resetSoloRacePlayback();
     setSoloAssetId(assetId);
     setSoloHorizonMode("recent10y");
+    setSoloInvestmentMode("lump-sum");
     setSoloFlowStep("amount");
     setFlowStep("solo");
   }
@@ -5848,13 +5807,55 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setSoloAmountInput(formatManUnitAmountInput(value));
   }
 
-  function goToSoloRace() {
+  function goToSoloStyle() {
+    if (!soloAssetId) {
+      return;
+    }
+    setSoloFlowStep("style");
+  }
+
+  function goToSoloConfirm() {
+    if (!soloAssetId) {
+      return;
+    }
+    setSoloFlowStep("confirm");
+  }
+
+  function startBeginnerSoloRace() {
     if (!soloAssetId || isSoloMarketLoading || soloLoadError || soloCalculationError) {
+      return;
+    }
+
+    // Monthly style reuses the proven compare race (asset + deposit).
+    if (soloInvestmentMode === "monthly") {
+      if (!supportsMonthlyContributionAsset(soloAssetId)) {
+        setAssetToast("이 자산은 매달 넣기 비교를 아직 지원하지 않아요.");
+        return;
+      }
+      resetRacePlayback();
+      resetSoloRacePlayback();
+      setSelectedAssetIds(normalizeMainComparisonSelection([soloAssetId, "deposit"]));
+      setInvestmentMode("monthly");
+      setMonthlyContributionMode("custom");
+      setActiveMonthlyContributionPreset(0);
+      setMonthlyContributionInput(formatManUnitAmountInput(soloAmountValue));
+      setIsCustomMonthlyContributionOpen(false);
+      setAmountMode("custom");
+      setActivePreset(0);
+      setAmountInput(formatManUnitAmountInput(soloAmountValue));
+      setFlowStep("race");
+      setRaceStatus("idle");
+      setVisibleCount(1);
+      setAssetToast("매달 조금씩 넣었다면으로 달려볼게요");
       return;
     }
 
     resetSoloRacePlayback();
     setSoloFlowStep("race");
+  }
+
+  function goToSoloRace() {
+    startBeginnerSoloRace();
   }
 
   function goToSoloResult() {
@@ -5871,6 +5872,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setSoloAssetId(null);
     setSoloAmountInput(formatManUnitAmountInput(DEFAULT_AMOUNT));
     setSoloHorizonMode("recent10y");
+    setSoloInvestmentMode("lump-sum");
     setSoloFlowStep("pick");
     setFlowStep("solo");
   }
@@ -5886,6 +5888,19 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setSelectedAssetIds([soloAssetId]);
     setAssetToast("비교할 자산을 하나 더 골라주세요");
     setFlowStep("assets");
+  }
+
+  function compareSoloWithMonthly() {
+    if (!soloAssetId) {
+      return;
+    }
+    if (!supportsMonthlyContributionAsset(soloAssetId)) {
+      setAssetToast("이 자산은 매달 넣기 비교를 아직 지원하지 않아요.");
+      return;
+    }
+    setSoloInvestmentMode("monthly");
+    setSoloFlowStep("confirm");
+    setAssetToast("매달 조금씩 넣었다면으로 다시 확인해요");
   }
 
   function goToSavedRecords() {
@@ -5911,6 +5926,25 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setIsAssetFilterExpanded(false);
     setAssetPickerReturnStep("assets");
     setShowAllAssets(true);
+  }
+
+  function openHomeCompanyBrowser({
+    market,
+    query,
+  }: {
+    market: CompanyMarketFilter;
+    query: string;
+  }) {
+    resetRacePlayback();
+    setIsMenuOpen(false);
+    setAssetSearchQuery(query);
+    setActiveAssetFilter(
+      market === "US" ? "us-stock" : market === "KR" ? "kr-stock" : "all",
+    );
+    setIsAssetFilterExpanded(false);
+    setAssetPickerReturnStep("intro");
+    setShowAllAssets(true);
+    setFlowStep("assets");
   }
 
   function handleAssetFilterChange(nextFilter: AssetFilterId) {
@@ -5993,6 +6027,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       setSoloAssetId(assetId);
       setSoloFlowStep("amount");
       setSoloHorizonMode("recent10y");
+      setSoloInvestmentMode("lump-sum");
       setSoloAmountInput(formatManUnitAmountInput(DEFAULT_AMOUNT));
       setSelectedAssetIds([]);
       setDetailChartContext(null);
@@ -6697,43 +6732,100 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
   async function shareOrCopy({
     copiedMessage,
     errorMessage,
+    files,
     text,
     title,
     url = window.location.href,
   }: {
     copiedMessage: string;
     errorMessage: string;
+    files?: File[];
     text: string;
     title: string;
     url?: string;
   }) {
-    const shareData: ShareData = { text, title, url };
+    const textWithUrl = `${text.trim()}\n\n직접 돌려보기\n${url}`;
 
-    try {
-      if (
-        typeof navigator.share === "function" &&
-        (!navigator.canShare || navigator.canShare(shareData))
-      ) {
-        await navigator.share(shareData);
-        setShareFeedback("공유창을 열었습니다.");
-        return;
+    if (typeof navigator.share === "function") {
+      const fileShareData: ShareData = {
+        files,
+        text: textWithUrl,
+        title,
+      };
+      let canShareFiles = false;
+
+      if (files?.length && typeof navigator.canShare === "function") {
+        try {
+          canShareFiles = navigator.canShare(fileShareData);
+        } catch {
+          canShareFiles = false;
+        }
       }
 
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
+      const nativeShareData = canShareFiles
+        ? fileShareData
+        : ({ text: textWithUrl, title } satisfies ShareData);
+      let canShareNatively = true;
+
+      if (!canShareFiles && typeof navigator.canShare === "function") {
+        try {
+          canShareNatively = navigator.canShare(nativeShareData);
+        } catch {
+          canShareNatively = true;
+        }
+      }
+
+      if (canShareNatively) {
+        try {
+          await navigator.share(nativeShareData);
+          setShareFeedback(
+            canShareFiles ? "결과 카드와 상세 내용을 공유했습니다." : "상세 결과를 공유했습니다.",
+          );
+          return;
+        } catch (error) {
+          if (
+            typeof error === "object" &&
+            error !== null &&
+            "name" in error &&
+            error.name === "AbortError"
+          ) {
+            setShareFeedback("공유를 취소했습니다.");
+            return;
+          }
+        }
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(textWithUrl);
+        setShareFeedback(copiedMessage);
+        return;
+      } catch {
+        // 일부 브라우저는 권한 정책으로 Clipboard API를 막으므로 DOM 복사를 시도합니다.
+      }
+    }
+
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = textWithUrl;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand("copy");
+      textarea.remove();
+
+      if (copied) {
         setShareFeedback(copiedMessage);
         return;
       }
-
-      throw new Error("share-unavailable");
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        setShareFeedback("공유를 취소했습니다.");
-        return;
-      }
-
-      setShareFeedback(errorMessage);
+    } catch {
+      // 아래 공통 오류 문구로 처리합니다.
     }
+
+    setShareFeedback(errorMessage);
   }
 
   async function handleShareResult() {
@@ -6742,30 +6834,135 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     }
 
     const lead = resultRows[0]!;
-    const amountLabel = formatKrwCompact(lead.finalValue);
-    const leadTimetable =
-      noProfitTimetableOptions.find((option) => option.id === lead.assetId)?.timetable ??
-      noProfitTimetable;
+    const leadMetrics = resultAssetMetrics[lead.assetId];
+    const leadReport = holdingPainReports[lead.assetId];
     const depositResult = resultRows.find((row) => row.assetId === "deposit");
     const investedKrw = lead.totalInvestedKrw ?? activeInvestmentAmountValue;
     const finalGapKrw = depositResult ? lead.finalValue - depositResult.finalValue : lead.finalValue - investedKrw;
-    const waitingMonths = leadTimetable?.belowHighMonths ?? 0;
-    const summary = `아... 10년 전 ${lead.label} 샀으면 내 자산 ${amountLabel} 됐었네... ${formatPercent(
-      lead.totalReturnPct,
-    )} 대박 스코어 뒤에 숨겨진 가혹했던 ${waitingMonths}개월의 기다림 지도 지금 직접 확인해봐. 너라면 버텼을까?\n투자 권유가 아닌 과거 시뮬레이션입니다.`;
-    const shareUrl = buildOgShareUrl({
-      assetLabel: lead.label,
-      finalValueLabel: amountLabel,
+    const shareRows: ResultShareRow[] = resultRows.slice(0, 2).map((result) => {
+      const metrics = resultAssetMetrics[result.assetId];
+      const report = holdingPainReports[result.assetId];
+
+      return {
+        finalValueLabel: formatKrwExact(metrics?.finalValue ?? result.finalValue),
+        label: metrics?.displayLabel ?? result.label,
+        maxDrawdownLabel:
+          metrics || report
+            ? formatMetricPercent(
+                metrics?.maxDrawdownPct ?? report?.maxDrawdown.maxDrawdownPct ?? 0,
+              )
+            : "데이터 없음",
+        recoveryLabel: report
+          ? report.recovery.recovered
+            ? `${report.recovery.recoveryMonths ?? 0}개월`
+            : "종료일까지 미회복"
+          : "데이터 없음",
+        totalReturnLabel: formatMetricPercent(metrics?.totalReturnPct ?? result.totalReturnPct),
+      };
+    });
+    const comparisonLabel = shareRows.map((row) => row.label).join(" vs ");
+    const previewAssetLabel = shareRows[0]?.label ?? lead.label;
+    const dateRangeLabel = `${formatDateLabel(raceBuild.resolvedStartDate)} → ${formatDateLabel(
+      raceBuild.resolvedEndDate,
+    )}`;
+    const investmentLabel = isMonthlyInvestmentMode
+      ? `월 ${formattedActiveInvestmentAmountValue}`
+      : formatKrwExact(investedKrw);
+    const headline = isMonthlyInvestmentMode
+      ? `매달 ${formattedActiveInvestmentAmountValue}씩 넣었다면`
+      : `같은 ${formatKrwExact(investedKrw)}, 결과는 이렇게 달랐습니다`;
+    const summary = buildResultShareText({
+      dateRangeLabel,
+      headline,
+      rows: shareRows,
+    });
+    const waitingMonths = leadReport?.recovery.recoveryMonths ?? 0;
+    const shareUrl = buildResultShareUrl({
+      assetIds: selectedAssetIds,
+      assetLabel: previewAssetLabel,
+      baseUrl: window.location.origin,
+      drawdownLabel: shareRows[0]?.maxDrawdownLabel ?? "데이터 없음",
+      endDate: raceBuild.resolvedEndDate,
+      finalValueLabel: shareRows[0]?.finalValueLabel ?? formatKrwExact(lead.finalValue),
       gapLabel: formatKrwExact(finalGapKrw),
-      investedLabel: formatKrwExact(investedKrw),
+      inputKrw: activeInvestmentAmountValue,
+      investmentMode,
+      investedLabel: investmentLabel,
+      recoveryLabel: shareRows[0]?.recoveryLabel ?? "데이터 없음",
+      startDate: raceBuild.resolvedStartDate,
+      totalReturnLabel:
+        shareRows[0]?.totalReturnLabel ?? formatMetricPercent(leadMetrics?.totalReturnPct ?? lead.totalReturnPct),
       waitingMonths,
+    });
+    const shareCard = createResultShareCardFile({
+      amountLabel: isMonthlyInvestmentMode ? `월 납입 ${formattedActiveInvestmentAmountValue}` : `투입 원금 ${formatKrwExact(investedKrw)}`,
+      dateRangeLabel,
+      headline,
+      rows: shareRows,
     });
 
     await shareOrCopy({
-      copiedMessage: "결과 링크와 요약을 복사했습니다.",
+      copiedMessage: "상세 결과와 직접 돌려보기 링크를 복사했습니다.",
       errorMessage: "결과 공유를 완료하지 못했습니다.",
+      files: shareCard ? [shareCard] : undefined,
       text: summary,
-      title: `Regretzero · ${lead.label} 10년 결과`,
+      title: `Regretzero · ${comparisonLabel} 결과`,
+      url: shareUrl,
+    });
+  }
+
+  async function handleShareSoloResult() {
+    if (!soloAsset || !soloSimulation || !soloResultMetrics || !soloHoldingPainReport) {
+      return;
+    }
+
+    const row: ResultShareRow = {
+      finalValueLabel: formatKrwExact(soloResultMetrics.finalValue),
+      label: soloResultMetrics.displayLabel,
+      maxDrawdownLabel: formatMetricPercent(soloResultMetrics.maxDrawdownPct),
+      recoveryLabel: soloHoldingPainReport.recovery.recovered
+        ? `${soloHoldingPainReport.recovery.recoveryMonths ?? 0}개월`
+        : "종료일까지 미회복",
+      totalReturnLabel: formatMetricPercent(soloResultMetrics.totalReturnPct),
+    };
+    const dateRangeLabel = `${formatDateLabel(soloSimulation.resolvedStartDate)} → ${formatDateLabel(
+      soloSimulation.resolvedEndDate,
+    )}`;
+    const headline = `${soloResultMetrics.displayLabel}에 ${formatKrwExact(soloAmountValue)}을 넣었다면`;
+    const depositBenchmarkValue = calculateSoloDepositBenchmarkValue(
+      soloAmountValue,
+      soloSimulation.resolvedStartDate,
+      soloSimulation.resolvedEndDate,
+    );
+    const shareUrl = buildResultShareUrl({
+      assetIds: buildSoloReplayAssetIds(soloAsset.id),
+      assetLabel: row.label,
+      baseUrl: window.location.origin,
+      drawdownLabel: row.maxDrawdownLabel,
+      endDate: soloSimulation.resolvedEndDate,
+      finalValueLabel: row.finalValueLabel,
+      gapLabel: formatKrwExact(soloResultMetrics.finalValue - depositBenchmarkValue),
+      inputKrw: soloAmountValue,
+      investmentMode: "lump-sum",
+      investedLabel: formatKrwExact(soloAmountValue),
+      recoveryLabel: row.recoveryLabel,
+      startDate: soloSimulation.resolvedStartDate,
+      totalReturnLabel: row.totalReturnLabel,
+      waitingMonths: soloHoldingPainReport.recovery.recoveryMonths ?? 0,
+    });
+    const shareCard = createResultShareCardFile({
+      amountLabel: `투입 원금 ${formatKrwExact(soloAmountValue)}`,
+      dateRangeLabel,
+      headline,
+      rows: [row],
+    });
+
+    await shareOrCopy({
+      copiedMessage: "상세 결과와 직접 돌려보기 링크를 복사했습니다.",
+      errorMessage: "결과 공유를 완료하지 못했습니다.",
+      files: shareCard ? [shareCard] : undefined,
+      text: buildResultShareText({ dateRangeLabel, headline, rows: [row] }),
+      title: `Regretzero · ${row.label} 결과`,
       url: shareUrl,
     });
   }
@@ -7013,7 +7210,9 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               {getAssetBrowserLabel(asset)}
             </div>
             <div className="mt-1 line-clamp-2 text-xs leading-5 text-white/54">
-              {getAssetBrowserDescription(asset)}
+              {asset.marketCapRank
+                ? `#${asset.marketCapRank} · ${asset.id === "brkb" ? "BRK.B" : asset.marketTicker} · ${asset.exchange}`
+                : getAssetBrowserDescription(asset)}
             </div>
           </div>
 
@@ -7043,12 +7242,11 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
   return (
     <main className="rz-light-app min-h-dvh bg-transparent text-slate-900">
-      {showDesktopHomeDashboard ? (
+      {showDesktopHomeDashboard && !showAllAssets ? (
         <DesktopHomeDashboard
           activeMenuIntent={menuIntent}
           activePrimaryNavKey={primaryNavActiveKey}
           canContinueFromAssetSelection={canContinueFromAssetSelection}
-          dailyDirectPickAssets={dailyDirectPickAssets}
           featuredRivalScenarios={featuredRivalScenarios}
           featuredSoloScenarios={featuredSoloScenarios}
           goToAllAssets={goToCompareBuilder}
@@ -7058,17 +7256,15 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
           goToSavedRecords={goToSavedRecords}
           isMenuOpen={isMenuOpen}
           onAssetToggle={handleAssetToggle}
+          onCompanyBrowserOpen={openHomeCompanyBrowser}
           onMoreMenuOpen={openMoreMenu}
           onMenuOpenChange={setIsMenuOpen}
           onPresetBrowserOpen={goToRecommendedComparisons}
           onRivalScenarioShuffle={shuffleFeaturedRivalScenarios}
           onScenarioStart={startHomeScenario}
           onSoloScenarioShuffle={shuffleFeaturedSoloScenarios}
-          onTimelineScenarioReplay={startTimelineScenario}
           rivalScenarioShuffleKey={rivalScenarioShuffleKey}
           selectedAssetIds={selectedAssetIds}
-          selectedAssets={selectedAssets}
-          syncedMatchups={syncedMatchups}
         />
       ) : null}
 
@@ -7096,11 +7292,13 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       ) : null}
 
       <div
+        aria-hidden={showAllAssets || undefined}
         className={`mx-auto flex min-h-dvh w-full max-w-[460px] flex-col px-5 pt-4 sm:max-w-[560px] ${
           shouldUseWideDesktopCanvas ? "lg:max-w-6xl" : ""
         } ${mobileBottomPaddingClass} ${
           showDesktopHomeDashboard ? "lg:hidden" : ""
         }`}
+        inert={showAllAssets || undefined}
       >
         <header className="relative flex items-center justify-between">
           {shouldShowBottomPrimaryNav ? (
@@ -7126,108 +7324,73 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
         <div className="flex flex-1 flex-col">
           {flowStep === "intro" ? (
-            <section className="flex flex-1 flex-col py-4 pb-8">
-              <div className="space-y-4">
-                <div className="px-1 pt-2">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/36">
-                    REGRETZERO
-                  </div>
-                  <h1 className="mt-2 text-[2.15rem] font-semibold leading-[1.04] tracking-[-0.075em] text-white">
-                    10년 전 샀다면,
-                    <br />
-                    지금 얼마가 되었을까요?
-                  </h1>
-                  <p className="mt-3 text-sm leading-6 text-white/56">
-                    <strong className="font-semibold text-white">그때 샀다면</strong> 얼마가 됐는지,{" "}
-                    <strong className="font-semibold text-white">하락과 회복</strong>까지 함께 봅니다.
+            <section className="flex flex-1 flex-col py-5 pb-8">
+              <div className="space-y-6">
+                <div className="px-1 pt-3">
+                  <p className="text-sm font-semibold text-[var(--rz-accent)]">
+                    {HOME_FLOW_COPY.heroEyebrow}
                   </p>
-                  <ComplianceNotice className="mt-4" compact />
-                  <div className="mt-3">
-                    <TrendRankingTicker
-                      matchups={syncedMatchups}
-                      onSelect={(assetIds) =>
-                        startHomeScenario({
-                          assetIds,
-                          badge: "오늘의 복기",
-                          description: "오늘 많이 복기한 조합입니다.",
-                          mode: "compare",
-                          title: getComparisonAssetIdsLabel(assetIds),
-                        })
-                      }
-                    />
-                  </div>
+                  <h1 className="mt-3 text-[2.35rem] font-semibold leading-[1.05] tracking-[-0.06em] text-[var(--rz-text-primary)]">
+                    10년 전에
+                    <br />
+                    100만원을 넣었다면…
+                  </h1>
+                  <p className="mt-3 max-w-[22rem] text-base leading-7 text-[var(--rz-text-secondary)]">
+                    {HOME_FLOW_COPY.heroDescription}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
+                    복잡한 용어 없이, 고르고 달려보기만 하면 돼요.
+                  </p>
                 </div>
 
-                <div className="surface-card rounded-[26px] px-4 py-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--rz-accent)]">
-                        START
-                      </div>
-                      <div className="mt-2 text-lg font-semibold tracking-[-0.05em] text-white">
-                        인기 종목 하나만 보기
-                      </div>
-                      <div className="mt-1 text-sm leading-6 text-white/56">
-                        먼저 익숙한 자산 하나를 눌러 정기예금 흐름과 비교해보세요.
-                      </div>
-                    </div>
-                    <button
-                      className="shrink-0 rounded-full border border-white/14 bg-white/[0.08] px-4 py-2 text-sm font-bold text-white transition hover:bg-white/[0.12]"
-                      onClick={shuffleFeaturedSoloScenarios}
-                      type="button"
-                    >
-                      🔄 다른 자산 보기
-                    </button>
+                <div className="surface-card rounded-[28px] px-4 py-5">
+                  <div className="text-lg font-semibold tracking-[-0.04em] text-[var(--rz-text-primary)]">
+                    {HOME_FLOW_COPY.quickAssetTitle}
                   </div>
-                  <div className="mt-5">
-                    <HomeScenarioGrid
-                      onSelect={startHomeScenario}
-                      scenarios={featuredSoloScenarios}
-                    />
-                  </div>
-                  <div className="mt-5 border-t border-white/8 pt-4">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                          라이벌 수익 대결
+                  <p className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                    {HOME_FLOW_COPY.quickAssetDescription}
+                  </p>
+                  <div className="mt-4 grid grid-cols-2 gap-2.5">
+                    {BEGINNER_PRIMARY_ASSETS.map((asset) => (
+                      <button
+                        key={asset.id}
+                        className="min-h-[88px] rounded-[22px] border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-3.5 py-3.5 text-left transition hover:border-[var(--rz-border-strong)]"
+                        onClick={() => handleSoloAssetSelect(asset.id)}
+                        type="button"
+                      >
+                        <div className="text-base font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                          {asset.label}
                         </div>
-                        <div className="mt-1 text-xs leading-5 text-white/46">
-                          대표 조합 네 개를 먼저 보여드립니다.
+                        <div className="mt-1 text-xs leading-5 text-[var(--rz-text-muted)]">
+                          {asset.hint}
                         </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <button
-                          className="rounded-full border border-white/14 bg-white/[0.08] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-white/[0.12]"
-                          onClick={shuffleFeaturedRivalScenarios}
-                          type="button"
-                        >
-                          🔄 다른 매치 보기
-                        </button>
-                        <button
-                          className="border-b border-white pb-0.5 text-xs font-bold text-white transition hover:text-white/78"
-                          onClick={goToRecommendedComparisons}
-                          type="button"
-                        >
-                          전체 보기
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      className="animate-[rz-map-fade_180ms_ease-out]"
-                      key={`mobile-rivals-${rivalScenarioShuffleKey}`}
-                    >
-                      <HomeScenarioGrid
-                        onSelect={startHomeScenario}
-                        scenarios={featuredRivalScenarios}
-                      />
-                    </div>
+                      </button>
+                    ))}
                   </div>
+                  <button
+                    className="btn-secondary mt-4 min-h-12 w-full rounded-full px-5 text-sm font-semibold text-[var(--rz-text-primary)]"
+                    onClick={goToAllAssets}
+                    type="button"
+                  >
+                    다른 것도 찾아보기
+                  </button>
                 </div>
 
-                <DynamicLiveTimeline
-                  matchups={syncedMatchups}
-                  onReplayScenario={startTimelineScenario}
-                />
+                <div className="rounded-[24px] border border-[var(--rz-border)] bg-[var(--rz-surface-card)] px-4 py-4">
+                  <div className="text-sm font-semibold text-[var(--rz-text-primary)]">두 개 비교가 궁금하다면</div>
+                  <p className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                    나중에 해도 괜찮아요. 먼저 하나만 달려봐도 충분합니다.
+                  </p>
+                  <button
+                    className="mt-3 min-h-11 rounded-full border border-[var(--rz-border)] px-4 text-sm font-semibold text-[var(--rz-accent)]"
+                    onClick={goToCompareBuilder}
+                    type="button"
+                  >
+                    비교해보기
+                  </button>
+                </div>
+
+                <ComplianceNotice compact variant="light" />
               </div>
             </section>
           ) : null}
@@ -7237,19 +7400,19 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               {soloFlowStep === "pick" ? (
                 <>
                   <StepHeader
-                    description="시중 은행 정기예금 흐름과 비교해 한 종목의 10년을 먼저 봅니다."
+                    description="잘 알려진 것부터 하나만 골라보세요."
                     onBack={goToHome}
                     step={1}
-                    title="한 종목만 골라보세요"
+                    title="어디에 넣었다고 볼까요?"
                   />
                   <div className="surface-card mt-7 rounded-[26px] p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/34">
-                          SOLO REWIND
+                          하나만 고르기
                         </div>
                         <div className="mt-2 text-lg font-semibold tracking-[-0.05em] text-white">
-                          궁금한 자산 하나를 선택하세요
+                          눌러서 고르면 바로 시작해요
                         </div>
                         <div className="mt-1 text-sm leading-6 text-white/54">
                           결과는 다른 자산이 아니라{" "}
@@ -7279,9 +7442,9 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               {soloFlowStep === "amount" && soloAsset ? (
                 <>
                   <StepHeader
-                    description={`${soloAsset.shortLabel ?? soloAsset.label}에 넣었다고 볼 금액을 정합니다. 결과는 정기예금 흐름과 함께 봅니다.`}
-                    onBack={() => setSoloFlowStep("pick")}
-                    step={2}
+                    description="부담 없는 금액으로 시작해도 괜찮아요."
+                    onBack={goToHome}
+                    step={1}
                     title="얼마를 넣었다고 볼까요?"
                   />
                   <div className="surface-card mt-7 rounded-[26px] p-4">
@@ -7298,20 +7461,20 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                     </div>
 
                     <div className="mt-4 rounded-[22px] border border-[var(--rz-border)] bg-white/80 p-2 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
-                      <div className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--rz-text-muted)]">
-                        분석 범위
+                      <div className="px-2 pb-2 text-xs font-semibold text-[var(--rz-text-muted)]">
+                        어디까지 볼까요?
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {[
                           {
-                            body: "정기예금 복리 흐름과 최근 10년을 맞춥니다.",
+                            body: "요즘 기준으로 지난 10년을 봐요.",
                             id: "recent10y" as const,
-                            title: "최근 10년 복리 대조",
+                            title: "최근 10년",
                           },
                           {
-                            body: "가능한 첫 데이터부터 끝까지 들고 있었다고 봅니다.",
+                            body: "데이터가 있는 처음부터 끝까지 봐요.",
                             id: "since-listing" as const,
-                            title: "태초부터 홀딩",
+                            title: "처음부터",
                           },
                         ].map((option) => {
                           const isActive = soloHorizonMode === option.id;
@@ -7381,13 +7544,121 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
                     <button
                       className="btn-accent mt-5 min-h-13 w-full rounded-full px-5 text-sm font-semibold tracking-[-0.02em] transition disabled:cursor-wait disabled:bg-white/12 disabled:text-white/40"
-                      disabled={isSoloMarketLoading || Boolean(soloLoadError || soloCalculationError)}
-                      onClick={goToSoloRace}
+                      disabled={!soloAmountValue}
+                      onClick={goToSoloStyle}
                       type="button"
                     >
-                      {isSoloMarketLoading
-                        ? "데이터 준비 중..."
-                        : `${formattedSoloAmountValue}으로 레이스 시작`}
+                      다음 · 어떻게 넣을까요?
+                    </button>
+                  </div>
+                </>
+              ) : null}
+
+              
+              {soloFlowStep === "style" && soloAsset ? (
+                <>
+                  <StepHeader
+                    description="같은 돈을 한 번에 넣을지, 나눠 넣을지만 고르면 돼요."
+                    onBack={() => setSoloFlowStep("amount")}
+                    step={2}
+                    title="어떻게 넣을까요?"
+                  />
+                  <div className="surface-card mt-7 rounded-[26px] p-4">
+                    <div className="grid gap-3">
+                      {([
+                        {
+                          description: "처음에 모두 넣었다고 봐요.",
+                          id: "lump-sum" as const,
+                          label: "한 번에",
+                        },
+                        {
+                          description: "매달 조금씩 넣었다고 봐요.",
+                          id: "monthly" as const,
+                          label: "매달 조금씩",
+                        },
+                      ]).map((mode) => {
+                        const isActive = soloInvestmentMode === mode.id;
+                        return (
+                          <button
+                            key={mode.id}
+                            aria-pressed={isActive}
+                            className={`min-h-[96px] rounded-[22px] border px-4 py-4 text-left transition ${
+                              isActive
+                                ? "border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)]"
+                                : "border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)]"
+                            }`}
+                            onClick={() => setSoloInvestmentMode(mode.id)}
+                            type="button"
+                          >
+                            <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                              {mode.label}
+                            </div>
+                            <div className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                              {mode.description}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      className="btn-accent mt-5 min-h-13 w-full rounded-full px-5 text-sm font-semibold"
+                      onClick={goToSoloConfirm}
+                      type="button"
+                    >
+                      다음 · 확인하기
+                    </button>
+                  </div>
+                </>
+              ) : null}
+
+              {soloFlowStep === "confirm" && soloAsset ? (
+                <>
+                  <StepHeader
+                    description="이 조건으로 달려볼게요."
+                    onBack={() => setSoloFlowStep("style")}
+                    step={3}
+                    title="이대로 볼까요?"
+                  />
+                  <div className="surface-card mt-7 rounded-[26px] p-5">
+                    <div className="space-y-3 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                      <div className="flex items-center justify-between gap-3">
+                        <span>고른 것</span>
+                        <strong className="text-[var(--rz-text-primary)]">{getHomeIntroSelectedLabel(soloAsset)}</strong>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span>금액</span>
+                        <strong className="text-[var(--rz-text-primary)]">{formattedSoloAmountValue}</strong>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span>넣는 방식</span>
+                        <strong className="text-[var(--rz-text-primary)]">
+                          {soloInvestmentMode === "monthly" ? "매달 조금씩" : "한 번에"}
+                        </strong>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span>기간</span>
+                        <strong className="text-[var(--rz-text-primary)]">{soloRequestedDateRange.label}</strong>
+                      </div>
+                    </div>
+                    {(soloLoadError || soloCalculationError) ? (
+                      <div className="mt-4 rounded-[18px] border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-100">
+                        {soloLoadError || soloCalculationError}
+                      </div>
+                    ) : null}
+                    <button
+                      className="btn-accent mt-5 min-h-14 w-full rounded-full px-5 text-base font-semibold tracking-[-0.02em] transition disabled:cursor-wait disabled:opacity-50"
+                      disabled={isSoloMarketLoading || Boolean(soloLoadError || soloCalculationError)}
+                      onClick={startBeginnerSoloRace}
+                      type="button"
+                    >
+                      {isSoloMarketLoading ? "데이터 준비 중..." : "▶ 달려보기"}
+                    </button>
+                    <button
+                      className="btn-secondary mt-3 min-h-12 w-full rounded-full px-5 text-sm font-semibold"
+                      onClick={() => setSoloFlowStep("amount")}
+                      type="button"
+                    >
+                      금액 다시 고르기
                     </button>
                   </div>
                 </>
@@ -7396,16 +7667,16 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               {soloFlowStep === "race" ? (
                 <>
                   <StepHeader
-                    description="정기예금 기준과 자산 흐름이 어떻게 갈라지는지 레이스로 봅니다."
+                    description="돈이 어떻게 달려왔는지 같이 봐요."
                     onBack={() => {
                       resetSoloRacePlayback();
-                      setSoloFlowStep("amount");
+                      setSoloFlowStep("confirm");
                     }}
-                    step={3}
+                    step={4}
                     title={
                       soloAsset
-                        ? `${soloAsset.shortLabel ?? soloAsset.label} · ${soloRequestedDateRange.label}`
-                        : "한 종목 레이스"
+                        ? `${soloAsset.shortLabel ?? soloAsset.label} 달려보기`
+                        : "달려보기"
                     }
                   />
                   {soloAsset && soloSimulation ? (
@@ -7430,7 +7701,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                               onClick={goToSoloResult}
                               type="button"
                             >
-                              결과 보기
+                              결과 한번 볼까요?
                             </button>
                           ) : (
                             <button
@@ -7446,7 +7717,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                             onClick={handleRestartSoloRace}
                             type="button"
                           >
-                            다시보기
+                            다시 해보기
                           </button>
                         </div>
                         <div className="mt-3 flex items-center justify-between gap-3">
@@ -7476,7 +7747,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                           </div>
                         </div>
                         <div className="mt-3 text-center text-xs leading-5 text-[var(--rz-text-muted)]">
-                          레이스가 끝나면 결과에서 수익률, 최대 낙폭, 회복 기간을 이어서 봅니다.
+                          끝까지 보면, 차분히 결과를 정리해 드릴게요.
                         </div>
                       </div>
                     </div>
@@ -7493,7 +7764,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               {soloFlowStep === "result" ? (
                 <>
                   <StepHeader
-                    description="한 종목의 흐름을 시중 은행 정기예금 흐름과 비교합니다."
+                    description="예금에 넣었다면과 비교해서 봐요."
                     onBack={() => {
                       resetSoloRacePlayback();
                       setSoloFlowStep("race");
@@ -7770,20 +8041,41 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
                       <div className="grid gap-2 sm:grid-cols-2">
                         <button
-                          className="btn-accent min-h-12 rounded-full px-5 text-sm font-semibold transition"
+                          className="btn-accent min-h-12 rounded-full px-5 text-sm font-semibold transition sm:col-span-2"
+                          onClick={() => void handleShareSoloResult()}
+                          type="button"
+                        >
+                          결과 카드 공유
+                        </button>
+                        {soloInvestmentMode === "lump-sum" ? (
+                          <button
+                            className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold transition"
+                            onClick={compareSoloWithMonthly}
+                            type="button"
+                          >
+                            비교해보기 · 매달 조금씩
+                          </button>
+                        ) : null}
+                        <button
+                          className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold transition"
                           onClick={compareFromSolo}
                           type="button"
                         >
-                          다른 자산과 비교
+                          다른 것과 비교해보기
                         </button>
                         <button
                           className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold text-[var(--rz-accent)] transition"
                           onClick={resetSoloFlow}
                           type="button"
                         >
-                          한 번 더 보기
+                          다시 해보기
                         </button>
                       </div>
+                      {shareFeedback ? (
+                        <div className="mt-3 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
+                          {shareFeedback}
+                        </div>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="surface-card mt-7 rounded-[26px] p-5 text-sm leading-6 text-white/58">
@@ -7989,14 +8281,14 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   {([
                     {
-                      description: "처음에 한 번 넣습니다.",
+                      description: "처음에 모두 넣어요.",
                       id: "lump-sum",
-                      label: "한 번에 투자",
+                      label: "한 번에",
                     },
                     {
-                      description: "매달 같은 금액을 넣습니다.",
+                      description: "매달 조금씩 넣어요.",
                       id: "monthly",
-                      label: "매달 적립",
+                      label: "매달 조금씩",
                     },
                   ] as const).map((mode) => {
                     const isActive = investmentMode === mode.id;
@@ -8402,7 +8694,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                         onClick={handleRestartRace}
                         type="button"
                       >
-                        다시보기
+                        다시 해보기
                       </button>
                     </div>
                   </div>
@@ -8432,7 +8724,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                       onClick={handleRestartRace}
                       type="button"
                     >
-                      다시보기
+                      다시 해보기
                     </button>
                   </div>
 
@@ -8827,7 +9119,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                           onClick={() => void handleShareResult()}
                           type="button"
                         >
-                          결과 공유
+                          결과 카드 공유
                         </button>
                       </div>
                     </div>
@@ -9379,7 +9671,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                       onClick={() => void handleShareResult()}
                       type="button"
                     >
-                      결과 공유
+                      결과 카드 공유
                     </button>
                     <button
                       className="btn-secondary min-h-11 rounded-full px-4 text-sm font-semibold tracking-[-0.02em] transition"
@@ -9397,14 +9689,6 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                     </button>
                   </div>
                 </div>
-              ) : null}
-
-              {raceCompletionSummary ? (
-                <ReferralCtaCard
-                  copy={resultReferral}
-                  onMissingUrl={() => setShareFeedback("레퍼럴 링크가 아직 설정되지 않았습니다.")}
-                  placement="receipt"
-                />
               ) : null}
 
               <div className="mt-6 space-y-4">
@@ -9749,12 +10033,6 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                 />
               ) : null}
 
-              <ReferralCtaCard
-                copy={resultReferral}
-                onMissingUrl={() => setShareFeedback("레퍼럴 링크가 아직 설정되지 않았습니다.")}
-                placement="volatility"
-              />
-
               <div className="surface-card mt-5 rounded-[24px] px-4 py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -9792,7 +10070,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                   onClick={() => void handleShareResult()}
                   type="button"
                 >
-                  결과 공유하기
+                  결과 카드 공유하기
                 </button>
                 <button
                   className="btn-secondary min-h-14 rounded-full px-5 text-base font-semibold tracking-[-0.02em] transition"
@@ -9949,7 +10227,17 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       ) : null}
 
       {flowStep === "assets" && showAllAssets ? (
-        <div className="fixed inset-0 z-50 h-dvh overflow-hidden bg-[#f3f7fc]">
+        <div
+          aria-labelledby="company-browser-title"
+          aria-modal="true"
+          className="fixed inset-0 z-50 h-dvh overflow-hidden bg-[#f3f7fc]"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              closeAssetPicker();
+            }
+          }}
+          role="dialog"
+        >
           <div className="mx-auto flex h-dvh w-full max-w-[560px] flex-col overflow-hidden px-4 pt-[calc(env(safe-area-inset-top)+8px)] lg:max-w-[1520px] lg:px-6 lg:py-5 lg:pt-5">
             <div className="shrink-0 border-b border-white/8 bg-[#f3f7fc]/95 pb-3 backdrop-blur lg:rounded-[28px] lg:border lg:border-[var(--rz-border)] lg:bg-white/78 lg:px-5 lg:py-4 lg:shadow-[0_18px_56px_rgba(15,23,42,0.07)]">
               <div className="flex items-center justify-between gap-3">
@@ -9964,8 +10252,11 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                   <div className="hidden text-[11px] font-semibold tracking-[0.24em] text-[var(--rz-text-muted)] lg:block">
                     ASSET BROWSER
                   </div>
-                  <div className="text-sm font-semibold tracking-[-0.03em] text-white lg:mt-1 lg:text-2xl lg:text-[var(--rz-text-primary)]">
-                    전체 자산 보기
+                  <div
+                    className="text-sm font-semibold tracking-[-0.03em] text-white lg:mt-1 lg:text-2xl lg:text-[var(--rz-text-primary)]"
+                    id="company-browser-title"
+                  >
+                    종목 검색
                   </div>
                 </div>
                 <div className="w-11 lg:hidden" />
@@ -9979,6 +10270,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                   <div className="text-[13px] font-medium text-[var(--rz-text-secondary)]">검색</div>
                   <input
                     aria-label="자산 이름으로 검색"
+                    autoFocus
                     className="min-w-0 flex-1 bg-transparent text-sm text-[var(--rz-text-primary)] outline-none placeholder:text-[var(--rz-text-muted)]"
                     inputMode="search"
                     onChange={(event) => {
@@ -10149,7 +10441,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
               </div>
             </div>
 
-            <div className="hidden shrink-0 lg:mt-3 lg:block">
+            <div className="mt-3 shrink-0">
               <div className="pb-[calc(env(safe-area-inset-bottom)+10px)] lg:pb-0">
                 <div className="surface-floating mx-auto w-full max-w-[560px] rounded-[22px] border border-white/8 p-2.5 backdrop-blur-xl lg:flex lg:max-w-none lg:items-center lg:justify-between lg:gap-4 lg:rounded-[24px] lg:border-[var(--rz-border)] lg:bg-white/84 lg:p-3 lg:shadow-[0_14px_42px_rgba(15,23,42,0.08)]">
                   <div className="px-1 lg:min-w-0 lg:flex-1">

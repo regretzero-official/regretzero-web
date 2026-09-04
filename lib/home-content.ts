@@ -1,4 +1,8 @@
 import type { MarketDataTicker } from "@/lib/market-data";
+import {
+  MARKET_CAP_COMPANIES,
+  MARKET_CAP_COMPANY_IDS,
+} from "@/lib/market-cap-universe";
 import { PRO_ASSET_LIBRARY } from "@/lib/pro-asset-library";
 
 export type AssetCategory =
@@ -25,6 +29,10 @@ export interface AssetOption {
   id: ComparisonAssetId;
   isAvailable: boolean;
   label: string;
+  marketCapAsOf?: string;
+  marketCapRank?: number;
+  companyMarket?: "KR" | "US";
+  exchange?: string;
   marketTicker?: MarketDataTicker;
   resultInfoLines?: string[];
   searchTerms: string[];
@@ -804,6 +812,43 @@ for (const asset of PRO_ASSET_LIBRARY) {
   });
 }
 
+for (const company of MARKET_CAP_COMPANIES) {
+  const category = company.market === "US" ? "미국주식" : "한국주식";
+  const generatedCategory = category as Exclude<AssetCategory, "부동산">;
+  const existingAsset = assetCatalog[company.id];
+  const marketLabel = company.market === "US" ? "미국 상장" : "한국";
+
+  assetCatalog[company.id] = createAsset({
+    ...(existingAsset ?? {}),
+    accent: existingAsset?.accent ?? GENERATED_ACCENT_BY_CATEGORY[generatedCategory],
+    basis: company.market === "US" ? "Adjusted close + USD/KRW 환산" : "KRW adjusted close",
+    category,
+    companyMarket: company.market,
+    description: `${marketLabel} 시가총액 ${company.rank}위`,
+    exchange: company.exchange,
+    glow: existingAsset?.glow ?? GENERATED_GLOW_BY_CATEGORY[generatedCategory],
+    id: company.id,
+    isAvailable: true,
+    label: company.label,
+    marketCapAsOf: company.rankAsOf,
+    marketCapRank: company.rank,
+    marketTicker: company.marketTicker,
+    searchTerms: [
+      ...new Set([
+        ...(existingAsset?.searchTerms ?? []),
+        company.id,
+        company.label,
+        company.marketTicker,
+        company.yahooSymbol,
+        ...(company.aliases ?? []),
+      ]),
+    ],
+    selectedSummary: `${marketLabel} 시총 ${company.rank}위`,
+    shortLabel: existingAsset?.shortLabel,
+    usesUsdFx: company.market === "US",
+  });
+}
+
 export const freePlanAssetIds: ComparisonAssetId[] = [
   "deposit",
   "gold",
@@ -915,6 +960,7 @@ const RAW_ASSET_ORDER: ComparisonAssetId[] = [
   "btc",
   "eth",
   ...PRO_LIBRARY_ASSET_IDS,
+  ...MARKET_CAP_COMPANY_IDS,
 ];
 
 export const assetOrder: ComparisonAssetId[] = Array.from(new Set(RAW_ASSET_ORDER));
@@ -927,10 +973,9 @@ export const featuredAssetIds: ComparisonAssetId[] = freePlanAssetIds;
 export const defaultSelectedAssetIds: ComparisonAssetId[] = [];
 
 export const amountPresets = [
+  { label: "100만원", value: 1_000_000 },
   { label: "500만원", value: 5_000_000 },
   { label: "1,000만원", value: 10_000_000 },
-  { label: "5,000만원", value: 50_000_000 },
-  { label: "1억", value: 100_000_000 },
 ] as const;
 
 export const trustNotes = [
@@ -949,7 +994,7 @@ export const trustNotes = [
 export const trustSummary =
   "과거 흐름 기준 · 서울/강남구 아파트 비교 지원 · 예금은 연 3.04% 복리 가정";
 
-export const DEFAULT_AMOUNT = 10_000_000;
+export const DEFAULT_AMOUNT = 1_000_000;
 export const INPUT_MAX_AMOUNT = 1_000_000_000_000;
 export const FIXED_YEARS = 10;
 export const RACE_DURATION_MS = 18_000;
