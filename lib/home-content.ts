@@ -973,9 +973,7 @@ export const featuredAssetIds: ComparisonAssetId[] = freePlanAssetIds;
 export const defaultSelectedAssetIds: ComparisonAssetId[] = [];
 
 export const amountPresets = [
-  { label: "100만원", value: 1_000_000 },
-  { label: "500만원", value: 5_000_000 },
-  { label: "1,000만원", value: 10_000_000 },
+  { label: "1억", value: 100_000_000 },
 ] as const;
 
 export const trustNotes = [
@@ -994,7 +992,7 @@ export const trustNotes = [
 export const trustSummary =
   "과거 흐름 기준 · 서울/강남구 아파트 비교 지원 · 예금은 연 3.04% 복리 가정";
 
-export const DEFAULT_AMOUNT = 1_000_000;
+export const DEFAULT_AMOUNT = 100_000_000;
 export const INPUT_MAX_AMOUNT = 1_000_000_000_000;
 export const FIXED_YEARS = 10;
 export const RACE_DURATION_MS = 18_000;
