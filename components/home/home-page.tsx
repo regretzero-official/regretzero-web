@@ -7626,7 +7626,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                         <strong className="text-[var(--rz-text-primary)]">{getHomeIntroSelectedLabel(soloAsset)}</strong>
                       </div>
                       <div className="flex items-center justify-between gap-3">
-                        <span>금액</span>
+                        <span>{soloInvestmentMode === "monthly" ? "매달 금액" : "넣은 금액"}</span>
                         <strong className="text-[var(--rz-text-primary)]">{formattedSoloAmountValue}</strong>
                       </div>
                       <div className="flex items-center justify-between gap-3">
