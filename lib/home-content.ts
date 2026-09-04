@@ -787,6 +787,36 @@ export const assetCatalog: Record<ComparisonAssetId, AssetOption> = {
     searchTerms: ["이더리움", "ethereum", "eth"],
     usesUsdFx: true,
   }),
+  sol: createAsset({
+    accent: "#8B7CFF",
+    amountInfo: "솔라나: 빠른 전송으로 알려진 디지털 자산이에요.",
+    basis: "SOL-USD 종가 + USD/KRW 환산",
+    category: "코인",
+    description: "빠른 전송으로 알려진 코인",
+    glow: "rgba(139, 124, 255, 0.18)",
+    id: "sol",
+    isAvailable: true,
+    label: "솔라나",
+    marketTicker: "SOL",
+    searchTerms: ["솔라나", "solana", "sol"],
+    selectedSummary: "빠른 전송으로 알려진 코인",
+    usesUsdFx: true,
+  }),
+  xrp: createAsset({
+    accent: "#4AA3FF",
+    amountInfo: "XRP: 송금 네트워크로 알려진 디지털 자산이에요.",
+    basis: "XRP-USD 종가 + USD/KRW 환산",
+    category: "코인",
+    description: "송금 네트워크로 알려진 코인",
+    glow: "rgba(74, 163, 255, 0.18)",
+    id: "xrp",
+    isAvailable: true,
+    label: "XRP",
+    marketTicker: "XRP",
+    searchTerms: ["엑스알피", "리플", "xrp", "ripple"],
+    selectedSummary: "송금 네트워크로 알려진 코인",
+    usesUsdFx: true,
+  }),
 };
 
 for (const asset of PRO_ASSET_LIBRARY) {
@@ -882,6 +912,8 @@ export const freePlanAssetIds: ComparisonAssetId[] = [
   "brkb",
   "btc",
   "eth",
+  "sol",
+  "xrp",
 ];
 
 const PRO_LIBRARY_ASSET_IDS: ComparisonAssetId[] = PRO_ASSET_LIBRARY.map((asset) => asset.id);
@@ -959,6 +991,8 @@ const RAW_ASSET_ORDER: ComparisonAssetId[] = [
   "360750",
   "btc",
   "eth",
+  "sol",
+  "xrp",
   ...PRO_LIBRARY_ASSET_IDS,
   ...MARKET_CAP_COMPANY_IDS,
 ];

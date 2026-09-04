@@ -6,8 +6,8 @@ import {
   Archive,
   ChartNoAxesCombined,
   HelpCircle,
+  Home,
   Info,
-  Rocket,
   Swords,
   type LucideIcon,
 } from "lucide-react";
@@ -63,6 +63,12 @@ import {
   type AssetOption,
   type ComparisonAssetId,
 } from "@/lib/home-content";
+import {
+  FIND_CURATED_COUNT,
+  FIND_SEARCH_RESULT_LIMIT,
+  getFindCuratedRows,
+  searchFindAssetIds,
+} from "@/lib/find-stock";
 import {
   buildAssetPriceSeries,
   buildMonthlyContributionRaceData,
@@ -124,7 +130,8 @@ type FlowStep =
 type RaceStatus = "complete" | "idle" | "loading" | "paused" | "racing";
 type AmountMode = "custom" | "preset";
 type InvestmentMode = "lump-sum" | "monthly";
-type PrimaryNavKey = "assets" | "compare" | "more" | "saved";
+type PrimaryNavKey = "home" | "compare" | "saved";
+type AssetPickerMode = "solo-find" | "compare-pick";
 type SoloFlowStep = "amount" | "confirm" | "pick" | "race" | "result" | "style";
 type SoloHorizonMode = "recent10y" | "since-listing";
 type HomeScenarioMode = "compare" | "solo";
@@ -3272,10 +3279,9 @@ function DirectPickAssetGrid({
 interface PrimaryNavigationProps {
   activeKey: PrimaryNavKey | null;
   canContinue: boolean;
-  onAssets: () => void;
   onCompare: () => void;
   onContinue: () => void;
-  onMore: () => void;
+  onHome: () => void;
   onSaved: () => void;
 }
 
@@ -3283,14 +3289,14 @@ function getPrimaryNavButtonClass(isActive: boolean, variant: "desktop" | "mobil
   if (variant === "desktop") {
     return `min-h-10 rounded-full px-4 text-sm font-semibold tracking-[-0.02em] transition ${
       isActive
-        ? "bg-indigo-50/70 text-indigo-600 shadow-[0_10px_28px_rgba(79,70,229,0.12)]"
+        ? "bg-[var(--rz-accent-soft)] text-[var(--rz-accent)] shadow-[0_10px_28px_rgba(88,120,96,0.12)]"
         : "text-slate-500 hover:bg-white/70 hover:text-slate-900"
     }`;
   }
 
   return `flex min-h-[58px] flex-1 flex-col items-center justify-center gap-1 rounded-[18px] px-0.5 text-[10px] font-semibold tracking-[-0.04em] transition ${
     isActive
-      ? "text-indigo-600"
+      ? "text-[var(--rz-accent)]"
       : "text-slate-400 hover:bg-slate-50 hover:text-slate-600"
   }`;
 }
@@ -3298,10 +3304,9 @@ function getPrimaryNavButtonClass(isActive: boolean, variant: "desktop" | "mobil
 function DesktopPrimaryNav({
   activeKey,
   canContinue,
-  onAssets,
   onCompare,
   onContinue,
-  onMore,
+  onHome,
   onSaved,
 }: PrimaryNavigationProps) {
   const navItems: Array<{
@@ -3310,10 +3315,9 @@ function DesktopPrimaryNav({
     label: string;
     onClick: () => void;
   }> = [
-    { Icon: Rocket, key: "compare", label: "그 종목 파보기", onClick: onCompare },
-    { Icon: Swords, key: "assets", label: "라이벌 대결", onClick: onAssets },
-    { Icon: Archive, key: "saved", label: "내 보관함", onClick: onSaved },
-    { Icon: Info, key: "more", label: "서비스 안내", onClick: onMore },
+    { Icon: Home, key: "home", label: "홈", onClick: onHome },
+    { Icon: Swords, key: "compare", label: "비교", onClick: onCompare },
+    { Icon: Archive, key: "saved", label: "기록", onClick: onSaved },
   ];
 
   return (
@@ -3335,7 +3339,7 @@ function DesktopPrimaryNav({
           >
             <Icon
               aria-hidden="true"
-              className={isActive ? "h-4 w-4 text-indigo-600" : "h-4 w-4 text-slate-400"}
+              className={isActive ? "h-4 w-4 text-[var(--rz-accent)]" : "h-4 w-4 text-slate-400"}
               strokeWidth={1.5}
             />
             {item.label}
@@ -3357,9 +3361,8 @@ function DesktopPrimaryNav({
 
 function BottomPrimaryNav({
   activeKey,
-  onAssets,
   onCompare,
-  onMore,
+  onHome,
   onSaved,
 }: Omit<PrimaryNavigationProps, "canContinue" | "onContinue">) {
   const navItems: Array<{
@@ -3368,10 +3371,9 @@ function BottomPrimaryNav({
     label: string;
     onClick: () => void;
   }> = [
-    { Icon: Rocket, key: "compare", label: "그 종목", onClick: onCompare },
-    { Icon: Swords, key: "assets", label: "라이벌", onClick: onAssets },
-    { Icon: Archive, key: "saved", label: "보관함", onClick: onSaved },
-    { Icon: Info, key: "more", label: "안내", onClick: onMore },
+    { Icon: Home, key: "home", label: "홈", onClick: onHome },
+    { Icon: Swords, key: "compare", label: "비교", onClick: onCompare },
+    { Icon: Archive, key: "saved", label: "기록", onClick: onSaved },
   ];
 
   return (
@@ -3395,11 +3397,11 @@ function BottomPrimaryNav({
               <Icon
                 aria-hidden="true"
                 className={`h-4 w-4 rounded-[12px] p-0.5 ${
-                  isActive ? "bg-indigo-50/70 text-indigo-600" : "text-slate-400"
+                  isActive ? "bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]" : "text-slate-400"
                 }`}
                 strokeWidth={1.5}
               />
-              <span className={isActive ? "whitespace-nowrap text-indigo-600 font-bold" : "whitespace-nowrap text-slate-400"}>
+              <span className={isActive ? "whitespace-nowrap text-[var(--rz-accent)] font-bold" : "whitespace-nowrap text-slate-400"}>
                 {item.label}
               </span>
             </button>
@@ -3605,6 +3607,7 @@ export function HomePage() {
   const [assetSearchQuery, setAssetSearchQuery] = useState("");
   const [, setIsAssetFilterExpanded] = useState(false);
   const [showAllAssets, setShowAllAssets] = useState(false);
+  const [assetPickerMode, setAssetPickerMode] = useState<AssetPickerMode>("solo-find");
   const [assetPickerReturnStep, setAssetPickerReturnStep] = useState<FlowStep>("intro");
   const [isPresetBrowserOpen, setIsPresetBrowserOpen] = useState(false);
   const [dailyDirectPickAssetIds, setDailyDirectPickAssetIds] = useState<ComparisonAssetId[]>(
@@ -3867,6 +3870,16 @@ export function HomePage() {
     () => normalizeAssetSearchQuery(assetSearchQuery),
     [assetSearchQuery],
   );
+  const findCuratedRows = useMemo(() => getFindCuratedRows(), []);
+  const findSearchAssetIds = useMemo(() => {
+    if (!assetSearchQuery.trim()) {
+      return [] as ComparisonAssetId[];
+    }
+    return searchFindAssetIds(assetSearchQuery, {
+      limit: FIND_SEARCH_RESULT_LIMIT,
+    });
+  }, [assetSearchQuery]);
+  const isFindSearching = assetSearchQuery.trim().length > 0;
   const activeBrowserFilter =
     ASSET_FILTERS.find((filter) => filter.id === activeAssetFilter) ?? ASSET_FILTERS[0]!;
   const assetBrowserFilterChips = useMemo(() => ASSET_FILTERS, []);
@@ -4793,31 +4806,21 @@ export function HomePage() {
       })
     : "";
   const isPremiumCustomScenario = activeStartDateRange.isPremiumCustom;
-  const showDesktopHomeDashboard = flowStep === "intro" || flowStep === "assets";
+  const showDesktopHomeDashboard = flowStep === "intro";
   const shouldUseWideDesktopCanvas =
     flowStep === "result" ||
     flowStep === "difficulty" ||
     (flowStep === "solo" && soloFlowStep === "result");
-  const primaryNavActiveKey: PrimaryNavKey | null = isMenuOpen
-    ? "more"
-    : isPresetBrowserOpen
-      ? "compare"
-      : showAllAssets || flowStep === "assets"
-        ? "assets"
-        : flowStep === "saved"
-          ? "saved"
-        : flowStep === "solo"
-          ? "compare"
-        : flowStep === "difficulty"
-          ? "more"
-          : flowStep === "start-point"
-            ? "more"
-            : flowStep === "intro"
-              ? "compare"
-              : null;
+  const primaryNavActiveKey: PrimaryNavKey | null =
+    flowStep === "saved"
+      ? "saved"
+      : flowStep === "assets" || (showAllAssets && assetPickerMode === "compare-pick")
+        ? "compare"
+        : flowStep === "intro" || flowStep === "solo" || flowStep === "amount" || flowStep === "race" || flowStep === "result"
+          ? "home"
+          : "home";
   const shouldShowBottomPrimaryNav =
-    (flowStep === "intro" ||
-      flowStep === "saved") &&
+    (flowStep === "intro" || flowStep === "saved" || flowStep === "assets") &&
     !showAllAssets &&
     !isPresetBrowserOpen &&
     !isMenuOpen;
@@ -5680,6 +5683,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setAssetSearchQuery("");
     setIsAssetFilterExpanded(false);
     setAssetPickerReturnStep("intro");
+    setAssetPickerMode("solo-find");
     setShowAllAssets(true);
     setFlowStep("assets");
   }
@@ -5875,6 +5879,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setAssetSearchQuery("");
     setIsAssetFilterExpanded(false);
     setAssetPickerReturnStep("assets");
+    setAssetPickerMode("compare-pick");
     setShowAllAssets(true);
   }
 
@@ -7116,6 +7121,72 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     );
   }
 
+  function handleFindRowSelect(assetId: ComparisonAssetId) {
+    const asset = assetCatalog[assetId];
+    if (!asset?.isAvailable) {
+      setAssetToast("아직 과거 데이터가 부족해요");
+      return;
+    }
+
+    if (assetPickerMode === "solo-find") {
+      setShowAllAssets(false);
+      handleSoloAssetSelect(assetId);
+      return;
+    }
+
+    handleAssetToggle(assetId);
+  }
+
+  function renderFindStockRow(assetId: ComparisonAssetId, hint?: string) {
+    const asset = assetCatalog[assetId];
+    if (!asset) {
+      return null;
+    }
+    const isAvailable = asset.isAvailable;
+    const selectedIndex = selectedAssetIds.indexOf(assetId);
+    const isSelected = selectedIndex >= 0;
+    const rowHint =
+      hint ??
+      (isAvailable
+        ? getAssetBrowserDescription(asset)
+        : "아직 과거 데이터가 부족해요");
+
+    return (
+      <button
+        key={`find-${assetId}`}
+        className={`flex min-h-[64px] w-full items-center gap-3 rounded-[16px] border px-4 py-3 text-left transition ${
+          isSelected
+            ? "border-[var(--rz-accent)] bg-[var(--rz-accent-soft)]"
+            : "border-[var(--rz-border)] bg-white hover:border-[var(--rz-accent)]"
+        } ${isAvailable ? "" : "opacity-55"}`}
+        onClick={() => handleFindRowSelect(assetId)}
+        type="button"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="text-[1.05rem] font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+            {getAssetBrowserLabel(asset)}
+          </div>
+          <div className="mt-1 truncate text-sm leading-5 text-[var(--rz-text-secondary)]">
+            {rowHint}
+          </div>
+        </div>
+        {assetPickerMode === "compare-pick" ? (
+          <div className="shrink-0 text-xs font-medium text-[var(--rz-text-muted)]">
+            {!isAvailable
+              ? "데이터 부족"
+              : isSelected
+                ? `${selectedIndex + 1}`
+                : "선택"}
+          </div>
+        ) : !isAvailable ? (
+          <div className="shrink-0 text-xs font-medium text-[var(--rz-text-muted)]">
+            데이터 부족
+          </div>
+        ) : null}
+      </button>
+    );
+  }
+
   function renderAssetBrowserItem(
     assetId: ComparisonAssetId,
     options?: {
@@ -7223,10 +7294,9 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
             <DesktopPrimaryNav
               activeKey={primaryNavActiveKey}
               canContinue={canContinueFromAssetSelection && flowStep !== "amount"}
-              onAssets={goToCompareBuilder}
-              onCompare={goToSoloBuilder}
+              onCompare={goToCompareBuilder}
               onContinue={goToAmount}
-              onMore={openMoreMenu}
+              onHome={goToHome}
               onSaved={goToSavedRecords}
             />
           </header>
@@ -7920,176 +7990,85 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
           {flowStep === "assets" ? (
             <section className="flex flex-1 flex-col py-6 pb-40">
-              <StepHeader
-                description={HOME_FLOW_COPY.assetDescription}
-                onBack={() => setFlowStep("intro")}
-                step={1}
-                title={HOME_FLOW_COPY.assetTitle}
-              />
+              <div className="px-1 pt-2">
+                <button
+                  className="text-sm text-[var(--rz-text-secondary)]"
+                  onClick={goToHome}
+                  type="button"
+                >
+                  ← 뒤로
+                </button>
+                <h2 className="mt-6 text-[1.85rem] font-semibold leading-snug tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                  두 개를 골라 비교해요
+                </h2>
+                <p className="mt-3 text-base leading-7 text-[var(--rz-text-secondary)]">
+                  같은 돈으로 두 자산이 지나온 시간을 나란히 봅니다.
+                </p>
+              </div>
 
-              <div className="surface-card mt-8 rounded-[26px] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.22em] text-white/34">선택한 자산</div>
-                    <div className="mt-2 text-sm text-white/56">
-                      {selectedAssetIds.length >= MIN_COMPARISON_ASSETS
-                      ? "준비됐습니다."
-                        : "두 개만 고르면 됩니다."}
-                    </div>
-                  </div>
-                  <div className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-white/56">
-                    {selectedAssetIds.length} / {MAIN_COMPARISON_ASSET_LIMIT} 선택
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-2">
-                  {selectedAssetSlots.map((asset, index) =>
-                    asset ? (
-                      <button
-                        key={asset.id}
-                        className="flex items-center gap-3 rounded-[18px] border px-3 py-2.5 text-left transition"
-                        onClick={() => handleRemoveSelectedAsset(asset.id)}
-                        style={{
-                          backgroundColor: getComparisonSlotGlow(index, 0.14),
-                          borderColor: `${getComparisonSlotColor(index)}66`,
-                          boxShadow: "0 0 0 1px rgba(255,255,255,0.06)",
-                        }}
-                        type="button"
-                      >
-                        <div
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                          style={{
-                            backgroundColor: `${getComparisonSlotColor(index)}24`,
-                            color: getComparisonSlotColor(index),
-                          }}
-                        >
-                          {index + 1}
+              <div className="mt-8 space-y-3">
+                {selectedAssetSlots.map((asset, index) =>
+                  asset ? (
+                    <button
+                      key={asset.id}
+                      className="flex min-h-[64px] w-full items-center gap-3 rounded-[16px] border border-[var(--rz-border)] bg-white px-4 py-3 text-left"
+                      onClick={() => handleRemoveSelectedAsset(asset.id)}
+                      type="button"
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--rz-accent-soft)] text-sm font-semibold text-[var(--rz-accent)]">
+                        {index + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-base font-semibold text-[var(--rz-text-primary)]">
+                          {getSelectedQueueLabel(asset)}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                            {getSelectedQueueLabel(asset)}
-                          </div>
-                          <div className="mt-1 truncate text-[12px] text-white/48">
-                            {getSelectedQueueSummary(asset)}
-                          </div>
-                        </div>
-                        <div className="text-[11px] text-white/40">제거</div>
-                      </button>
-                    ) : (
-                      <div
-                        key={`asset-step-empty-slot-${index + 1}`}
-                        className="flex items-center gap-3 rounded-[18px] border border-dashed border-white/10 bg-white/[0.02] px-3 py-2.5"
-                        style={{
-                          borderColor: `${getComparisonSlotColor(index)}20`,
-                        }}
-                      >
-                        <div
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                          style={{
-                            backgroundColor: `${getComparisonSlotColor(index)}16`,
-                            color: getComparisonSlotColor(index),
-                          }}
-                        >
-                          {index + 1}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm text-white/38">비어 있음</div>
+                        <div className="mt-1 text-sm text-[var(--rz-text-secondary)]">
+                          탭해서 빼기
                         </div>
                       </div>
-                    ),
-                  )}
-                </div>
-
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[12px] leading-5 text-white/48">
-                      새로 고르면 오래된 선택이 바뀝니다.
-                    </div>
-                    <div className="mt-1 text-[11px] text-white/40">{HOME_FLOW_COPY.allAssetsHint}</div>
-                  </div>
-                  {!isAssetSelectionFull ? (
+                    </button>
+                  ) : (
                     <button
-                      className="min-h-11 shrink-0 rounded-full border border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)] px-4 text-sm font-semibold text-[var(--rz-accent)] transition hover:brightness-105"
+                      key={`empty-slot-${index + 1}`}
+                      className="flex min-h-[64px] w-full items-center gap-3 rounded-[16px] border border-dashed border-[var(--rz-border)] bg-white/70 px-4 py-3 text-left"
                       onClick={openAssetPicker}
                       type="button"
                     >
-                      전체 자산 보기
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--rz-accent-soft)] text-sm font-semibold text-[var(--rz-text-muted)]">
+                        {index + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-base font-medium text-[var(--rz-text-primary)]">
+                          자산 고르기
+                        </div>
+                        <div className="mt-1 text-sm text-[var(--rz-text-secondary)]">
+                          종목 찾기에서 고르세요
+                        </div>
+                      </div>
                     </button>
-                  ) : null}
-                </div>
+                  ),
+                )}
               </div>
 
               <div className="mt-6">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.22em] text-white/34">
-                      빠른 선택
-                    </div>
-                    <div className="mt-2 text-sm text-white/56">
-                      익숙한 이름부터 시작하세요.
-                    </div>
-                  </div>
-                  <button
-                    className="rounded-full border border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--rz-accent)] transition hover:brightness-105"
-                    onClick={openAssetPicker}
-                    type="button"
-                  >
-                    전체 목록
-                  </button>
-                </div>
-
-                <DirectPickAssetGrid
-                  assets={dailyDirectPickAssets}
-                  className="mt-4 sm:grid-cols-4"
-                  onAssetToggle={handleAssetToggle}
-                  selectedAssetIds={selectedAssetIds}
-                />
-              </div>
-
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.22em] text-white/34">
-                      {HOME_FLOW_COPY.recommendedTitle}
-                    </div>
-                    <div className="mt-2 text-sm text-white/56">
-                      {HOME_FLOW_COPY.recommendedDescription}
-                    </div>
-                  </div>
-                  <div className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-white/56">
-                    2개 자산
-                  </div>
-                </div>
-
                 <button
-                  className="btn-secondary min-h-12 w-full rounded-full px-5 text-sm font-semibold text-[var(--rz-accent)] transition"
-                  onClick={goToRecommendedComparisons}
+                  className="min-h-12 w-full rounded-full border border-[var(--rz-border)] bg-white px-5 text-sm font-semibold text-[var(--rz-text-primary)] transition hover:border-[var(--rz-accent)]"
+                  onClick={openAssetPicker}
                   type="button"
                 >
-                  프리셋 목록 열기
+                  종목 찾기에서 고르기
                 </button>
               </div>
 
-              <div className="mt-6 rounded-[24px] border border-white/8 bg-white/[0.02] px-4 py-4">
-                <BeginnerGuideBoard compact onStartExample={startTutorialExample} />
-                <AdSlot
-                  className="mt-4 min-h-[90px]"
-                  label="홈 광고"
-                  placement="home-mobile-guide"
-                  slot={process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT}
-                />
-              </div>
-
-              <div className="mt-auto pt-8">
-                <div className="text-sm text-white/48">
-                  {!canContinueFromAssetSelection
-                    ? "궁금한 자산을 고르면 바로 시작할 수 있습니다."
-                    : selectedAssetIds.length === 1
-                      ? "하나만 골라도 정기예금 기준으로 먼저 볼 수 있습니다."
-                    : isAssetSelectionFull
-                      ? "두 자산이 준비됐습니다."
-                      : "지금 시작하거나, 다른 자산으로 바꿀 수 있습니다."}
-                </div>
+              <div className="mt-auto pt-10">
+                <button
+                  className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold transition disabled:opacity-40"
+                  disabled={!canStartComparison(selectedAssetIds)}
+                  onClick={goToAmount}
+                  type="button"
+                >
+                  {canStartComparison(selectedAssetIds) ? "이 둘로 비교하기" : "두 개를 골라 주세요"}
+                </button>
               </div>
             </section>
           ) : null}
@@ -8961,10 +8940,10 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
           {flowStep === "saved" ? (
             <section className="flex flex-1 flex-col py-6 pb-28">
               <StepHeader
-                description="저장해둔 조합과 시나리오를 다시 불러와요."
-                onBack={() => setFlowStep("intro")}
+                description="지난 결과만 모아서 보여요."
+                onBack={goToHome}
                 step={1}
-                title="저장한 기록"
+                title="기록"
               />
 
               <div className="surface-card mt-6 rounded-[24px] px-4 py-4">
@@ -9026,13 +9005,6 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                 </section>
               ) : null}
 
-              <div className="mt-5">
-                <DynamicLiveTimeline
-                  matchups={syncedMatchups}
-                  onReplayScenario={startTimelineScenario}
-                />
-              </div>
-
               {savedScenarios.length === 0 &&
               savedAssetCombos.length === 0 &&
               savedFutureScenarios.length === 0 &&
@@ -9046,7 +9018,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                   </div>
                   <button
                     className="btn-accent mt-5 min-h-12 rounded-full px-5 text-sm font-semibold"
-                    onClick={goToAssets}
+                    onClick={goToCompareBuilder}
                     type="button"
                   >
                     비교하러 가기
@@ -9940,44 +9912,10 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       {shouldShowBottomPrimaryNav ? (
         <BottomPrimaryNav
           activeKey={primaryNavActiveKey}
-          onAssets={goToCompareBuilder}
-          onCompare={goToSoloBuilder}
-          onMore={openMoreMenu}
+          onCompare={goToCompareBuilder}
+          onHome={goToHome}
           onSaved={goToSavedRecords}
         />
-      ) : null}
-
-      {flowStep === "assets" ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-5 pb-[calc(env(safe-area-inset-bottom)+16px)] lg:hidden">
-          <div className="mx-auto w-full max-w-[460px] sm:max-w-[560px]">
-            <div className="surface-floating pointer-events-auto rounded-[28px] p-3 backdrop-blur-xl animate-[fade-in_220ms_ease-out]">
-              <div className="px-2 pb-2 text-center text-[11px] text-white/46">
-                {canContinueFromAssetSelection
-                  ? `${selectedAssets.map((asset) => asset.shortLabel ?? asset.label).join(" · ")} 준비됨`
-                  : "궁금한 자산을 골라주세요"}
-              </div>
-              <div className="px-2 pb-2 text-center text-[11px] text-white/34">
-                {canContinueFromAssetSelection
-                  ? selectedAssetIds.length === 1
-                    ? "정기예금 기준과 먼저 비교해요"
-                    : "같은 돈이 지나온 시간"
-                  : "하나만 골라도 다음 단계로 넘어가요"}
-              </div>
-              <button
-                className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold tracking-[-0.02em] transition disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/34"
-                disabled={!canContinueFromAssetSelection}
-                onClick={goToAmount}
-                type="button"
-              >
-                {canContinueFromAssetSelection
-                  ? selectedAssetIds.length === 1
-                    ? "이 자산만 먼저 보기"
-                    : "이 자산으로 계속"
-                  : "자산을 골라주세요"}
-              </button>
-            </div>
-          </div>
-        </div>
       ) : null}
 
       {flowStep === "amount" ? (
@@ -10055,11 +9993,11 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
         </div>
       ) : null}
 
-      {flowStep === "assets" && showAllAssets ? (
+      {showAllAssets ? (
         <div
-          aria-labelledby="company-browser-title"
+          aria-labelledby="find-stock-title"
           aria-modal="true"
-          className="fixed inset-0 z-50 h-dvh overflow-hidden bg-[#f3f7fc]"
+          className="fixed inset-0 z-50 h-dvh overflow-hidden bg-[var(--rz-bg)]"
           onKeyDown={(event) => {
             if (event.key === "Escape") {
               closeAssetPicker();
@@ -10067,231 +10005,108 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
           }}
           role="dialog"
         >
-          <div className="mx-auto flex h-dvh w-full max-w-[560px] flex-col overflow-hidden px-4 pt-[calc(env(safe-area-inset-top)+8px)] lg:max-w-[1520px] lg:px-6 lg:py-5 lg:pt-5">
-            <div className="shrink-0 border-b border-white/8 bg-[#f3f7fc]/95 pb-3 backdrop-blur lg:rounded-[28px] lg:border lg:border-[var(--rz-border)] lg:bg-white/78 lg:px-5 lg:py-4 lg:shadow-[0_18px_56px_rgba(15,23,42,0.07)]">
-              <div className="flex items-center justify-between gap-3">
+          <div className="mx-auto flex h-dvh w-full max-w-[560px] flex-col overflow-hidden px-4 pt-[calc(env(safe-area-inset-top)+8px)] pb-[calc(env(safe-area-inset-bottom)+12px)]">
+            <div className="shrink-0 pb-3">
+              <div className="flex items-center gap-3">
                 <button
-                  className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-white/68 transition hover:bg-white/[0.06] lg:order-3 lg:border-[var(--rz-border)] lg:bg-white lg:text-[var(--rz-text-secondary)] lg:hover:bg-[var(--rz-surface-card-elevated)]"
+                  className="rounded-full border border-[var(--rz-border)] bg-white px-3 py-2 text-sm text-[var(--rz-text-secondary)] transition hover:bg-[var(--rz-accent-soft)]"
                   onClick={closeAssetPicker}
                   type="button"
                 >
-                  닫기
+                  ← 뒤로
                 </button>
-                <div className="min-w-0 text-center lg:text-left">
-                  <div className="hidden text-[11px] font-semibold tracking-[0.24em] text-[var(--rz-text-muted)] lg:block">
-                    ASSET BROWSER
-                  </div>
-                  <div
-                    className="text-sm font-semibold tracking-[-0.03em] text-white lg:mt-1 lg:text-2xl lg:text-[var(--rz-text-primary)]"
-                    id="company-browser-title"
-                  >
-                    종목 검색
-                  </div>
-                </div>
-                <div className="w-11 lg:hidden" />
+                <h2
+                  className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]"
+                  id="find-stock-title"
+                >
+                  종목 찾기
+                </h2>
               </div>
 
-              <div className="mt-2 lg:mt-3 lg:grid lg:grid-cols-[minmax(240px,360px)_1fr] lg:items-end lg:gap-5">
-                <div className="px-1 text-[12px] leading-5 text-white/46 lg:px-0 lg:text-sm lg:leading-6 lg:text-[var(--rz-text-secondary)]">
-                  {HOME_FLOW_COPY.allAssetsHint}
-                </div>
-                <div className="surface-card mt-2 flex min-h-[48px] items-center gap-3 rounded-[18px] px-4 py-3 lg:mt-0 lg:min-h-[48px] lg:rounded-[20px] lg:px-5 lg:py-2">
-                  <div className="text-[13px] font-medium text-[var(--rz-text-secondary)]">검색</div>
-                  <input
-                    aria-label="자산 이름으로 검색"
-                    autoFocus
-                    className="min-w-0 flex-1 bg-transparent text-sm text-[var(--rz-text-primary)] outline-none placeholder:text-[var(--rz-text-muted)]"
-                    inputMode="search"
-                    onChange={(event) => {
-                      const nextQuery = event.target.value;
-                      setAssetSearchQuery(nextQuery);
-                      if (nextQuery.trim()) {
-                        setActiveAssetFilter("all");
-                      }
-                    }}
-                    placeholder="자산 이름으로 검색"
-                    type="search"
-                    value={assetSearchQuery}
-                  />
-                  {assetSearchQuery ? (
-                    <button
-                      className="rounded-full border border-white/8 bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-white/54 transition hover:bg-white/[0.05] lg:border-[var(--rz-border)] lg:bg-white lg:text-[var(--rz-text-secondary)]"
-                      onClick={() => setAssetSearchQuery("")}
-                      type="button"
-                    >
-                      지우기
-                    </button>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="-mx-1 mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] lg:mx-0 lg:mt-3 lg:flex-wrap lg:gap-2 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
-                {assetBrowserFilterChips.map((filter) => {
-                  const isActive = filter.id === activeAssetFilter;
-
-                  return (
-                    <button
-                      key={filter.id}
-                      className="min-h-[34px] shrink-0 rounded-full border px-3 py-1 text-[11px] font-medium whitespace-nowrap transition lg:min-h-[30px] lg:px-3"
-                      onClick={() => handleAssetFilterChange(filter.id)}
-                      style={{
-                        backgroundColor: isActive
-                          ? "var(--rz-accent-soft)"
-                          : "var(--rz-surface-card)",
-                        borderColor: isActive
-                          ? "var(--rz-border-strong)"
-                          : "var(--rz-border)",
-                        color: isActive ? "var(--rz-accent)" : "var(--rz-text-secondary)",
-                      }}
-                      type="button"
-                    >
-                      {filter.label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-1 px-1 lg:hidden">
-                <div className="text-[11px] leading-4 text-white/46 lg:text-[12px] lg:text-[var(--rz-text-muted)]">
-                  {normalizedAssetSearchQuery
-                    ? `검색 결과 ${browserVisibleAssetCount}개`
-                    : activeAssetFilter === "popular"
-                      ? "많이 찾는 이름입니다."
-                      : "테마를 넘기고, 아래에서 고르세요."}
-                </div>
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-2 lg:mt-3 lg:rounded-[28px] lg:border lg:border-[var(--rz-border)] lg:bg-white/60 lg:p-4 lg:shadow-[0_18px_56px_rgba(15,23,42,0.06)] lg:[scrollbar-color:rgba(100,116,139,0.34)_transparent] lg:[scrollbar-width:thin]">
-              <div className="space-y-4 pb-3 lg:space-y-5 lg:pb-0">
-                {displayedPopularBrowserAssetIds.length > 0 ? (
-                  <section>
-                    <div className="flex items-end justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                          지금 많이 보는 자산
-                        </div>
-                        <div className="mt-1 text-[11px] leading-4 text-white/48">
-                          많이 찾는 이름입니다.
-                        </div>
-                      </div>
-                      <div className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-[11px] text-white/48">
-                        {displayedPopularBrowserAssetIds.length}개
-                      </div>
-                    </div>
-                    <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                      {displayedPopularBrowserAssetIds.map((assetId) => renderAssetBrowserItem(assetId))}
-                    </div>
-                    {hiddenPopularBrowserAssetCount > 0 ? (
-                      <button
-                        className="mt-3 min-h-11 w-full rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card)] px-4 text-sm font-semibold text-[var(--rz-text-secondary)] transition hover:bg-[var(--rz-surface-card-elevated)]"
-                        onClick={() => handleAssetFilterChange("popular")}
-                        type="button"
-                      >
-                        {hiddenPopularBrowserAssetCount}개 더 보기
-                      </button>
-                    ) : null}
-                  </section>
-                ) : null}
-
-                {assetBrowserSections.map((section) => (
-                  <section key={section.id}>
-                    <div className="flex items-end justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                          {section.title}
-                        </div>
-                        <div className="mt-1 text-[11px] leading-4 text-white/48">
-                          {section.helper}
-                        </div>
-                      </div>
-                      <div className="text-[11px] text-white/40">{section.assetIds.length}개</div>
-                    </div>
-                    <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                      {section.assetIds.map((assetId) => renderAssetBrowserItem(assetId))}
-                    </div>
-                  </section>
-                ))}
-
-                {directSearchAssetIds.length > 0 ? (
-                  <section>
-                    <div className="flex items-end justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                          검색 결과
-                        </div>
-                        <div className="mt-1 text-[11px] leading-4 text-white/48">
-                          검색어와 맞는 자산입니다.
-                        </div>
-                      </div>
-                      <div className="text-[11px] text-white/40">{directSearchAssetIds.length}개</div>
-                    </div>
-                    <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                      {directSearchAssetIds.map((assetId) => renderAssetBrowserItem(assetId))}
-                    </div>
-                  </section>
-                ) : null}
-
-                {shouldShowProDiscoverySection ? (
-                  <section className="surface-card rounded-[24px] border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)] px-4 py-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold tracking-[-0.03em] text-white">
-                          곧 추가될 자산
-                        </div>
-                        <div className="mt-1 text-xs leading-5 text-white/52">
-                          더 많은 자산을 광고 기반 무료 기능으로 열어둘 예정입니다.
-                        </div>
-                      </div>
-                      <button
-                        className="rounded-full border border-[var(--rz-border-strong)] bg-white px-3 py-2 text-[11px] font-semibold text-[var(--rz-accent)] transition hover:brightness-105"
-                        onClick={() => openPremiumPrompt("deeper-analysis")}
-                        type="button"
-                      >
-                        준비 중인 자산 보기
-                      </button>
-                    </div>
-                    <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                      {proDiscoveryAssetIds.map((assetId) =>
-                        renderAssetBrowserItem(assetId, { locked: true }),
-                      )}
-                    </div>
-                  </section>
-                ) : null}
-
-                {browserVisibleAssetCount === 0 && !shouldShowProDiscoverySection ? (
-                  <div className="surface-card rounded-[24px] px-4 py-8 text-center">
-                    <div className="text-sm font-semibold text-white">찾는 자산이 없습니다</div>
-                    <div className="mt-2 text-xs leading-5 text-white/48">
-                      검색어를 줄이거나 전체를 선택하세요.
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="mt-3 shrink-0">
-              <div className="pb-[calc(env(safe-area-inset-bottom)+10px)] lg:pb-0">
-                <div className="surface-floating mx-auto w-full max-w-[560px] rounded-[22px] border border-white/8 p-2.5 backdrop-blur-xl lg:flex lg:max-w-none lg:items-center lg:justify-between lg:gap-4 lg:rounded-[24px] lg:border-[var(--rz-border)] lg:bg-white/84 lg:p-3 lg:shadow-[0_14px_42px_rgba(15,23,42,0.08)]">
-                  <div className="px-1 lg:min-w-0 lg:flex-1">
-                    <div className="text-[11px] font-semibold text-white/72">
-                      {assetPickerSelectionCountLabel}
-                    </div>
-                    <div className="mt-0.5 truncate text-[12px] text-white/52 lg:text-[var(--rz-text-secondary)]">
-                      {assetPickerBottomDescription}
-                    </div>
-                  </div>
+              <label className="mt-4 flex min-h-[56px] items-center gap-3 rounded-[18px] border border-[var(--rz-border)] bg-white px-4 py-3 shadow-sm">
+                <span className="sr-only">종목 검색</span>
+                <input
+                  aria-label="종목 검색"
+                  autoFocus
+                  className="min-w-0 flex-1 bg-transparent text-base text-[var(--rz-text-primary)] outline-none placeholder:text-[var(--rz-text-muted)]"
+                  inputMode="search"
+                  onChange={(event) => setAssetSearchQuery(event.target.value)}
+                  placeholder="이름이나 티커로 찾아보세요"
+                  type="search"
+                  value={assetSearchQuery}
+                />
+                {assetSearchQuery ? (
                   <button
-                    className="btn-accent mt-2 min-h-11 w-full rounded-full px-4 text-sm font-semibold tracking-[-0.02em] transition disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/34 lg:mt-0 lg:min-h-10 lg:w-auto lg:min-w-[240px]"
-                    disabled={!canContinueFromAssetSelection}
-                    onClick={continueFromAssetPicker}
+                    className="rounded-full border border-[var(--rz-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--rz-text-secondary)]"
+                    onClick={() => setAssetSearchQuery("")}
                     type="button"
                   >
-                    {assetPickerPrimaryLabel}
+                    지우기
                   </button>
-                </div>
-              </div>
+                ) : null}
+              </label>
             </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-4">
+              {!isFindSearching ? (
+                <section>
+                  <div className="px-1 pb-3 text-sm font-semibold tracking-[-0.02em] text-[var(--rz-text-primary)]">
+                    대표로 고르기
+                  </div>
+                  <div className="space-y-2">
+                    {findCuratedRows.map((row) =>
+                      renderFindStockRow(row.id, row.hint),
+                    )}
+                  </div>
+                  <div className="mt-4 px-1 text-xs leading-5 text-[var(--rz-text-muted)]">
+                    대표 {FIND_CURATED_COUNT}개 · 더 많은 종목은 위 검색으로 찾을 수 있어요.
+                  </div>
+                </section>
+              ) : (
+                <section>
+                  <div className="px-1 pb-3 text-sm font-semibold tracking-[-0.02em] text-[var(--rz-text-primary)]">
+                    검색 결과 {findSearchAssetIds.length}개
+                  </div>
+                  {findSearchAssetIds.length > 0 ? (
+                    <div className="space-y-2">
+                      {findSearchAssetIds.map((assetId) => renderFindStockRow(assetId))}
+                    </div>
+                  ) : (
+                    <div className="rounded-[16px] border border-[var(--rz-border)] bg-white px-4 py-8 text-center">
+                      <div className="text-sm font-semibold text-[var(--rz-text-primary)]">
+                        찾는 종목이 없어요
+                      </div>
+                      <div className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                        글자를 줄이거나, 티커·한글 이름으로 다시 검색해 보세요.
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
+
+            {assetPickerMode === "compare-pick" ? (
+              <div className="shrink-0 border-t border-[var(--rz-border)] pt-3">
+                <div className="mb-2 px-1 text-sm text-[var(--rz-text-secondary)]">
+                  {selectedAssetIds.length}/2 선택
+                  {selectedAssets.length > 0
+                    ? ` · ${selectedAssets.map((asset) => asset.shortLabel ?? asset.label).join(" · ")}`
+                    : ""}
+                </div>
+                <button
+                  className="btn-accent min-h-12 w-full rounded-full px-5 text-sm font-semibold transition disabled:opacity-40"
+                  disabled={!canStartComparison(selectedAssetIds)}
+                  onClick={() => {
+                    setShowAllAssets(false);
+                    setAssetSearchQuery("");
+                    setFlowStep("assets");
+                  }}
+                  type="button"
+                >
+                  {canStartComparison(selectedAssetIds) ? "선택 완료" : "두 개를 골라 주세요"}
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}
