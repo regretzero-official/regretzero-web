@@ -27,9 +27,8 @@ import type { DetailChartContext } from "@/features/detail-chart/types";
 import { formatCrisisPeriodLabel } from "@/features/detail-chart/utils/buildDetailChartSeries";
 import { ControlledAppMenu } from "@/components/app-menu";
 import { NoProfitTimetableCard } from "@/components/home/no-profit-timetable-card";
-import {
-  type CompanyMarketFilter,
-} from "@/components/home/home-company-search";
+type CompanyMarketFilter = "US" | "KR" | "ALL";
+
 import { ProStartExplorerChart } from "@/components/home/pro-start-explorer-chart";
 import { RaceChart, type RaceChartAsset } from "@/components/home/race-chart";
 import {
