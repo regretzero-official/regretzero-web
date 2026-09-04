@@ -5,13 +5,10 @@ import Link from "next/link";
 import {
   Archive,
   ChartNoAxesCombined,
-  Clock3,
   HelpCircle,
   Info,
-  RefreshCw,
   Rocket,
   Swords,
-  TrendingDown,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -31,7 +28,6 @@ import { formatCrisisPeriodLabel } from "@/features/detail-chart/utils/buildDeta
 import { ControlledAppMenu } from "@/components/app-menu";
 import { NoProfitTimetableCard } from "@/components/home/no-profit-timetable-card";
 import {
-  HomeCompanySearch,
   type CompanyMarketFilter,
 } from "@/components/home/home-company-search";
 import { ProStartExplorerChart } from "@/components/home/pro-start-explorer-chart";
@@ -3476,193 +3472,95 @@ function MetricLabel({
 
 interface DesktopHomeDashboardProps {
   activeMenuIntent: string | null;
-  activePrimaryNavKey: PrimaryNavKey | null;
-  canContinueFromAssetSelection: boolean;
-  featuredRivalScenarios: HomeScenario[];
-  featuredSoloScenarios: HomeScenario[];
   goToAllAssets: () => void;
-  goToAmount: () => void;
+  goToCompare: () => void;
   goToHome: () => void;
-  goToExamples: () => void;
-  goToSavedRecords: () => void;
   isMenuOpen: boolean;
-  onAssetToggle: (assetId: ComparisonAssetId) => void;
-  onCompanyBrowserOpen: (payload: {
-    market: CompanyMarketFilter;
-    query: string;
-  }) => void;
-  onMoreMenuOpen: () => void;
   onMenuOpenChange: (open: boolean) => void;
-  onPresetBrowserOpen: () => void;
-  onRivalScenarioShuffle: () => void;
-  onScenarioStart: (scenario: HomeScenario) => void;
-  onSoloScenarioShuffle: () => void;
-  rivalScenarioShuffleKey: number;
-  selectedAssetIds: ComparisonAssetId[];
+  onPrimaryAssetSelect: (assetId: ComparisonAssetId) => void;
 }
 
 function DesktopHomeDashboard({
   activeMenuIntent,
-  activePrimaryNavKey,
-  canContinueFromAssetSelection,
-  featuredRivalScenarios,
-  featuredSoloScenarios,
   goToAllAssets,
-  goToAmount,
+  goToCompare,
   goToHome,
-  goToExamples,
-  goToSavedRecords,
   isMenuOpen,
-  onAssetToggle,
-  onCompanyBrowserOpen,
-  onMoreMenuOpen,
   onMenuOpenChange,
-  onPresetBrowserOpen,
-  onRivalScenarioShuffle,
-  onScenarioStart,
-  onSoloScenarioShuffle,
-  rivalScenarioShuffleKey,
-  selectedAssetIds,
+  onPrimaryAssetSelect,
 }: DesktopHomeDashboardProps) {
   return (
     <section className="hidden min-h-dvh px-6 py-5 lg:block xl:px-8 xl:py-6">
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <ControlledAppMenu
-            activeMenuIntent={activeMenuIntent}
-            isOpen={isMenuOpen}
-            onHomeClick={goToHome}
-            onOpenChange={onMenuOpenChange}
-            variant="light"
-          />
-          <button
-            className="text-lg font-semibold tracking-[-0.04em] text-[var(--rz-text-primary)]"
-            onClick={goToHome}
-            type="button"
-          >
-            Regretzero
-          </button>
-        </div>
-        <DesktopPrimaryNav
-          activeKey={activePrimaryNavKey}
-          canContinue={canContinueFromAssetSelection}
-          onAssets={goToAllAssets}
-          onCompare={goToExamples}
-          onContinue={goToAmount}
-          onMore={onMoreMenuOpen}
-          onSaved={goToSavedRecords}
+      <header className="mx-auto flex w-full max-w-3xl items-center gap-3">
+        <ControlledAppMenu
+          activeMenuIntent={activeMenuIntent}
+          isOpen={isMenuOpen}
+          onHomeClick={goToHome}
+          onOpenChange={onMenuOpenChange}
+          variant="light"
         />
+        <button
+          className="text-xl font-semibold tracking-[-0.04em] text-[var(--rz-text-primary)]"
+          onClick={goToHome}
+          type="button"
+        >
+          Regretzero
+        </button>
       </header>
 
-      <section className="mx-auto w-full max-w-6xl space-y-8 py-10">
-        <div className="grid items-start gap-10 xl:grid-cols-[0.82fr_1.18fr] xl:gap-14">
-          <div className="px-1 pt-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--rz-border)] bg-white/72 px-3 py-2 text-xs font-semibold text-[var(--rz-text-secondary)] shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-              <ChartNoAxesCombined aria-hidden="true" className="h-4 w-4 text-[var(--rz-accent)]" />
-              과거 데이터 시뮬레이션
-            </div>
-            <h1 className="mt-6 max-w-[560px] text-[3.65rem] font-semibold leading-[0.94] tracking-[-0.085em] text-[var(--rz-text-primary)] xl:text-[4.4rem]">
-              그 종목,
-              <br />
-              10년 전 샀다면.
-            </h1>
-            <p className="mt-6 max-w-[520px] text-lg leading-8 text-[var(--rz-text-secondary)]">
-              수익, 최대 하락, 회복 기간을 한 번에 봅니다.
-            </p>
-
-            <div className="mt-7 grid max-w-[520px] grid-cols-3 gap-2">
-              {[
-                { icon: ChartNoAxesCombined, label: "수익" },
-                { icon: TrendingDown, label: "최대 하락" },
-                { icon: Clock3, label: "회복 기간" },
-              ].map(({ icon: Icon, label }) => (
-                <div
-                  className="flex min-h-14 items-center gap-2 rounded-[18px] border border-[var(--rz-border)] bg-white/68 px-3 text-sm font-semibold text-[var(--rz-text-secondary)]"
-                  key={label}
-                >
-                  <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--rz-accent)]" />
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            <ComplianceNotice className="mt-6 max-w-[520px]" compact variant="light" />
-          </div>
-
-          <HomeCompanySearch
-            companies={MARKET_CAP_COMPANIES}
-            onContinue={goToAmount}
-            onOpenAll={onCompanyBrowserOpen}
-            onToggle={onAssetToggle}
-            selectedAssetIds={selectedAssetIds}
-            variant="light"
-          />
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-10 py-14">
+        <div className="px-1">
+          <p className="text-base font-semibold text-[var(--rz-accent)]">
+            {HOME_FLOW_COPY.heroEyebrow}
+          </p>
+          <h1 className="mt-5 max-w-[34rem] text-[3.1rem] font-semibold leading-[1.12] tracking-[-0.055em] text-[var(--rz-text-primary)] xl:text-[3.6rem]">
+            10년 전에 100만원을 넣었다면,
+            <br />
+            지금은?
+          </h1>
+          <p className="mt-5 max-w-[28rem] text-xl leading-8 text-[var(--rz-text-secondary)]">
+            그때 이걸 샀다면? 하나만 골라 보세요.
+          </p>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-2">
-          <div className="surface-card rounded-[30px] px-5 py-5">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]">
-                  <ChartNoAxesCombined aria-hidden="true" className="h-5 w-5" />
-                </div>
-                <div className="text-xl font-semibold tracking-[-0.05em] text-white">한 종목</div>
-              </div>
-              <button
-                aria-label="다른 종목 보기"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
-                onClick={onSoloScenarioShuffle}
-                type="button"
-              >
-                <RefreshCw aria-hidden="true" className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="mt-5">
-              <HomeScenarioGrid
-                onSelect={onScenarioStart}
-                scenarios={featuredSoloScenarios}
-                twoColumnOnWide
-              />
-            </div>
-          </div>
-
-          <div className="surface-card rounded-[30px] px-5 py-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]">
-                  <Swords aria-hidden="true" className="h-5 w-5" />
-                </div>
-                <div className="text-xl font-semibold tracking-[-0.05em] text-white">종목 비교</div>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  aria-label="다른 비교 보기"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
-                  onClick={onRivalScenarioShuffle}
-                  type="button"
-                >
-                  <RefreshCw aria-hidden="true" className="h-4 w-4" />
-                </button>
-                <button
-                  className="min-h-10 rounded-full border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-4 text-sm font-semibold text-[var(--rz-text-secondary)] transition hover:text-[var(--rz-text-primary)]"
-                  onClick={onPresetBrowserOpen}
-                  type="button"
-                >
-                  전체
-                </button>
-              </div>
-            </div>
-            <div
-              className="animate-[rz-map-fade_180ms_ease-out]"
-              key={`desktop-rivals-${rivalScenarioShuffleKey}`}
+        <div className="grid grid-cols-3 gap-4">
+          {BEGINNER_PRIMARY_ASSETS.map((asset) => (
+            <button
+              key={asset.id}
+              className="min-h-[112px] rounded-[24px] border border-[var(--rz-border)] bg-white/80 px-4 py-5 text-left shadow-[0_10px_28px_rgba(15,23,42,0.04)] transition hover:border-[var(--rz-border-strong)] hover:bg-white"
+              onClick={() => onPrimaryAssetSelect(asset.id)}
+              type="button"
             >
-              <HomeScenarioGrid
-                onSelect={onScenarioStart}
-                scenarios={featuredRivalScenarios}
-                twoColumnOnWide
-              />
-            </div>
-          </div>
+              <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                {asset.label}
+              </div>
+              <div className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
+                {asset.hint}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <button
+          className="btn-secondary min-h-14 w-full rounded-full px-6 text-base font-semibold text-[var(--rz-text-primary)]"
+          onClick={goToAllAssets}
+          type="button"
+        >
+          다른 것도 찾아보기
+        </button>
+
+        <div className="flex flex-col items-start gap-6 px-1">
+          <button
+            className="min-h-12 text-base font-medium text-[var(--rz-text-muted)] underline-offset-4 transition hover:text-[var(--rz-text-secondary)] hover:underline"
+            onClick={goToCompare}
+            type="button"
+          >
+            비교해보기
+          </button>
+          <p className="text-base leading-7 text-[var(--rz-text-muted)]">
+            지금이라도 감 잡기. 과거 숫자로만 봐요.
+          </p>
+          <ComplianceNotice className="max-w-[520px]" compact variant="light" />
         </div>
 
         <AdSlot
@@ -7245,26 +7143,12 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       {showDesktopHomeDashboard && !showAllAssets ? (
         <DesktopHomeDashboard
           activeMenuIntent={menuIntent}
-          activePrimaryNavKey={primaryNavActiveKey}
-          canContinueFromAssetSelection={canContinueFromAssetSelection}
-          featuredRivalScenarios={featuredRivalScenarios}
-          featuredSoloScenarios={featuredSoloScenarios}
-          goToAllAssets={goToCompareBuilder}
-          goToAmount={goToAmount}
+          goToAllAssets={goToAllAssets}
+          goToCompare={goToCompareBuilder}
           goToHome={goToHome}
-          goToExamples={goToSoloBuilder}
-          goToSavedRecords={goToSavedRecords}
           isMenuOpen={isMenuOpen}
-          onAssetToggle={handleAssetToggle}
-          onCompanyBrowserOpen={openHomeCompanyBrowser}
-          onMoreMenuOpen={openMoreMenu}
           onMenuOpenChange={setIsMenuOpen}
-          onPresetBrowserOpen={goToRecommendedComparisons}
-          onRivalScenarioShuffle={shuffleFeaturedRivalScenarios}
-          onScenarioStart={startHomeScenario}
-          onSoloScenarioShuffle={shuffleFeaturedSoloScenarios}
-          rivalScenarioShuffleKey={rivalScenarioShuffleKey}
-          selectedAssetIds={selectedAssetIds}
+          onPrimaryAssetSelect={handleSoloAssetSelect}
         />
       ) : null}
 
@@ -7325,76 +7209,63 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
         <div className="flex flex-1 flex-col">
           {flowStep === "intro" ? (
             <section className="flex flex-1 flex-col py-5 pb-8">
-              <div className="space-y-6">
+              <div className="space-y-7">
                 <div className="px-1 pt-3">
-                  <p className="text-sm font-semibold text-[var(--rz-accent)]">
+                  <p className="text-base font-semibold text-[var(--rz-accent)]">
                     {HOME_FLOW_COPY.heroEyebrow}
                   </p>
-                  <h1 className="mt-3 text-[2.35rem] font-semibold leading-[1.05] tracking-[-0.06em] text-[var(--rz-text-primary)]">
-                    10년 전에
+                  <h1 className="mt-4 text-[2.35rem] font-semibold leading-[1.15] tracking-[-0.045em] text-[var(--rz-text-primary)]">
+                    10년 전에 100만원을 넣었다면,
                     <br />
-                    100만원을 넣었다면…
+                    지금은?
                   </h1>
-                  <p className="mt-3 max-w-[22rem] text-base leading-7 text-[var(--rz-text-secondary)]">
-                    {HOME_FLOW_COPY.heroDescription}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
-                    복잡한 용어 없이, 고르고 달려보기만 하면 돼요.
+                  <p className="mt-4 text-lg leading-8 text-[var(--rz-text-secondary)]">
+                    그때 이걸 샀다면? 하나만 골라 보세요.
                   </p>
                 </div>
 
-                <div className="surface-card rounded-[28px] px-4 py-5">
-                  <div className="text-lg font-semibold tracking-[-0.04em] text-[var(--rz-text-primary)]">
-                    {HOME_FLOW_COPY.quickAssetTitle}
-                  </div>
-                  <p className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
-                    {HOME_FLOW_COPY.quickAssetDescription}
-                  </p>
-                  <div className="mt-4 grid grid-cols-2 gap-2.5">
-                    {BEGINNER_PRIMARY_ASSETS.map((asset) => (
-                      <button
-                        key={asset.id}
-                        className="min-h-[88px] rounded-[22px] border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-3.5 py-3.5 text-left transition hover:border-[var(--rz-border-strong)]"
-                        onClick={() => handleSoloAssetSelect(asset.id)}
-                        type="button"
-                      >
-                        <div className="text-base font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
-                          {asset.label}
-                        </div>
-                        <div className="mt-1 text-xs leading-5 text-[var(--rz-text-muted)]">
-                          {asset.hint}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    className="btn-secondary mt-4 min-h-12 w-full rounded-full px-5 text-sm font-semibold text-[var(--rz-text-primary)]"
-                    onClick={goToAllAssets}
-                    type="button"
-                  >
-                    다른 것도 찾아보기
-                  </button>
+                <div className="grid grid-cols-2 gap-3">
+                  {BEGINNER_PRIMARY_ASSETS.map((asset) => (
+                    <button
+                      key={asset.id}
+                      className="min-h-[104px] rounded-[24px] border border-[var(--rz-border)] bg-white/80 px-4 py-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-[var(--rz-border-strong)]"
+                      onClick={() => handleSoloAssetSelect(asset.id)}
+                      type="button"
+                    >
+                      <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                        {asset.label}
+                      </div>
+                      <div className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
+                        {asset.hint}
+                      </div>
+                    </button>
+                  ))}
                 </div>
 
-                <div className="rounded-[24px] border border-[var(--rz-border)] bg-[var(--rz-surface-card)] px-4 py-4">
-                  <div className="text-sm font-semibold text-[var(--rz-text-primary)]">두 개 비교가 궁금하다면</div>
-                  <p className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
-                    나중에 해도 괜찮아요. 먼저 하나만 달려봐도 충분합니다.
-                  </p>
-                  <button
-                    className="mt-3 min-h-11 rounded-full border border-[var(--rz-border)] px-4 text-sm font-semibold text-[var(--rz-accent)]"
-                    onClick={goToCompareBuilder}
-                    type="button"
-                  >
-                    비교해보기
-                  </button>
-                </div>
+                <button
+                  className="btn-secondary min-h-14 w-full rounded-full px-6 text-base font-semibold text-[var(--rz-text-primary)]"
+                  onClick={goToAllAssets}
+                  type="button"
+                >
+                  다른 것도 찾아보기
+                </button>
+
+                <button
+                  className="min-h-12 px-1 text-base font-medium text-[var(--rz-text-muted)] underline-offset-4 transition hover:text-[var(--rz-text-secondary)] hover:underline"
+                  onClick={goToCompareBuilder}
+                  type="button"
+                >
+                  비교해보기
+                </button>
+
+                <p className="px-1 text-base leading-7 text-[var(--rz-text-muted)]">
+                  지금이라도 감 잡기. 과거 숫자로만 봐요.
+                </p>
 
                 <ComplianceNotice compact variant="light" />
               </div>
             </section>
           ) : null}
-
           {flowStep === "solo" ? (
             <section className="flex flex-1 flex-col py-6 pb-10">
               {soloFlowStep === "pick" ? (
