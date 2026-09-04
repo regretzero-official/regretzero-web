@@ -533,12 +533,12 @@ const BEGINNER_PRIMARY_ASSETS: Array<{
   label: string;
   hint: string;
 }> = [
-  { id: "voo", label: "S&P500", hint: "미국 대표 500" },
-  { id: "005930", label: "삼성전자", hint: "한국 대표주" },
-  { id: "qqq", label: "QQQ", hint: "미국 기술 ETF" },
-  { id: "tsla", label: "테슬라", hint: "전기차·성장" },
-  { id: "gold", label: "금", hint: "안전자산" },
-  { id: "btc", label: "비트코인", hint: "디지털 자산" },
+  { id: "voo", label: "S&P500", hint: "미국을 대표하는 500개" },
+  { id: "005930", label: "삼성전자", hint: "한국에서 가장 익숙한 이름" },
+  { id: "qqq", label: "QQQ", hint: "기술 기업을 묶어 담은 ETF" },
+  { id: "tsla", label: "테슬라", hint: "많이 오르고, 많이 흔들리던" },
+  { id: "gold", label: "금", hint: "흔들릴 때 자주 떠올리는" },
+  { id: "btc", label: "비트코인", hint: "디지털 자산의 상징" },
 ];
 
 const SOLO_QUICK_ASSET_IDS: ComparisonAssetId[] = [
@@ -558,25 +558,25 @@ const SOLO_QUICK_ASSET_IDS: ComparisonAssetId[] = [
 
 const HOME_FLOW_COPY = {
   allAssetsHint: "이름이나 티커로 찾아보기",
-  amountDescription: "부담 없는 금액으로 시작해도 괜찮아요.",
-  amountTitle: "얼마를 넣었다고 볼까요?",
-  assetDescription: "궁금한 걸 하나만 골라도 충분해요.",
-  assetTitle: "무엇을 골라볼까요?",
-  beginnerDescription: "과거 숫자로, 그때 샀다면 어땠을지 같이 봐요.",
-  beginnerTitle: "처음이라면 여기부터",
+  amountDescription: "기본은 1억으로 볼게요.",
+  amountTitle: "얼마를 넣었다고 칠까요?",
+  assetDescription: "하나만 골라 보세요.",
+  assetTitle: "하나만 골라 보세요.",
+  beginnerDescription: "그때 이걸 사뒀다면, 지금은 얼마일까요.",
+  beginnerTitle: "10년 전, 1억이었다면.",
   emptySelection: "아직 고른 게 없어요.",
-  heroDescription: "10년 전에 100만원을 넣었다면, 지금은 얼마가 되었을까요?",
-  heroEyebrow: "그때 살걸",
-  heroTitle: "그때 살걸",
-  heroCta: "한번 볼까요?",
-  quickAssetDescription: "잘 알려진 것부터 눌러보세요.",
-  quickAssetTitle: "어디에 넣었다고 볼까요?",
-  raceDescription: "돈이 어떻게 달려왔는지 같이 봐요.",
-  raceTitle: "달려가는 동안",
-  recommendedDescription: "익숙한 것부터 감을 잡아보세요.",
-  recommendedTitle: "먼저 이걸로 볼까요?",
-  resultDescription: "숫자보다, 그 사이 지나온 시간이 더 중요해요.",
-  resultTitle: "그래서 지금은",
+  heroDescription: "그때 이걸 사뒀다면,\n지금은 얼마일까요.",
+  heroEyebrow: "Regretzero",
+  heroTitle: "10년 전, 1억이었다면.",
+  heroCta: "하나만 골라 보세요.",
+  quickAssetDescription: "하나만 골라 보세요.",
+  quickAssetTitle: "하나만 골라 보세요.",
+  raceDescription: "",
+  raceTitle: "달려보기",
+  recommendedDescription: "하나만 골라 보세요.",
+  recommendedTitle: "하나만 골라 보세요.",
+  resultDescription: "그때 사뒀다면.",
+  resultTitle: "그때 사뒀다면.",
 } as const;
 
 const MAIN_COMPARISON_ASSET_LIMIT = MIN_COMPARISON_ASSETS;
@@ -3506,67 +3506,56 @@ function DesktopHomeDashboard({
         </button>
       </header>
 
-      <section className="mx-auto flex w-full max-w-3xl flex-col gap-10 py-14">
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-12 py-16">
         <div className="px-1">
-          <p className="text-base font-semibold text-[var(--rz-accent)]">
-            {HOME_FLOW_COPY.heroEyebrow}
-          </p>
-          <h1 className="mt-5 max-w-[34rem] text-[3.1rem] font-semibold leading-[1.12] tracking-[-0.055em] text-[var(--rz-text-primary)] xl:text-[3.6rem]">
-            10년 전에 100만원을 넣었다면,
-            <br />
-            지금은?
+          <h1 className="max-w-[34rem] text-[2.8rem] font-semibold leading-[1.18] tracking-[-0.045em] text-[var(--rz-text-primary)] xl:text-[3.25rem]">
+            10년 전, 1억이었다면.
           </h1>
           <p className="mt-5 max-w-[28rem] text-xl leading-8 text-[var(--rz-text-secondary)]">
-            그때 이걸 샀다면? 하나만 골라 보세요.
+            그때 이걸 사뒀다면,
+            <br />
+            지금은 얼마일까요.
+          </p>
+          <p className="mt-8 text-base font-medium text-[var(--rz-text-primary)]">
+            하나만 골라 보세요.
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           {BEGINNER_PRIMARY_ASSETS.map((asset) => (
             <button
               key={asset.id}
-              className="min-h-[112px] rounded-[24px] border border-[var(--rz-border)] bg-white/80 px-4 py-5 text-left shadow-[0_10px_28px_rgba(15,23,42,0.04)] transition hover:border-[var(--rz-border-strong)] hover:bg-white"
+              className="min-h-[108px] rounded-[16px] border border-[var(--rz-border)] bg-white px-4 py-5 text-left transition hover:border-[var(--rz-accent)]"
               onClick={() => onPrimaryAssetSelect(asset.id)}
               type="button"
             >
               <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
                 {asset.label}
               </div>
-              <div className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
+              <div className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
                 {asset.hint}
               </div>
             </button>
           ))}
         </div>
 
-        <button
-          className="btn-secondary min-h-14 w-full rounded-full px-6 text-base font-semibold text-[var(--rz-text-primary)]"
-          onClick={goToAllAssets}
-          type="button"
-        >
-          다른 것도 찾아보기
-        </button>
-
-        <div className="flex flex-col items-start gap-6 px-1">
+        <div className="flex flex-col items-start gap-4 px-1">
           <button
-            className="min-h-12 text-base font-medium text-[var(--rz-text-muted)] underline-offset-4 transition hover:text-[var(--rz-text-secondary)] hover:underline"
+            className="text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 transition hover:text-[var(--rz-text-primary)] hover:underline"
+            onClick={goToAllAssets}
+            type="button"
+          >
+            다른 종목 찾기
+          </button>
+          <button
+            className="text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 transition hover:text-[var(--rz-text-primary)] hover:underline"
             onClick={goToCompare}
             type="button"
           >
-            비교해보기
+            두 개 비교하기
           </button>
-          <p className="text-base leading-7 text-[var(--rz-text-muted)]">
-            지금이라도 감 잡기. 과거 숫자로만 봐요.
-          </p>
-          <ComplianceNotice className="max-w-[520px]" compact variant="light" />
+          <ComplianceNotice className="mt-4 max-w-[520px]" compact variant="light" />
         </div>
-
-        <AdSlot
-          className="min-h-[90px]"
-          label="홈 광고"
-          placement="home-desktop-context"
-          slot={process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT}
-        />
       </section>
     </section>
   );
@@ -3692,6 +3681,11 @@ export function HomePage() {
   const [soloFlowStep, setSoloFlowStep] = useState<SoloFlowStep>("pick");
   const [soloAssetId, setSoloAssetId] = useState<ComparisonAssetId | null>(null);
   const [soloAmountInput, setSoloAmountInput] = useState(formatManUnitAmountInput(DEFAULT_AMOUNT));
+  const [soloCustomAmountOpen, setSoloCustomAmountOpen] = useState(false);
+  const [soloResultLayer, setSoloResultLayer] = useState<"l1" | "l2" | "l3">("l1");
+  const [soloRaceCaption, setSoloRaceCaption] = useState("");
+  const [soloDrawdownPaused, setSoloDrawdownPaused] = useState(false);
+  const soloDrawdownBeatDoneRef = useRef(false);
   const [soloHorizonMode, setSoloHorizonMode] = useState<SoloHorizonMode>("recent10y");
   const [soloInvestmentMode, setSoloInvestmentMode] = useState<InvestmentMode>("lump-sum");
   const [soloMarketBundle, setSoloMarketBundle] = useState<MarketBundle | null>(null);
@@ -4088,6 +4082,40 @@ export function HomePage() {
     }
 
     try {
+      if (soloInvestmentMode === "monthly") {
+        if (!supportsMonthlyContributionAsset(soloAssetId)) {
+          return {
+            error: "이 자산은 매달 넣기를 아직 지원하지 않아요.",
+            simulation: null as SingleAssetSimulationResult | null,
+          };
+        }
+        const monthlyContributionKrw = Math.max(10_000, Math.floor(soloAmountValue / 120));
+        const monthlyBuild = buildMonthlyContributionRaceData(
+          [soloAssetId],
+          soloMarketBundle,
+          monthlyContributionKrw,
+          soloRequestedDateRange.start,
+          soloRequestedDateRange.end,
+        );
+        const result = monthlyBuild.results[0];
+        if (!result) {
+          throw new Error("한 종목 결과를 계산하지 못했습니다.");
+        }
+        const simulation: SingleAssetSimulationResult = {
+          ...monthlyBuild,
+          assetId: soloAssetId,
+          principalKrw: soloAmountValue,
+          principalSeries: monthlyBuild.points.map((point) => ({
+            date: point.date,
+            index: point.index,
+            label: point.label,
+            value: monthlyContributionKrw,
+          })),
+          result,
+        };
+        return { error: "", simulation };
+      }
+
       return {
         error: "",
         simulation: buildSingleAssetSimulation(
@@ -4108,6 +4136,7 @@ export function HomePage() {
   }, [
     soloAmountValue,
     soloAssetId,
+    soloInvestmentMode,
     soloMarketBundle,
     soloRequestedDateRange.end,
     soloRequestedDateRange.start,
@@ -5499,6 +5528,35 @@ function clearTimers() {
     };
   }, [flowStep, raceDurationMs, soloFlowStep, soloRaceStatus, soloSimulation]);
 
+  useEffect(() => {
+    if (flowStep !== "solo" || soloFlowStep !== "race" || soloRaceStatus !== "complete") {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setSoloResultLayer("l1");
+      setSoloFlowStep("result");
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [flowStep, soloFlowStep, soloRaceStatus]);
+
+  useEffect(() => {
+    if (flowStep !== "solo" || soloFlowStep !== "race" || !soloCurrentPoint || !soloAssetId) {
+      return;
+    }
+    const year = Number(String(soloCurrentPoint.date).slice(0, 4));
+    const progress = soloProgressRef.current;
+    let caption = "";
+    if (progress > 0.12 && progress < 0.28) {
+      caption = "시장이 흔들리던 해";
+    } else if (progress > 0.45 && progress < 0.62) {
+      caption = "크게 내려앉았던 때";
+    } else if (progress > 0.88) {
+      caption = "그리고 지금";
+    }
+    setSoloRaceCaption(caption);
+    void year;
+  }, [flowStep, soloAssetId, soloCurrentPoint, soloFlowStep, soloVisibleCount]);
+
   function handleAssetToggle(assetId: ComparisonAssetId) {
   handleHomepageAssetToggle(assetId);
 }
@@ -5691,6 +5749,12 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setSoloAssetId(assetId);
     setSoloHorizonMode("recent10y");
     setSoloInvestmentMode("lump-sum");
+    setSoloCustomAmountOpen(false);
+    setSoloAmountInput(formatManUnitAmountInput(DEFAULT_AMOUNT));
+    setSoloResultLayer("l1");
+    setSoloRaceCaption("");
+    setSoloDrawdownPaused(false);
+    soloDrawdownBeatDoneRef.current = false;
     setSoloFlowStep("amount");
     setFlowStep("solo");
   }
@@ -5722,31 +5786,16 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
       return;
     }
 
-    // Monthly style reuses the proven compare race (asset + deposit).
-    if (soloInvestmentMode === "monthly") {
-      if (!supportsMonthlyContributionAsset(soloAssetId)) {
-        setAssetToast("이 자산은 매달 넣기 비교를 아직 지원하지 않아요.");
-        return;
-      }
-      resetRacePlayback();
-      resetSoloRacePlayback();
-      setSelectedAssetIds(normalizeMainComparisonSelection([soloAssetId, "deposit"]));
-      setInvestmentMode("monthly");
-      setMonthlyContributionMode("custom");
-      setActiveMonthlyContributionPreset(0);
-      setMonthlyContributionInput(formatManUnitAmountInput(soloAmountValue));
-      setIsCustomMonthlyContributionOpen(false);
-      setAmountMode("custom");
-      setActivePreset(0);
-      setAmountInput(formatManUnitAmountInput(soloAmountValue));
-      setFlowStep("race");
-      setRaceStatus("idle");
-      setVisibleCount(1);
-      setAssetToast("매달 조금씩 넣었다면으로 달려볼게요");
+    if (soloInvestmentMode === "monthly" && !supportsMonthlyContributionAsset(soloAssetId)) {
+      setAssetToast("이 자산은 매달 넣기를 아직 지원하지 않아요.");
       return;
     }
 
     resetSoloRacePlayback();
+    setSoloRaceCaption("");
+    setSoloDrawdownPaused(false);
+    soloDrawdownBeatDoneRef.current = false;
+    setSoloResultLayer("l1");
     setSoloFlowStep("race");
   }
 
@@ -5767,10 +5816,15 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     resetSoloRacePlayback();
     setSoloAssetId(null);
     setSoloAmountInput(formatManUnitAmountInput(DEFAULT_AMOUNT));
+    setSoloCustomAmountOpen(false);
+    setSoloResultLayer("l1");
+    setSoloRaceCaption("");
+    setSoloDrawdownPaused(false);
+    soloDrawdownBeatDoneRef.current = false;
     setSoloHorizonMode("recent10y");
     setSoloInvestmentMode("lump-sum");
     setSoloFlowStep("pick");
-    setFlowStep("solo");
+    setFlowStep("intro");
   }
 
   function compareFromSolo() {
@@ -6086,7 +6140,13 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
     setSoloFlowStep("pick");
     setSoloAssetId(null);
     setSoloHorizonMode("recent10y");
+    setSoloInvestmentMode("lump-sum");
     setSoloAmountInput(formatManUnitAmountInput(DEFAULT_AMOUNT));
+    setSoloCustomAmountOpen(false);
+    setSoloResultLayer("l1");
+    setSoloRaceCaption("");
+    setSoloDrawdownPaused(false);
+    soloDrawdownBeatDoneRef.current = false;
     setSoloLoadError("");
     setFlowStep("intro");
   }
@@ -7195,7 +7255,7 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
           )}
           <button
             aria-label="Regretzero 초기 화면으로 이동"
-            className="absolute left-1/2 -translate-x-1/2 rounded-full px-3 py-2 text-base font-semibold tracking-[-0.03em] text-white transition hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70"
+            className="absolute left-1/2 -translate-x-1/2 rounded-full px-3 py-2 text-base font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)] transition hover:bg-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rz-accent)]"
             onClick={goToHome}
             type="button"
           >
@@ -7206,19 +7266,19 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
         <div className="flex flex-1 flex-col">
           {flowStep === "intro" ? (
-            <section className="flex flex-1 flex-col py-5 pb-8">
-              <div className="space-y-7">
-                <div className="px-1 pt-3">
-                  <p className="text-base font-semibold text-[var(--rz-accent)]">
-                    {HOME_FLOW_COPY.heroEyebrow}
-                  </p>
-                  <h1 className="mt-4 text-[2.35rem] font-semibold leading-[1.15] tracking-[-0.045em] text-[var(--rz-text-primary)]">
-                    10년 전에 100만원을 넣었다면,
-                    <br />
-                    지금은?
+            <section className="flex flex-1 flex-col py-6 pb-10">
+              <div className="space-y-8">
+                <div className="px-1 pt-4">
+                  <h1 className="text-[2.15rem] font-semibold leading-[1.2] tracking-[-0.04em] text-[var(--rz-text-primary)]">
+                    10년 전, 1억이었다면.
                   </h1>
                   <p className="mt-4 text-lg leading-8 text-[var(--rz-text-secondary)]">
-                    그때 이걸 샀다면? 하나만 골라 보세요.
+                    그때 이걸 사뒀다면,
+                    <br />
+                    지금은 얼마일까요.
+                  </p>
+                  <p className="mt-7 text-base font-medium text-[var(--rz-text-primary)]">
+                    하나만 골라 보세요.
                   </p>
                 </div>
 
@@ -7226,39 +7286,36 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
                   {BEGINNER_PRIMARY_ASSETS.map((asset) => (
                     <button
                       key={asset.id}
-                      className="min-h-[104px] rounded-[24px] border border-[var(--rz-border)] bg-white/80 px-4 py-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-[var(--rz-border-strong)]"
+                      className="min-h-[100px] rounded-[14px] border border-[var(--rz-border)] bg-white px-4 py-4 text-left transition hover:border-[var(--rz-accent)]"
                       onClick={() => handleSoloAssetSelect(asset.id)}
                       type="button"
                     >
-                      <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                      <div className="text-[1.05rem] font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
                         {asset.label}
                       </div>
-                      <div className="mt-2 text-sm leading-6 text-[var(--rz-text-muted)]">
+                      <div className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
                         {asset.hint}
                       </div>
                     </button>
                   ))}
                 </div>
 
-                <button
-                  className="btn-secondary min-h-14 w-full rounded-full px-6 text-base font-semibold text-[var(--rz-text-primary)]"
-                  onClick={goToAllAssets}
-                  type="button"
-                >
-                  다른 것도 찾아보기
-                </button>
-
-                <button
-                  className="min-h-12 px-1 text-base font-medium text-[var(--rz-text-muted)] underline-offset-4 transition hover:text-[var(--rz-text-secondary)] hover:underline"
-                  onClick={goToCompareBuilder}
-                  type="button"
-                >
-                  비교해보기
-                </button>
-
-                <p className="px-1 text-base leading-7 text-[var(--rz-text-muted)]">
-                  지금이라도 감 잡기. 과거 숫자로만 봐요.
-                </p>
+                <div className="flex flex-col items-start gap-3 px-1">
+                  <button
+                    className="text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 transition hover:text-[var(--rz-text-primary)] hover:underline"
+                    onClick={goToAllAssets}
+                    type="button"
+                  >
+                    다른 종목 찾기
+                  </button>
+                  <button
+                    className="text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 transition hover:text-[var(--rz-text-primary)] hover:underline"
+                    onClick={goToCompareBuilder}
+                    type="button"
+                  >
+                    두 개 비교하기
+                  </button>
+                </div>
 
                 <ComplianceNotice compact variant="light" />
               </div>
@@ -7310,171 +7367,149 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
               {soloFlowStep === "amount" && soloAsset ? (
                 <>
-                  <StepHeader
-                    description="부담 없는 금액으로 시작해도 괜찮아요."
-                    onBack={goToHome}
-                    step={1}
-                    title="얼마를 넣었다고 볼까요?"
-                  />
-                  <div className="surface-card mt-7 rounded-[26px] p-4">
-                    <div className="rounded-[22px] border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-4 py-4">
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--rz-text-muted)]">
-                        선택한 자산
-                      </div>
-                      <div className="mt-2 text-xl font-semibold tracking-[-0.05em] text-[var(--rz-text-primary)]">
-                        {getHomeIntroSelectedLabel(soloAsset)}
-                      </div>
-                      <div className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
-                        {getHomeIntroSelectedDescription(soloAsset)}
-                      </div>
-                    </div>
+                  <div className="px-1 pt-6">
+                    <button
+                      className="text-sm text-[var(--rz-text-secondary)]"
+                      onClick={goToHome}
+                      type="button"
+                    >
+                      ← 뒤로
+                    </button>
+                    <h2 className="mt-8 text-[1.85rem] font-semibold leading-snug tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                      얼마를 넣었다고 칠까요?
+                    </h2>
+                  </div>
 
-                    <div className="mt-4 rounded-[22px] border border-[var(--rz-border)] bg-white/80 p-2 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
-                      <div className="px-2 pb-2 text-xs font-semibold text-[var(--rz-text-muted)]">
-                        어디까지 볼까요?
+                  <div className="mt-10 space-y-3">
+                    <button
+                      className={`min-h-[72px] w-full rounded-full border px-6 text-left transition ${
+                        !soloCustomAmountOpen && soloAmountValue === DEFAULT_AMOUNT
+                          ? "border-[var(--rz-accent)] bg-[var(--rz-accent-soft)]"
+                          : "border-[var(--rz-border)] bg-white"
+                      }`}
+                      onClick={() => {
+                        setSoloCustomAmountOpen(false);
+                        handleSoloAmountPresetClick(DEFAULT_AMOUNT);
+                      }}
+                      type="button"
+                    >
+                      <div className="text-xl font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                        1억
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          {
-                            body: "요즘 기준으로 지난 10년을 봐요.",
-                            id: "recent10y" as const,
-                            title: "최근 10년",
-                          },
-                          {
-                            body: "데이터가 있는 처음부터 끝까지 봐요.",
-                            id: "since-listing" as const,
-                            title: "처음부터",
-                          },
-                        ].map((option) => {
-                          const isActive = soloHorizonMode === option.id;
-
-                          return (
-                            <button
-                              className={`min-h-[86px] rounded-[18px] border-2 px-3 py-3 text-left transition ${
-                                isActive
-                                  ? "!border-slate-900 !bg-white !text-slate-950 shadow-[0_12px_28px_rgba(15,23,42,0.08)] ring-4 ring-slate-100"
-                                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-                              }`}
-                              key={option.id}
-                              onClick={() => {
-                                resetSoloRacePlayback();
-                                setSoloHorizonMode(option.id);
-                              }}
-                              type="button"
-                            >
-                              <span className="block text-sm font-extrabold tracking-[-0.03em]">
-                                {option.title}
-                              </span>
-                              <span className="mt-1 block text-xs font-medium leading-5 opacity-85">
-                                {option.body}
-                              </span>
-                            </button>
-                          );
-                        })}
+                      <div className="mt-1 text-sm text-[var(--rz-text-secondary)]">
+                        기본으로 볼게요
                       </div>
-                    </div>
+                    </button>
 
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      {amountPresets.map((preset) => (
-                        <button
-                          className={`min-h-12 rounded-[18px] border px-3 text-sm font-semibold tracking-[-0.03em] transition ${
-                            soloAmountValue === preset.value
-                              ? "border-[var(--rz-accent)] bg-[var(--rz-accent-soft)] text-[var(--rz-accent)]"
-                              : "border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] text-[var(--rz-text-primary)] hover:border-[var(--rz-border-strong)] hover:bg-[var(--rz-accent-soft)]"
-                          }`}
-                          key={`solo-preset-${preset.value}`}
-                          onClick={() => handleSoloAmountPresetClick(preset.value)}
-                          type="button"
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <label className="mt-4 block rounded-[22px] border border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)] px-4 py-3">
-                      <span className="text-xs font-medium text-[var(--rz-text-muted)]">직접 입력</span>
-                      <div className="mt-2 flex items-center gap-2">
-                        <input
-                          className="min-w-0 flex-1 bg-transparent text-2xl font-semibold tracking-[-0.05em] text-[var(--rz-text-primary)] outline-none placeholder:text-[var(--rz-text-subtle)]"
-                          inputMode="numeric"
-                          onChange={(event) => handleSoloAmountInputChange(event.target.value)}
-                          placeholder="1,000"
-                          value={soloAmountInput}
-                        />
-                        <span className="shrink-0 text-sm font-semibold text-[var(--rz-text-secondary)]">만원</span>
+                    <button
+                      className={`min-h-[56px] w-full rounded-[14px] border px-6 text-left transition ${
+                        soloCustomAmountOpen
+                          ? "border-[var(--rz-accent)] bg-white"
+                          : "border-[var(--rz-border)] bg-white"
+                      }`}
+                      onClick={() => setSoloCustomAmountOpen(true)}
+                      type="button"
+                    >
+                      <div className="text-base font-medium text-[var(--rz-text-primary)]">
+                        다른 금액
                       </div>
-                    </label>
+                    </button>
+
+                    {soloCustomAmountOpen ? (
+                      <label className="mt-2 block rounded-[14px] border border-[var(--rz-border)] bg-white px-4 py-3">
+                        <span className="text-xs text-[var(--rz-text-secondary)]">직접 입력</span>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            className="min-w-0 flex-1 bg-transparent text-2xl font-semibold tabular-nums tracking-[-0.04em] text-[var(--rz-text-primary)] outline-none"
+                            inputMode="numeric"
+                            onChange={(event) => handleSoloAmountInputChange(event.target.value)}
+                            placeholder="10,000"
+                            value={soloAmountInput}
+                          />
+                          <span className="shrink-0 text-sm font-medium text-[var(--rz-text-secondary)]">만원</span>
+                        </div>
+                      </label>
+                    ) : null}
 
                     {(soloLoadError || soloCalculationError) ? (
-                      <div className="mt-4 rounded-[18px] border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-100">
+                      <div className="rounded-[14px] border border-[var(--rz-drawdown)]/30 bg-[var(--rz-drawdown)]/5 px-4 py-3 text-sm leading-6 text-[var(--rz-drawdown)]">
                         {soloLoadError || soloCalculationError}
                       </div>
                     ) : null}
+                  </div>
 
+                  <div className="mt-auto pt-10">
                     <button
-                      className="btn-accent mt-5 min-h-13 w-full rounded-full px-5 text-sm font-semibold tracking-[-0.02em] transition disabled:cursor-wait disabled:bg-white/12 disabled:text-white/40"
+                      className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold transition disabled:opacity-40"
                       disabled={!soloAmountValue}
                       onClick={goToSoloStyle}
                       type="button"
                     >
-                      다음 · 어떻게 넣을까요?
+                      다음
                     </button>
                   </div>
                 </>
               ) : null}
 
-              
               {soloFlowStep === "style" && soloAsset ? (
                 <>
-                  <StepHeader
-                    description="같은 돈을 한 번에 넣을지, 나눠 넣을지만 고르면 돼요."
-                    onBack={() => setSoloFlowStep("amount")}
-                    step={2}
-                    title="어떻게 넣을까요?"
-                  />
-                  <div className="surface-card mt-7 rounded-[26px] p-4">
-                    <div className="grid gap-3">
-                      {([
-                        {
-                          description: "처음에 모두 넣었다고 봐요.",
-                          id: "lump-sum" as const,
-                          label: "한 번에",
-                        },
-                        {
-                          description: "매달 조금씩 넣었다고 봐요.",
-                          id: "monthly" as const,
-                          label: "매달 조금씩",
-                        },
-                      ]).map((mode) => {
-                        const isActive = soloInvestmentMode === mode.id;
-                        return (
-                          <button
-                            key={mode.id}
-                            aria-pressed={isActive}
-                            className={`min-h-[96px] rounded-[22px] border px-4 py-4 text-left transition ${
-                              isActive
-                                ? "border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)]"
-                                : "border-[var(--rz-border)] bg-[var(--rz-surface-card-elevated)]"
-                            }`}
-                            onClick={() => setSoloInvestmentMode(mode.id)}
-                            type="button"
-                          >
-                            <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
-                              {mode.label}
-                            </div>
-                            <div className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
-                              {mode.description}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                  <div className="px-1 pt-6">
                     <button
-                      className="btn-accent mt-5 min-h-13 w-full rounded-full px-5 text-sm font-semibold"
+                      className="text-sm text-[var(--rz-text-secondary)]"
+                      onClick={() => setSoloFlowStep("amount")}
+                      type="button"
+                    >
+                      ← 뒤로
+                    </button>
+                    <h2 className="mt-8 text-[1.85rem] font-semibold leading-snug tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                      어떻게 넣었을까요?
+                    </h2>
+                  </div>
+
+                  <div className="mt-10 grid gap-3">
+                    {([
+                      {
+                        description: "처음에 전부",
+                        id: "lump-sum" as const,
+                        label: "한 번에",
+                      },
+                      {
+                        description: "같은 금액을 나누어",
+                        id: "monthly" as const,
+                        label: "매달",
+                      },
+                    ]).map((mode) => {
+                      const isActive = soloInvestmentMode === mode.id;
+                      return (
+                        <button
+                          key={mode.id}
+                          aria-pressed={isActive}
+                          className={`min-h-[88px] rounded-[14px] border px-5 py-4 text-left transition ${
+                            isActive
+                              ? "border-[var(--rz-accent)] bg-[var(--rz-accent-soft)]"
+                              : "border-[var(--rz-border)] bg-white"
+                          }`}
+                          onClick={() => setSoloInvestmentMode(mode.id)}
+                          type="button"
+                        >
+                          <div className="text-lg font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                            {mode.label}
+                          </div>
+                          <div className="mt-1 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                            {mode.description}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-auto pt-10">
+                    <button
+                      className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold"
                       onClick={goToSoloConfirm}
                       type="button"
                     >
-                      다음 · 확인하기
+                      다음
                     </button>
                   </div>
                 </>
@@ -7482,52 +7517,46 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
               {soloFlowStep === "confirm" && soloAsset ? (
                 <>
-                  <StepHeader
-                    description="이 조건으로 달려볼게요."
-                    onBack={() => setSoloFlowStep("style")}
-                    step={3}
-                    title="이대로 볼까요?"
-                  />
-                  <div className="surface-card mt-7 rounded-[26px] p-5">
-                    <div className="space-y-3 text-sm leading-6 text-[var(--rz-text-secondary)]">
-                      <div className="flex items-center justify-between gap-3">
-                        <span>고른 것</span>
-                        <strong className="text-[var(--rz-text-primary)]">{getHomeIntroSelectedLabel(soloAsset)}</strong>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span>{soloInvestmentMode === "monthly" ? "매달 금액" : "넣은 금액"}</span>
-                        <strong className="text-[var(--rz-text-primary)]">{formattedSoloAmountValue}</strong>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span>넣는 방식</span>
-                        <strong className="text-[var(--rz-text-primary)]">
-                          {soloInvestmentMode === "monthly" ? "매달 조금씩" : "한 번에"}
-                        </strong>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span>기간</span>
-                        <strong className="text-[var(--rz-text-primary)]">{soloRequestedDateRange.label}</strong>
-                      </div>
-                    </div>
+                  <div className="px-1 pt-6">
+                    <button
+                      className="text-sm text-[var(--rz-text-secondary)]"
+                      onClick={() => setSoloFlowStep("style")}
+                      type="button"
+                    >
+                      ← 뒤로
+                    </button>
+                    <h2 className="mt-8 text-[1.85rem] font-semibold leading-snug tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                      이 조건으로 볼까요?
+                    </h2>
+                  </div>
+
+                  <div className="mt-10 rounded-[14px] border border-[var(--rz-border)] bg-white px-5 py-6">
+                    <p className="text-lg leading-8 text-[var(--rz-text-primary)]">
+                      <span className="font-semibold">{getHomeIntroSelectedLabel(soloAsset)}</span>
+                      <span className="text-[var(--rz-text-secondary)]"> · </span>
+                      <span className="font-semibold tabular-nums">{formattedSoloAmountValue}</span>
+                      <span className="text-[var(--rz-text-secondary)]"> · </span>
+                      <span className="font-semibold">10년</span>
+                      <span className="text-[var(--rz-text-secondary)]"> · </span>
+                      <span className="font-semibold">
+                        {soloInvestmentMode === "monthly" ? "매달" : "한 번에"}
+                      </span>
+                    </p>
                     {(soloLoadError || soloCalculationError) ? (
-                      <div className="mt-4 rounded-[18px] border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-100">
+                      <div className="mt-4 rounded-[12px] border border-[var(--rz-drawdown)]/30 bg-[var(--rz-drawdown)]/5 px-4 py-3 text-sm leading-6 text-[var(--rz-drawdown)]">
                         {soloLoadError || soloCalculationError}
                       </div>
                     ) : null}
+                  </div>
+
+                  <div className="mt-auto pt-10">
                     <button
-                      className="btn-accent mt-5 min-h-14 w-full rounded-full px-5 text-base font-semibold tracking-[-0.02em] transition disabled:cursor-wait disabled:opacity-50"
+                      className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold transition disabled:opacity-50"
                       disabled={isSoloMarketLoading || Boolean(soloLoadError || soloCalculationError)}
                       onClick={startBeginnerSoloRace}
                       type="button"
                     >
-                      {isSoloMarketLoading ? "데이터 준비 중..." : "▶ 달려보기"}
-                    </button>
-                    <button
-                      className="btn-secondary mt-3 min-h-12 w-full rounded-full px-5 text-sm font-semibold"
-                      onClick={() => setSoloFlowStep("amount")}
-                      type="button"
-                    >
-                      금액 다시 고르기
+                      {isSoloMarketLoading ? "준비하는 중..." : "달려보기"}
                     </button>
                   </div>
                 </>
@@ -7535,96 +7564,123 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
               {soloFlowStep === "race" ? (
                 <>
-                  <StepHeader
-                    description="돈이 어떻게 달려왔는지 같이 봐요."
-                    onBack={() => {
-                      resetSoloRacePlayback();
-                      setSoloFlowStep("confirm");
-                    }}
-                    step={4}
-                    title={
-                      soloAsset
-                        ? `${soloAsset.shortLabel ?? soloAsset.label} 달려보기`
-                        : "달려보기"
-                    }
-                  />
                   {soloAsset && soloSimulation ? (
-                    <div className="mt-7 space-y-4">
-                      <RaceChart
-                        assets={soloRaceAssets}
-                        basisLabel="시중 은행 정기예금 기준 (연 3.04% 복리 가정)"
-                        currentPoint={soloCurrentPoint}
-                        data={soloRaceVisibleData}
-                        fullData={soloRaceFullData}
-                        headerSubtitle={`${soloRequestedDateRange.label}로 시중 은행 정기예금 흐름과 비교합니다.`}
-                        headerTitle={`${formattedSoloAmountValue}으로 출발하면`}
-                        isLoading={isSoloMarketLoading || !soloSimulation || soloRaceStatus === "loading"}
-                        principalKrw={soloAmountValue}
-                      />
-
-                      <div className="surface-card rounded-[26px] p-4">
-                        <div className="grid grid-cols-2 gap-2">
-                          {soloRaceStatus === "complete" ? (
-                            <button
-                              className="btn-accent min-h-12 rounded-full px-5 text-sm font-semibold transition"
-                              onClick={goToSoloResult}
-                              type="button"
-                            >
-                              결과 한번 볼까요?
-                            </button>
-                          ) : (
-                            <button
-                              className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold text-[var(--rz-text-primary)] transition"
-                              onClick={soloRaceStatus === "racing" ? handlePauseSoloRace : handlePlaySoloRace}
-                              type="button"
-                            >
-                              {soloRaceStatus === "racing" ? "일시정지" : "재생"}
-                            </button>
+                    <div className="relative flex flex-1 flex-col pt-8">
+                      <div className="px-1">
+                        <div className="text-sm font-medium text-[var(--rz-text-secondary)]">
+                          {soloAsset.shortLabel ?? soloAsset.label}
+                        </div>
+                        <div className="mt-3 text-[2.6rem] font-semibold leading-none tracking-[-0.05em] tabular-nums text-[var(--rz-text-primary)]">
+                          {formatKrwExact(
+                            Number(
+                              (soloCurrentPoint as Record<string, number | string> | null)?.[
+                                soloAsset.id
+                              ] ?? soloAmountValue,
+                            ),
                           )}
-                          <button
-                            className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold text-[var(--rz-text-primary)] transition"
-                            onClick={handleRestartSoloRace}
-                            type="button"
-                          >
-                            다시 해보기
-                          </button>
                         </div>
-                        <div className="mt-3 flex items-center justify-between gap-3">
-                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/36">
-                            배속
-                          </div>
-                          <div className="grid flex-1 grid-cols-4 gap-1.5">
-                            {RACE_PLAYBACK_SPEED_OPTIONS.map((option) => {
-                              const isActive = option.id === raceSpeed;
+                        <div className="mt-6 text-[3.4rem] font-semibold leading-none tracking-[-0.06em] tabular-nums text-[var(--rz-text-primary)]/90">
+                          {String(soloCurrentPoint?.date ?? "").slice(0, 4) || "—"}
+                        </div>
+                        <div className="mt-4 min-h-[1.75rem] text-base text-[var(--rz-text-secondary)]">
+                          {soloRaceCaption}
+                        </div>
+                      </div>
 
-                              return (
-                                <button
-                                  key={`solo-speed-${option.id}`}
-                                  aria-pressed={isActive}
-                                  className={`min-h-9 rounded-full border px-2 text-xs font-semibold transition ${
-                                    isActive
-                                      ? "border-white/24 bg-white text-slate-950"
-                                      : "border-white/8 bg-white/[0.03] text-white/58 hover:bg-white/[0.06] hover:text-white/76"
-                                  }`}
-                                  onClick={() => handleChangeRaceSpeed(option.id)}
-                                  type="button"
-                                >
-                                  {option.label}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        <div className="mt-3 text-center text-xs leading-5 text-[var(--rz-text-muted)]">
-                          끝까지 보면, 차분히 결과를 정리해 드릴게요.
+                      <div className="relative mt-8 h-28 w-full overflow-hidden rounded-[14px] border border-[var(--rz-border)] bg-white">
+                        <svg
+                          className="h-full w-full"
+                          preserveAspectRatio="none"
+                          viewBox="0 0 100 40"
+                        >
+                          {(() => {
+                            const values = soloRaceVisibleData.map((point) =>
+                              Number((point as Record<string, number | string>)[soloAsset.id] ?? soloAmountValue),
+                            );
+                            if (values.length < 2) {
+                              return null;
+                            }
+                            const min = Math.min(...values);
+                            const max = Math.max(...values);
+                            const span = Math.max(max - min, 1);
+                            const points = values
+                              .map((value, index) => {
+                                const x = (index / (values.length - 1)) * 100;
+                                const y = 36 - ((value - min) / span) * 30;
+                                return `${x},${y}`;
+                              })
+                              .join(" ");
+                            const isDown =
+                              values[values.length - 1]! < values[0]!;
+                            return (
+                              <polyline
+                                fill="none"
+                                points={points}
+                                stroke={isDown ? "var(--rz-drawdown)" : "var(--rz-accent)"}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.4"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                            );
+                          })()}
+                          {soloInvestmentMode === "lump-sum" && soloRaceVisibleData.length > 1
+                            ? (() => {
+                                const depositValues = soloRaceVisibleData.map((point) =>
+                                  Number((point as Record<string, number | string>)[SOLO_PRINCIPAL_ASSET_ID] ?? soloAmountValue),
+                                );
+                                const assetValues = soloRaceVisibleData.map((point) =>
+                                  Number((point as Record<string, number | string>)[soloAsset.id] ?? soloAmountValue),
+                                );
+                                const all = [...assetValues, ...depositValues];
+                                const min = Math.min(...all);
+                                const max = Math.max(...all);
+                                const span = Math.max(max - min, 1);
+                                const points = depositValues
+                                  .map((value, index) => {
+                                    const x = (index / (depositValues.length - 1)) * 100;
+                                    const y = 36 - ((value - min) / span) * 30;
+                                    return `${x},${y}`;
+                                  })
+                                  .join(" ");
+                                return (
+                                  <polyline
+                                    fill="none"
+                                    points={points}
+                                    stroke="var(--rz-text-secondary)"
+                                    strokeDasharray="2 3"
+                                    strokeLinecap="round"
+                                    strokeWidth="1"
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                );
+                              })()
+                            : null}
+                        </svg>
+                      </div>
+
+                      <div className="mt-auto pb-6 pt-10">
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--rz-border)]">
+                          <div
+                            className="h-full rounded-full bg-[var(--rz-accent)] transition-[width] duration-75"
+                            style={{
+                              width: `${Math.min(
+                                100,
+                                Math.max(
+                                  2,
+                                  (soloVisibleCount / Math.max(soloRaceFullData.length, 1)) * 100,
+                                ),
+                              )}%`,
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="surface-card mt-7 rounded-[26px] p-5 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                    <div className="mt-16 text-base leading-7 text-[var(--rz-text-secondary)]">
                       {isSoloMarketLoading
-                        ? "레이스 데이터를 준비하고 있습니다."
-                        : soloLoadError || soloCalculationError || "레이스를 준비하지 못했습니다."}
+                        ? "잠시만요. 기록을 불러오고 있어요."
+                        : soloLoadError || soloCalculationError || "기록을 준비하지 못했어요."}
                     </div>
                   )}
                 </>
@@ -7632,325 +7688,229 @@ function handleHomepageAssetToggle(assetId: ComparisonAssetId) {
 
               {soloFlowStep === "result" ? (
                 <>
-                  <StepHeader
-                    description="예금에 넣었다면과 비교해서 봐요."
-                    onBack={() => {
-                      resetSoloRacePlayback();
-                      setSoloFlowStep("race");
-                    }}
-                    step={4}
-                    title={
-                      soloAsset
-                        ? `${soloAsset.shortLabel ?? soloAsset.label} · ${soloRequestedDateRange.label}`
-                        : "한 종목 결과"
-                    }
-                  />
-                  <ComplianceNotice className="mt-4" />
                   {soloAsset && soloSimulation && soloHoldingPainReport && soloResultMetrics ? (
-                    <div className="mt-7 space-y-5">
-                      <div className="surface-card rounded-[28px] px-4 py-4">
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-white/34">
-                          한 줄 결론
-                        </div>
-                        <div className="mt-2 text-[1.15rem] font-semibold leading-7 tracking-[-0.04em] text-white">
-                          {buildResultOneLineCopy({
-                            assetLabel: soloResultMetrics.displayLabel,
-                            finalValueLabel: formatKrwExact(soloResultMetrics.finalValue),
-                            isMonthlyInvestmentMode: false,
-                            maxDrawdownPct: soloResultMetrics.maxDrawdownPct,
-                            multiple: soloResultMetrics.multiple,
-                            recovered: soloHoldingPainReport.recovery.recovered,
-                            recoveryMonths: soloHoldingPainReport.recovery.recoveryMonths,
-                          })}
-                        </div>
-                        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/38">최종 금액</div>
-                            <div className="mt-2 font-semibold text-white">
+                    <div className="flex flex-1 flex-col pt-6">
+                      {soloResultLayer === "l1" ? (
+                        <>
+                          <div className="px-1">
+                            <div className="text-sm text-[var(--rz-text-secondary)]">
+                              {soloResultMetrics.displayLabel} · 10년
+                            </div>
+                            <div className="mt-6 text-base text-[var(--rz-text-secondary)]">
+                              <span className="tabular-nums">{formattedSoloAmountValue}</span>
+                              <span> → </span>
+                            </div>
+                            <div className="mt-2 text-[2.55rem] font-semibold leading-[1.1] tracking-[-0.05em] tabular-nums text-[var(--rz-text-primary)]">
                               {formatKrwExact(soloResultMetrics.finalValue)}
                             </div>
+                            <p className="mt-6 text-xl font-medium leading-8 text-[var(--rz-text-primary)]">
+                              그때 사뒀다면.
+                            </p>
+                            {soloInvestmentMode === "lump-sum" ? (
+                              <p className="mt-4 text-base leading-7 text-[var(--rz-text-secondary)]">
+                                통장에만 두었다면{" "}
+                                <span className="tabular-nums">
+                                  {formatKrwExact(
+                                    calculateSoloDepositBenchmarkValue(
+                                      soloAmountValue,
+                                      soloSimulation.resolvedStartDate,
+                                      soloSimulation.resolvedEndDate,
+                                    ),
+                                  )}
+                                </span>{" "}
+                                정도였을 거예요.
+                              </p>
+                            ) : (
+                              <p className="mt-4 text-base leading-7 text-[var(--rz-text-secondary)]">
+                                같은 돈을 매달 나누어 넣었다고 본 결과예요.
+                              </p>
+                            )}
                           </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/38">투입금 대비</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatMetricMultiple(soloResultMetrics.multiple)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="고점에서 저점까지 가장 크게 밀린 비율입니다. 수익률보다 버티기 난이도를 보여주는 값이에요.">
-                              최대 낙폭
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatMetricPercent(soloResultMetrics.maxDrawdownPct)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="크게 떨어진 뒤 이전 고점을 다시 넘기까지 걸린 시간입니다.">
-                              회복 기간
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">{soloRecoveryLabel}</div>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="surface-card rounded-[26px] px-4 py-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="text-xs uppercase tracking-[0.22em] text-[var(--rz-accent)]">
-                              선택 자산
-                            </div>
-                            <div className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white">
-                              {soloResultMetrics.displayLabel}
-                            </div>
+                          <div className="mt-10 space-y-3 px-1">
+                            <button
+                              className="block text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 hover:underline"
+                              onClick={() => setSoloResultLayer("l2")}
+                              type="button"
+                            >
+                              그사이 무슨 일이 있었는지 ›
+                            </button>
+                            <button
+                              className="block text-sm font-medium text-[var(--rz-text-secondary)] underline-offset-4 hover:underline"
+                              onClick={() => setSoloResultLayer("l3")}
+                              type="button"
+                            >
+                              숫자로 자세히 ›
+                            </button>
                           </div>
-                          <div className="h-2.5 w-2.5 rounded-full bg-[var(--rz-accent)]" />
-                        </div>
 
-                        {soloStartDateAdjustmentNotice ? (
-                          <div className="mt-4 rounded-[18px] border border-[var(--rz-border-strong)] bg-[var(--rz-accent-soft)] px-3 py-3 text-sm leading-6 text-[var(--rz-accent)]">
-                            {soloStartDateAdjustmentNotice}
+                          <div className="mt-auto space-y-3 pt-12">
+                            <button
+                              className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold"
+                              onClick={goToHome}
+                              type="button"
+                            >
+                              다른 종목도 볼게요
+                            </button>
+                            <p className="text-center text-xs text-[var(--rz-text-secondary)]">
+                              지금 시작해도 늦지 않아요.
+                            </p>
                           </div>
-                        ) : null}
-
-                        <div className="mt-5 text-[1.45rem] font-semibold tracking-[-0.05em] text-white">
-                          {formatKrwExact(soloResultMetrics.finalValue)}
-                        </div>
-
-                        <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">총 수익률</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatMetricPercent(soloResultMetrics.totalReturnPct)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">최종 배수</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatMetricMultiple(soloResultMetrics.multiple)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="처음 넣은 돈이 매년 같은 속도로 자랐다고 가정했을 때의 연평균 성장률입니다.">
-                              CAGR
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">
-                              {soloResultMetrics.annualizedReturnPct === null
-                                ? "-"
-                                : formatMetricPercent(soloResultMetrics.annualizedReturnPct)}
-                            </div>
-                            <div className="mt-1 text-[11px] leading-4 text-white/36">
-                              연복리 기준 연평균 성장률입니다.
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">실제 적용 시작일</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatDateLabel(soloResultMetrics.appliedStartDate)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">종료 날짜</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatDateLabel(soloResultMetrics.appliedEndDate)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">{soloResultMetrics.startPriceLabel}</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {soloResultMetrics.startPriceValue}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">{soloResultMetrics.endPriceLabel}</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {soloResultMetrics.endPriceValue}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">투입 금액</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatKrwExact(soloResultMetrics.investmentAmount)}
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">수익</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatKrwExact(soloResultMetrics.profitKrw)}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4">
-                          <button
-                            className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-sm text-white/72 transition hover:bg-white/[0.06]"
-                            onClick={() => toggleResultAssetInfo(soloAsset.id)}
-                            type="button"
-                          >
-                            {isSoloResultInfoOpen ? "자산 설명 닫기" : "자산 설명 보기"}
-                          </button>
-                        </div>
-                        {isSoloResultInfoOpen ? (
-                          <div className="mt-3 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3">
-                            <div className="grid gap-1.5 text-sm leading-6 text-white/56">
-                              {getResultInfoLines(soloAsset).slice(0, 3).map((line) => (
-                                <div key={`${soloAsset.id}-${line}`}>{line}</div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : null}
-
-                        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="고점에서 저점까지 가장 크게 밀린 비율입니다. 결과가 커 보여도 이 구간을 지나야 했습니다.">
-                              최대 낙폭
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">
-                              {formatMetricPercent(soloResultMetrics.maxDrawdownPct)}
-                            </div>
-                            <div className="mt-1 text-[11px] leading-4 text-white/36">
-                              시작 후 최고점에서 가장 크게 밀린 폭입니다.
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="직전 고점 대비 30% 이상 하락한 구간 수입니다.">
-                              고비 횟수
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">
-                              {Math.round(soloResultMetrics.hardshipCount)}회
-                            </div>
-                            <div className="mt-1 text-[11px] leading-4 text-white/36">
-                              직전 고점 대비 30% 이상 하락한 구간 수입니다.
-                            </div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <MetricLabel help="하락 후 이전 고점을 다시 넘어서기까지 기다린 시간입니다.">
-                              회복 기간
-                            </MetricLabel>
-                            <div className="mt-2 font-semibold text-white">{soloRecoveryLabel}</div>
-                          </div>
-                          <div className="rounded-[18px] border border-white/8 bg-white/[0.02] px-3 py-3">
-                            <div className="text-[11px] text-white/42">버티기 난이도</div>
-                            <div className="mt-2 font-semibold text-white">
-                              {soloHoldingPainReport.difficulty.label}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.02] px-4 py-3">
-                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
-                            가장 힘들었던 구간
-                          </div>
-                          <div className="mt-2 text-sm font-semibold text-white">
-                            {formatDateLabel(soloHoldingPainReport.worstMoment.date)} · 전고점 대비{" "}
-                            {formatMetricPercent(soloHoldingPainReport.worstMoment.drawdownPct)}
-                          </div>
-                          <div className="mt-2 text-sm leading-6 text-white/56">
-                            {soloHoldingPainReport.difficulty.explanation}
-                          </div>
-                        </div>
-
-                        {soloCrisisEntries.length > 0 ? (
-                          <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.02] px-4 py-3">
-                            <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
-                              주요 고비
-                            </div>
-                            <div className="mt-3 space-y-3">
-                              {soloCrisisEntries.map(({ crisis, index, label }) => (
-                                <div
-                                  key={`${soloAsset.id}-${crisis.startDate}-${crisis.troughDate}`}
-                                  className="rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-3"
-                                >
-                                  <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                      <div className="text-[11px] text-white/42">고비 {index + 1}</div>
-                                      <div className="mt-1 text-sm font-semibold text-white">{label}</div>
-                                      <div className="mt-1 text-xs leading-5 text-white/44">
-                                        최대 낙폭 {formatMetricPercent(crisis.maxDrawdownPct)}
-                                      </div>
-                                    </div>
-                                    {soloCanOpenDetailChart ? (
-                                      <button
-                                        className="btn-secondary min-h-10 rounded-full px-4 text-sm font-semibold transition"
-                                        onClick={() => openDetailChartForCrisis(soloAsset, label, crisis)}
-                                        type="button"
-                                      >
-                                        이 구간 자세히 보기
-                                      </button>
-                                    ) : null}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : null}
-
-                        {soloResultMetrics.currencyNote ? (
-                          <div className="mt-3 text-sm leading-6 text-white/46">
-                            {soloResultMetrics.currencyNote}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.02] px-4 py-3 text-sm leading-6 text-white/50">
-                        고비 횟수는 직전 고점 대비 30% 이상 하락한 구간 수입니다.
-                      </div>
-
-                      {soloNoProfitTimetable ? (
-                        <NoProfitTimetableCard
-                          formatKrw={formatKrwCompact}
-                          onShare={(activeTimetable) =>
-                            void handleShareSoloNoProfitTimetable(activeTimetable)
-                          }
-                          timetable={soloNoProfitTimetable}
-                        />
+                        </>
                       ) : null}
 
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        <button
-                          className="btn-accent min-h-12 rounded-full px-5 text-sm font-semibold transition sm:col-span-2"
-                          onClick={() => void handleShareSoloResult()}
-                          type="button"
-                        >
-                          결과 카드 공유
-                        </button>
-                        {soloInvestmentMode === "lump-sum" ? (
+                      {soloResultLayer === "l2" ? (
+                        <div className="flex flex-1 flex-col">
                           <button
-                            className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold transition"
-                            onClick={compareSoloWithMonthly}
+                            className="px-1 text-sm text-[var(--rz-text-secondary)]"
+                            onClick={() => setSoloResultLayer("l1")}
                             type="button"
                           >
-                            비교해보기 · 매달 조금씩
+                            ← 뒤로
                           </button>
-                        ) : null}
-                        <button
-                          className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold transition"
-                          onClick={compareFromSolo}
-                          type="button"
-                        >
-                          다른 것과 비교해보기
-                        </button>
-                        <button
-                          className="btn-secondary min-h-12 rounded-full px-5 text-sm font-semibold text-[var(--rz-accent)] transition"
-                          onClick={resetSoloFlow}
-                          type="button"
-                        >
-                          다시 해보기
-                        </button>
-                      </div>
-                      {shareFeedback ? (
-                        <div className="mt-3 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
-                          {shareFeedback}
+                          <h2 className="mt-6 px-1 text-[1.55rem] font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                            그사이 무슨 일이 있었는지
+                          </h2>
+                          <div className="mt-8 space-y-4">
+                            <div className="rounded-[14px] border border-[var(--rz-border)] bg-white px-5 py-5">
+                              <div className="text-sm font-medium text-[var(--rz-drawdown)]">
+                                가장 많이 빠졌을 때
+                              </div>
+                              <div className="mt-2 text-lg font-semibold tabular-nums text-[var(--rz-text-primary)]">
+                                {formatMetricPercent(soloResultMetrics.maxDrawdownPct)}
+                              </div>
+                              <p className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                                계좌가 가장 얇아 보이던 순간이에요.
+                              </p>
+                            </div>
+                            <div className="rounded-[14px] border border-[var(--rz-border)] bg-white px-5 py-5">
+                              <div className="text-sm font-medium text-[var(--rz-text-primary)]">
+                                다시 이전으로 오는 데
+                              </div>
+                              <div className="mt-2 text-lg font-semibold text-[var(--rz-text-primary)]">
+                                {soloRecoveryLabel}
+                              </div>
+                              <p className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                                고점을 다시 보기까지 걸린 시간이에요.
+                              </p>
+                            </div>
+                            <div className="rounded-[14px] border border-[var(--rz-border)] bg-white px-5 py-5">
+                              <div className="text-sm font-medium text-[var(--rz-text-primary)]">
+                                기다리는 구간이 길었던 때
+                              </div>
+                              <div className="mt-2 text-lg font-semibold text-[var(--rz-text-primary)]">
+                                {formatDateLabel(soloHoldingPainReport.worstMoment.date)}
+                              </div>
+                              <p className="mt-2 text-sm leading-6 text-[var(--rz-text-secondary)]">
+                                손에서 놓기 가장 쉬운 날들에 가까워요.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-auto pt-10">
+                            <button
+                              className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold"
+                              onClick={() => setSoloResultLayer("l1")}
+                              type="button"
+                            >
+                              결과로 돌아가기
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {soloResultLayer === "l3" ? (
+                        <div className="flex flex-1 flex-col">
+                          <button
+                            className="px-1 text-sm text-[var(--rz-text-secondary)]"
+                            onClick={() => setSoloResultLayer("l1")}
+                            type="button"
+                          >
+                            ← 뒤로
+                          </button>
+                          <h2 className="mt-6 px-1 text-[1.55rem] font-semibold tracking-[-0.03em] text-[var(--rz-text-primary)]">
+                            숫자로 자세히
+                          </h2>
+                          <div className="mt-8 overflow-hidden rounded-[14px] border border-[var(--rz-border)] bg-white">
+                            <table className="w-full text-left text-sm">
+                              <tbody>
+                                {[
+                                  ["시작", formatDateLabel(soloResultMetrics.appliedStartDate)],
+                                  ["끝", formatDateLabel(soloResultMetrics.appliedEndDate)],
+                                  ["넣은 금액", formatKrwExact(soloResultMetrics.investmentAmount)],
+                                  ["최종", formatKrwExact(soloResultMetrics.finalValue)],
+                                  ["배수", formatMetricMultiple(soloResultMetrics.multiple)],
+                                  ["최대 낙폭", formatMetricPercent(soloResultMetrics.maxDrawdownPct)],
+                                  ["회복", soloRecoveryLabel],
+                                  [
+                                    "연평균",
+                                    soloResultMetrics.annualizedReturnPct === null
+                                      ? "-"
+                                      : formatMetricPercent(soloResultMetrics.annualizedReturnPct),
+                                  ],
+                                ].map(([label, value]) => (
+                                  <tr key={String(label)} className="border-b border-[var(--rz-border)] last:border-b-0">
+                                    <th className="px-4 py-3 font-medium text-[var(--rz-text-secondary)]">
+                                      {label}
+                                    </th>
+                                    <td className="px-4 py-3 text-right tabular-nums font-semibold text-[var(--rz-text-primary)]">
+                                      {value}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <div className="relative mt-5 h-24 w-full overflow-hidden rounded-[14px] border border-[var(--rz-border)] bg-white">
+                            <svg className="h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 40">
+                              {(() => {
+                                const values = soloRaceFullData.map((point) =>
+                                  Number((point as Record<string, number | string>)[soloAsset.id] ?? soloAmountValue),
+                                );
+                                if (values.length < 2) return null;
+                                const min = Math.min(...values);
+                                const max = Math.max(...values);
+                                const span = Math.max(max - min, 1);
+                                const points = values
+                                  .map((value, index) => {
+                                    const x = (index / (values.length - 1)) * 100;
+                                    const y = 36 - ((value - min) / span) * 30;
+                                    return `${x},${y}`;
+                                  })
+                                  .join(" ");
+                                return (
+                                  <polyline
+                                    fill="none"
+                                    points={points}
+                                    stroke="var(--rz-accent)"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="1.2"
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                );
+                              })()}
+                            </svg>
+                          </div>
+                          <p className="mt-4 px-1 text-xs leading-5 text-[var(--rz-text-secondary)]">
+                            과거 시세 기준 · 배당·세금·수수료는 단순화했어요. 미래 수익을 약속하지 않아요.
+                          </p>
+                          <div className="mt-auto pt-10">
+                            <button
+                              className="btn-accent min-h-14 w-full rounded-full px-5 text-base font-semibold"
+                              onClick={() => setSoloResultLayer("l1")}
+                              type="button"
+                            >
+                              결과로 돌아가기
+                            </button>
+                          </div>
                         </div>
                       ) : null}
                     </div>
                   ) : (
-                    <div className="surface-card mt-7 rounded-[26px] p-5 text-sm leading-6 text-white/58">
+                    <div className="mt-16 text-base leading-7 text-[var(--rz-text-secondary)]">
                       {isSoloMarketLoading
-                        ? "데이터를 준비하고 있습니다."
-                        : soloLoadError || soloCalculationError || "결과를 준비하지 못했습니다."}
+                        ? "결과를 정리하고 있어요."
+                        : soloLoadError || soloCalculationError || "결과를 준비하지 못했어요."}
                     </div>
                   )}
                 </>
