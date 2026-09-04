@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -83,7 +83,6 @@ import {
   type SingleAssetSimulationResult,
 } from "@/lib/race-engine";
 import type { HistoricalSeriesResponse, MarketDataTicker } from "@/lib/market-data";
-import { MARKET_CAP_COMPANIES } from "@/lib/market-cap-universe";
 import {
   buildResultShareText,
   buildResultShareUrl,
