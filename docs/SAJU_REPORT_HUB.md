@@ -13,6 +13,7 @@ Core female-guide line: **여자의 마음은 여자가 잘 알지.**
 | `/saju/breakup` | 이별 결정 | 차유리 |
 | `/saju/strategy` | 재회 행동 전략 | 한보라 |
 | `/saju/faq` | 공통 FAQ | — |
+| `/saju/my` | 내 사주 (저장된 리포트) | — |
 
 Hub cards link to these landings first. Sticky CTA on a landing deep-links into the hub form via `/saju?product=<id>` (e.g. `reunion-luck`).
 
@@ -23,8 +24,9 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 1. Hub: 2-col product cards, character portraits, **예시 후기(데모)**, sticky CTA
 2. Birth / concern form
 3. Free blurred preview
-4. Demo unlock **₩9,900** → full long Korean report (`localStorage`: `rz-saju-report-demo-unlock`)
-5. Secondary: `/saju/chat` — 캐릭터와 대화(베타)
+4. Checkout sheet (요약 → 카드/카카오페이/토스 UI → 확인) · “테스트 결제(실제 청구 없음)” 1회 · unlock **₩9,900** → full report (`rz-saju-report-demo-unlock` + `rz-saju-my-readings`)
+5. Bottom nav on `/saju*`: 홈 · 상품 · 내 사주 · FAQ · 문의
+6. Secondary: `/saju/chat` — 캐릭터와 대화(베타)
 
 ## Products (MVP)
 

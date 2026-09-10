@@ -48,3 +48,28 @@ describe("buildTemplateReport depth", () => {
     expect(buildTemplateReport("reunion-strategy", form).characterName).toBe("한보라");
   });
 });
+
+describe("character voice distinctness", () => {
+  it("baek-ryeon vs cha-yuri openers feel different", () => {
+    const baek = buildTemplateReport("reunion-luck", form);
+    const cha = buildTemplateReport("breakup-decision", form);
+    const baekBody = baek.sections.map((s) => s.body).join("\n");
+    const chaBody = cha.sections.map((s) => s.body).join("\n");
+    expect(baekBody).toMatch(/기운이 보여|氣/);
+    expect(chaBody).toMatch(/퍼줘|아껴도 돼|팩트/);
+    expect(baekBody.slice(0, 400)).not.toEqual(chaBody.slice(0, 400));
+    expect(baek.sections.find((s) => s.id === "cover")?.body).toContain("백련");
+    expect(cha.sections.find((s) => s.id === "cover")?.body).toContain("차유리");
+  });
+
+  it("seo-nari vs han-bora openers feel different", () => {
+    const seo = buildTemplateReport("partner-heart", form);
+    const bora = buildTemplateReport("reunion-strategy", form);
+    const seoOpen = seo.sections.find((s) => s.id === "cover")!.body;
+    const boraOpen = bora.sections.find((s) => s.id === "cover")!.body;
+    expect(seoOpen).toMatch(/느낌이 왔어|언니/);
+    expect(boraOpen).toMatch(/헐|네 마음부터/);
+    expect(seoOpen.slice(0, 280)).not.toEqual(boraOpen.slice(0, 280));
+  });
+});
+

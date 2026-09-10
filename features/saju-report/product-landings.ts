@@ -25,7 +25,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/reunion",
     heroHook: "그 사람, 아직 나에게 마음이 남아 있을까?",
     heroSub:
-      "헤어진 뒤에도 밤에 생각날 때. 무당 백련이 기운으로 재회 가능성과 타이밍을 길게 읽어드려요.",
+      "헤어진 뒤에도 밤에 생각날 때. 무당 백련이 기운으로 재회 가능성과 타이밍을 길게 짚어줘요.",
     whoFor: [
       "연락이 끊긴 전 연인에게 아직 마음이 남은 사람",
       "재회할 수 있는지, 상대 속마음과 함께 보고 싶은 사람",
@@ -33,7 +33,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
       "다시 이어진다면 같은 실수를 반복하고 싶지 않은 사람",
     ],
     deliverables: [
-      "한 줄 결론 — 지금 흐름을 짧게 짚어드려요",
+      "한 줄 결론 — 지금 흐름을 짧게",
       "연애 기질 · 인연의 결",
       "재회 타임라인 (언제쯤 흔들릴지)",
       "연락 가이드 · 재접근 전략",
@@ -47,7 +47,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     faq: [
       {
         q: "진짜 예언인가요?",
-        a: "아니요. 재미·위로용 엔터테인먼트예요. 실제 만세력·점술·상담을 대신하지 않아요.",
+        a: "아니요. 재미·위로용이에요. 실제 만세력·점술·상담을 대신하지 않아요.",
       },
       {
         q: "무료로 어디까지 보나요?",
@@ -67,7 +67,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/heart",
     heroHook: "연락 없는 그 사람, 속마음은 뭘까요?",
     heroSub:
-      "읽씹·잠수·애매한 거리. 점쟁이 서나리가 여자의 시선으로 남은 마음과 거리감의 이유를 짚어드려요.",
+      "읽씹·잠수·애매한 거리. 점쟁이 서나리가 직감으로 남은 마음과 거리감의 이유를 짚어줘요.",
     whoFor: [
       "상대가 나를 어떻게 생각하는지 답답한 사람",
       "표면 태도와 속마음이 달라 보여 혼란스러운 사람",
@@ -93,7 +93,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
       },
       {
         q: "실제 속마음을 보장하나요?",
-        a: "아니요. 사주 프레이밍의 위로·통찰용 콘텐츠예요. 확정 예언이 아니에요.",
+        a: "아니요. 위로·통찰용 콘텐츠예요. 확정 예언이 아니에요.",
       },
       {
         q: "결제는 어떻게 되나요?",
@@ -109,7 +109,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/breakup",
     heroHook: "이 사람, 붙잡아야 할까 끝내야 할까?",
     heroSub:
-      "마음만 흔들릴 때. 깍쟁이 차유리가 팩트로, 후회 덜한 쪽을 정리해드려요.",
+      "마음만 흔들릴 때. 깍쟁이 차유리가 팩트로, 후회 덜한 쪽을 짚어줘요.",
     whoFor: [
       "헤어질지 말지 몇 달째 같은 생각만 반복하는 사람",
       "남겨둘 이유와 놓을 이유가 한꺼번에 떠오르는 사람",
@@ -131,7 +131,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     faq: [
       {
         q: "이별을 강요하나요?",
-        a: "한쪽을 강요하지 않아요. 체크리스트로 스스로 고르기 쉽게 정리해드려요.",
+        a: "한쪽을 강요하지 않아요. 체크리스트로 스스로 고르기 쉽게 도와드려요.",
       },
       {
         q: "상담·치료를 대신하나요?",
@@ -149,9 +149,9 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     slug: "strategy",
     productId: "reunion-strategy",
     path: "/saju/strategy",
-    heroHook: "지금 연락해도 될까? 첫 문장부터 알려드려요.",
+    heroHook: "지금 연락해도 될까? 첫 문장부터 같이 골라봐요.",
     heroSub:
-      "마음만 앞서갈 때. 아이돌 한보라가 공감 먼저, 재접근 타이밍·해도 되는 말까지 짚어드려요.",
+      "마음만 앞서갈 때. 아이돌 한보라가 공감 먼저, 재접근 타이밍·해도 되는 말까지 짚어줘요.",
     whoFor: [
       "재회하고 싶은데 첫 톡이 막히는 사람",
       "연락했다가 더 멀어질까 봐 두려운 사람",

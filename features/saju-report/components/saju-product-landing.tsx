@@ -10,6 +10,7 @@ import {
 } from "@/features/saju-report/product-landings";
 import { getSajuProduct } from "@/features/saju-report/products";
 
+import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
 import { SajuEntryGate, SajuEntryReplayLink } from "./saju-entry-overlay";
 import {
   DemoReviewCard,
@@ -50,7 +51,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
           </Link>
         </header>
 
-        <main className="flex-1 space-y-10 pb-32">
+        <main className={`flex-1 space-y-10 ${SAJU_BOTTOM_NAV_PAD}`}>
           {/* 1. Hero */}
           <section className="px-5 pt-5">
             <div className="overflow-hidden rounded-[24px] border border-white/10">
@@ -144,8 +145,8 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
               <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
                 미리보기 구성
               </h2>
-              <span className="text-[11px] font-semibold text-[#FF7A99]">
-                약 {product.sections.length}개 섹션 · 긴 해석
+              <span className="rounded-full border border-[#E8336D]/40 bg-[#E8336D]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#FF7A99]">
+                미리보기 {landing.previewUnlockedCount}/{product.sections.length}
               </span>
             </div>
             <p className="mt-1 text-xs leading-5 text-[#9A9098]">
@@ -261,15 +262,15 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
           </section>
         </main>
 
-        {/* 5. Sticky CTA */}
-        <div className="saju-footer fixed bottom-0 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3">
+        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
           <Link
             href={startHref}
-            className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
+            className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
           >
             {landing.ctaLabel}
           </Link>
         </div>
+        <SajuBottomNav />
       </div>
     </div>
   );
