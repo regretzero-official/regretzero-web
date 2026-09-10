@@ -73,7 +73,7 @@ function ProductCard({
       <div className="flex flex-1 flex-col gap-2.5 p-3.5">
         <p className="line-clamp-3 text-[12px] leading-5 text-[#B8AEB4]">{product.painPoint}</p>
         <span className="saju-cta mt-auto inline-flex min-h-10 items-center justify-center rounded-full px-3 text-xs font-semibold">
-          {product.priceLabel} · 리포트 받기
+          무료로 시작하기
         </span>
       </div>
     </button>
@@ -90,32 +90,37 @@ function HubLanding({
   return (
     <div className="space-y-10 pb-28">
       <section className="px-5 pt-6">
-        <p className="text-[0.68rem] font-bold uppercase tracking-[0.34em] text-[#FF7A99]">
-          NIGHT SAJU REPORT
+        <p className="text-[0.75rem] font-semibold tracking-[0.08em] text-[#FF7A99]">
+          재회 · 속마음 · 이별
         </p>
-        <h1 className="mt-3 text-[1.85rem] font-black leading-[1.15] tracking-[-0.06em] text-[#F8F4F6]">
-          밤에 흔들리는 마음,
+        <h1 className="mt-3 text-[1.85rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
+          그 사람,
           <br />
-          <span className="text-[#FF7A99]">긴 사주 리포트</span>로 정리하세요
+          아직 나에게
+          <br />
+          <span className="text-[#FF7A99]">마음이 남아 있을까?</span>
         </h1>
         <p className="mt-3 text-sm leading-6 text-[#9A9098]">
-          재회운 · 속마음 · 이별 결정 · 행동 전략. 도령 캐릭터가 쓰는 프리미엄 톤의 긴 해석.
-          엔터테인먼트용이며 실제 예언이 아닙니다.
+          헤어진 뒤에도 밤에 생각날 때.
+          도령이 사주 흐름으로 재회운과 속마음을 길게 풀어드려요.
+        </p>
+        <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
+          재미·위로용 콘텐츠예요. 실제 예언이나 상담을 대신하지 않아요.
         </p>
         <button
           type="button"
           onClick={onScrollProducts}
           className="saju-cta mt-5 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold"
         >
-          리포트 상품 보기
+          무료로 시작하기
         </button>
       </section>
 
       <section id="saju-products" className="px-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">리포트 상품</h2>
-            <p className="mt-1 text-xs text-[#9A9098]">통증 카피 + 도령 비주얼 · MVP 4종</p>
+            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">어떤 사주가 필요하세요?</h2>
+            <p className="mt-1 text-xs text-[#9A9098]">지금 마음에 가장 가까운 걸 골라보세요</p>
           </div>
           <span className="saju-pill rounded-full px-2.5 py-1 text-[10px] font-semibold">
             데모 ₩9,900
@@ -133,8 +138,8 @@ function HubLanding({
       </section>
 
       <section className="px-5">
-        <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">도령을 만나보세요</h2>
-        <p className="mt-1 text-xs text-[#9A9098]">우리 캐릭터 초상 · 이도령 · 한시우 · 강세온</p>
+        <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 도령</h2>
+        <p className="mt-1 text-xs text-[#9A9098]">누가 읽어주길 원하는지에 따라 결이 달라요</p>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
           {SAJU_CHARACTERS.map((c) => (
             <div
@@ -662,10 +667,10 @@ export function SajuHubApp() {
     <div className="saju-shell">
       <div className="saju-app mx-auto flex min-h-dvh w-full max-w-[480px] flex-col border-x border-white/5 shadow-[0_0_80px_rgba(0,0,0,0.55)]">
         <header className="saju-header sticky top-0 z-40 flex items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className="text-xs font-bold tracking-[0.2em] text-[#9A9098]">
-            REGRETZERO
+          <Link href="/" className="text-xs font-semibold text-[#9A9098]">
+            돌아가기
           </Link>
-          <div className="text-sm font-bold tracking-[-0.03em] text-[#F4F0F2]">사주 리포트</div>
+          <div className="text-sm font-bold tracking-[-0.03em] text-[#F4F0F2]">밤의 사주</div>
           <Link
             href="/saju/chat"
             className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
@@ -715,7 +720,7 @@ export function SajuHubApp() {
           <div className="saju-footer fixed bottom-0 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3">
             <div className="mb-2 flex justify-center">
               <span className="rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold text-[#FF7A99] backdrop-blur">
-                예시 · 오늘밤 128명이 미리보기 생성 (데모)
+                예시 · 지금 보는 중
               </span>
             </div>
             <button
@@ -723,7 +728,7 @@ export function SajuHubApp() {
               onClick={scrollProducts}
               className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
             >
-              사주 리포트 시작하기
+              재회운 무료로 보기
             </button>
           </div>
         ) : null}
