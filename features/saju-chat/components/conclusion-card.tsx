@@ -1,5 +1,6 @@
+import Image from "next/image";
+
 import type { SajuCharacter, SajuConclusion } from "@/features/saju-chat/types";
-import { CharacterAvatar } from "./character-avatar";
 
 export function ConclusionCard({
   character,
@@ -19,23 +20,47 @@ export function ConclusionCard({
   ];
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+12px)]">
-      <div className="flex items-center gap-3">
-        <CharacterAvatar character={character} size="sm" />
-        <div>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[460px] flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-[calc(env(safe-area-inset-top)+12px)]">
+      <div className="relative mb-5 overflow-hidden rounded-[24px] border border-white/10">
+        <div className="relative h-28 w-full">
+          <Image
+            alt=""
+            className="object-cover object-top"
+            fill
+            sizes="460px"
+            src={character.portraitSrc}
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-[#08090d]/50 to-transparent" />
+        </div>
+        <div className="relative -mt-8 flex items-end gap-3 px-4 pb-4">
           <div
-            className="text-[11px] font-semibold uppercase tracking-[0.18em]"
-            style={{ color: character.accent }}
+            className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[#12151C]"
+            style={{ boxShadow: `0 0 0 2px ${character.accent}66` }}
           >
-            결정적 결론
+            <Image
+              alt={character.name}
+              className="object-cover object-top"
+              fill
+              sizes="56px"
+              src={character.portraitSrc}
+            />
           </div>
-          <h1 className="text-lg font-bold tracking-[-0.03em] text-[#F4F0F2]">
-            {character.name}의 통찰
-          </h1>
+          <div className="min-w-0 pb-0.5">
+            <div
+              className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+              style={{ color: character.accent }}
+            >
+              결정적 결론
+            </div>
+            <h1 className="text-lg font-bold tracking-[-0.03em] text-[#F4F0F2]">
+              {character.name}의 통찰
+            </h1>
+          </div>
         </div>
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="space-y-3">
         {sections.map((section) => (
           <section key={section.label} className="saju-card rounded-[22px] px-4 py-4">
             <div className="text-xs font-semibold" style={{ color: character.accent }}>

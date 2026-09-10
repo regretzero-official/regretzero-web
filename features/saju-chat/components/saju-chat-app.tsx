@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { SAJU_CHARACTERS, getSajuCharacter } from "@/features/saju-chat/characters";
 import { buildConclusionFallback } from "@/features/saju-chat/fallback";
@@ -60,52 +60,110 @@ function PortraitHeroCard({
   character,
   onSelect,
   variant = "carousel",
+  featured = false,
 }: {
   character: SajuCharacter;
   onSelect: () => void;
   variant?: "carousel" | "select";
+  featured?: boolean;
 }) {
   const isSelect = variant === "select";
+  const isFeatured = isSelect && featured;
 
   return (
     <button
       className={`saju-portrait-card group relative shrink-0 overflow-hidden text-left transition active:scale-[0.985] ${
         isSelect
-          ? "aspect-[3/4] w-full rounded-[22px]"
-          : "aspect-[3/4] w-[72%] max-w-[280px] rounded-[24px]"
+          ? isFeatured
+            ? "aspect-[4/5] w-full snap-start rounded-[26px]"
+            : "aspect-[3/4] w-full snap-start rounded-[22px]"
+          : "saju-carousel-card aspect-[3/4] snap-start rounded-[26px]"
       }`}
       onClick={onSelect}
-      style={{ boxShadow: `0 18px 48px ${character.accent}22` }}
+      style={{
+        boxShadow: `0 22px 56px rgba(0,0,0,0.55), 0 12px 36px ${character.accent}28`,
+      }}
       type="button"
     >
       <Image
         alt={character.name}
-        className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+        className="object-cover object-top transition duration-700 ease-out group-hover:scale-[1.04]"
         fill
-        sizes={isSelect ? "(max-width:480px) 45vw, 200px" : "(max-width:480px) 72vw, 280px"}
+        sizes={
+          isSelect
+            ? isFeatured
+              ? "(max-width:480px) 92vw, 440px"
+              : "(max-width:480px) 45vw, 210px"
+            : "(max-width:480px) 78vw, 320px"
+        }
         src={character.portraitSrc}
-        priority={!isSelect}
+        priority={!isSelect || isFeatured}
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-4">
-        <div className="text-lg font-bold tracking-[-0.03em] text-[#F4F0F2] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]">
+
+      {/* cinematic overlays */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent opacity-95" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(0,0,0,0.55)_100%)]" />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-28 opacity-70"
+        style={{
+          background: `linear-gradient(180deg, ${character.accent}33 0%, transparent 100%)`,
+        }}
+      />
+
+      <div className={`absolute inset-x-0 bottom-0 ${isSelect && !isFeatured ? "p-3.5" : "p-4"}`}>
+        {!isSelect ? (
+          <span
+            className="mb-2 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.04em] text-white"
+            style={{ background: character.accent }}
+          >
+            {character.vibe.split("·")[0]?.trim() || "Night"}
+          </span>
+        ) : null}
+
+        <div
+          className={`font-bold tracking-[-0.04em] text-[#F8F4F6] drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)] ${
+            isSelect && !isFeatured ? "text-[1.05rem] leading-tight" : "text-[1.35rem] leading-tight"
+          }`}
+        >
           {character.name}
         </div>
-        <div className="mt-0.5 truncate text-xs text-[#D8D0D4]/90">{character.tagline}</div>
+        <div
+          className={`mt-1 text-[#D8D0D4]/90 ${
+            isSelect && !isFeatured ? "line-clamp-2 text-[11px] leading-4" : "line-clamp-2 text-xs leading-5"
+          }`}
+        >
+          {character.tagline}
+        </div>
+
         {!isSelect ? (
-          <span className="mt-3 inline-flex rounded-full bg-[#E8336D] px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(232,51,109,0.45)]">
+          <span className="mt-3.5 inline-flex items-center rounded-full bg-[#E8336D] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_28px_rgba(232,51,109,0.5)]">
             대화 시작
           </span>
         ) : (
           <span
-            className="mt-2 inline-flex text-[11px] font-semibold"
+            className={`mt-2.5 inline-flex items-center gap-1 font-semibold ${
+              isFeatured ? "text-sm" : "text-[11px]"
+            }`}
             style={{ color: character.accent }}
           >
-            탭하여 대화 →
+            탭하여 대화
+            <span aria-hidden>→</span>
           </span>
         )}
       </div>
     </button>
+  );
+}
+
+function MobileShell({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`mx-auto flex w-full max-w-[460px] flex-col ${className}`}>{children}</div>
   );
 }
 
@@ -183,8 +241,7 @@ export function SajuChatApp() {
       content: text,
       createdAt: new Date().toISOString(),
     };
-    const nextHistory = [...messages, userMsg];
-    setMessages(nextHistory);
+    setMessages((prev) => [...prev, userMsg]);
     setSending(true);
 
     try {
@@ -264,8 +321,8 @@ export function SajuChatApp() {
 
   if (step === "landing") {
     return (
-      <div className="saju-shell relative min-h-dvh overflow-hidden">
-        <div className="relative mx-auto flex min-h-dvh w-full max-w-[480px] flex-col">
+      <div className="saju-shell relative min-h-dvh">
+        <MobileShell className="relative min-h-dvh">
           <header className="saju-header sticky top-0 z-20 flex items-center justify-between px-5 py-3">
             <Link
               className="text-sm font-semibold text-[#9A9098] transition hover:text-[#FF7A99]"
@@ -278,12 +335,12 @@ export function SajuChatApp() {
             </span>
           </header>
 
-          <div className="flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4">
+          <div className="flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3">
             <div className="px-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#FF7A99]">
                 Dark Romance
               </p>
-              <h1 className="mt-2 text-[1.85rem] font-bold leading-[1.2] tracking-[-0.05em] text-[#F4F0F2]">
+              <h1 className="mt-2 text-[1.8rem] font-bold leading-[1.18] tracking-[-0.05em] text-[#F4F0F2]">
                 오늘 밤, 누구의
                 <br />
                 목소리를 들을까요
@@ -304,8 +361,8 @@ export function SajuChatApp() {
               ))}
             </div>
 
-            <section className="mt-5">
-              <div className="saju-scroll-x flex gap-3 overflow-x-auto px-5 pb-2">
+            <section className="relative mt-5">
+              <div className="saju-scroll-x saju-carousel flex gap-3 overflow-x-auto px-5 pb-4 pt-1">
                 {SAJU_CHARACTERS.map((c) => (
                   <PortraitHeroCard
                     key={c.id}
@@ -314,10 +371,12 @@ export function SajuChatApp() {
                     variant="carousel"
                   />
                 ))}
+                {/* end spacer so last card can snap fully into view */}
+                <div aria-hidden className="w-2 shrink-0 snap-end" />
               </div>
             </section>
 
-            <div className="mt-auto space-y-3 px-5 pt-6">
+            <div className="mt-auto space-y-3 px-5 pt-5">
               <p className="text-center text-[10px] leading-4 text-[#6B6570]">
                 엔터테인먼트용 · 실제 예언이 아닙니다
               </p>
@@ -330,15 +389,17 @@ export function SajuChatApp() {
               </button>
             </div>
           </div>
-        </div>
+        </MobileShell>
       </div>
     );
   }
 
   if (step === "select") {
+    const [featured, ...rest] = SAJU_CHARACTERS;
+
     return (
       <div className="saju-shell min-h-dvh">
-        <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+12px)]">
+        <MobileShell className="min-h-dvh px-4 pb-[calc(env(safe-area-inset-bottom)+36px)] pt-[calc(env(safe-area-inset-top)+12px)]">
           <button
             className="self-start text-sm font-semibold text-[#9A9098] transition hover:text-[#FF7A99]"
             onClick={() => setStep("landing")}
@@ -349,22 +410,32 @@ export function SajuChatApp() {
           <h1 className="mt-4 text-[1.55rem] font-bold leading-tight tracking-[-0.04em] text-[#F4F0F2]">
             캐릭터 선택
           </h1>
+          <p className="mt-1.5 text-sm leading-5 text-[#9A9098]">
+            세 명의 목소리가 각자의 결로 마음을 받아줍니다.
+          </p>
 
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            {SAJU_CHARACTERS.map((c, index) => (
-              <div
-                key={c.id}
-                className={index === SAJU_CHARACTERS.length - 1 && SAJU_CHARACTERS.length % 2 === 1 ? "col-span-2 mx-auto w-[48%]" : undefined}
-              >
+          <div className="mt-5 flex flex-col gap-3.5">
+            {featured ? (
+              <PortraitHeroCard
+                character={featured}
+                featured
+                onSelect={() => startWithCharacter(featured.id)}
+                variant="select"
+              />
+            ) : null}
+
+            <div className="grid grid-cols-2 gap-3">
+              {rest.map((c) => (
                 <PortraitHeroCard
+                  key={c.id}
                   character={c}
                   onSelect={() => startWithCharacter(c.id)}
                   variant="select"
                 />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        </MobileShell>
       </div>
     );
   }
@@ -388,127 +459,139 @@ export function SajuChatApp() {
 
   return (
     <div className="saju-shell relative flex min-h-dvh flex-col">
-      <header className="saju-header sticky top-0 z-20 mx-auto flex w-full max-w-[480px] items-center gap-3 px-4 py-3">
-        <button
-          aria-label="캐릭터 다시 선택"
-          className="text-sm font-semibold text-[#9A9098]"
-          onClick={restart}
-          type="button"
-        >
-          ←
-        </button>
-        <CharacterAvatar character={character} size="sm" />
-        <div className="min-w-0 flex-1">
-          <div className="truncate font-bold tracking-[-0.03em] text-[#F4F0F2]">{character.name}</div>
-          <div className="truncate text-xs text-[#9A9098]">{character.tagline}</div>
-        </div>
-        <button
-          className="rounded-full px-3 py-1.5 text-xs font-semibold text-white"
-          style={{ background: "#E8336D" }}
-          onClick={() => void openConclusionFlow()}
-          type="button"
-        >
-          결론
-        </button>
-      </header>
-
-      <div
-        ref={listRef}
-        className="mx-auto flex w-full max-w-[480px] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
-      >
-        {messages.map((message) => {
-          const mine = message.role === "user";
-          return (
-            <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-              {!mine ? (
-                <div className="mr-2 mt-1">
-                  <CharacterAvatar character={character} size="sm" />
-                </div>
-              ) : null}
-              <div
-                className={`max-w-[78%] rounded-[22px] px-4 py-3 text-[0.95rem] leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.25)] ${
-                  mine ? "rounded-br-md text-white" : "saju-bubble-assistant rounded-bl-md"
-                }`}
-                style={mine ? { background: character.accent } : undefined}
-              >
-                {message.content}
-              </div>
-            </div>
-          );
-        })}
-        {sending ? (
-          <div className="flex items-center gap-2 text-sm text-[#9A9098]">
-            <CharacterAvatar character={character} size="sm" />
-            <span className="animate-pulse">{character.name}이(가) 답하는 중…</span>
-          </div>
-        ) : null}
-      </div>
-
-      {canOfferConclusion ? (
-        <div className="mx-auto w-full max-w-[480px] px-4">
+      <MobileShell className="sticky top-0 z-20">
+        <header className="saju-header flex items-center gap-3 px-4 py-3">
           <button
-            className="mb-2 flex min-h-11 w-full items-center justify-center rounded-full border border-[#E8336D]/40 bg-[#E8336D]/12 text-sm font-semibold text-[#FF7A99] transition hover:bg-[#E8336D]/2"
+            aria-label="캐릭터 다시 선택"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-[#9A9098] transition hover:bg-white/5 hover:text-[#FF7A99]"
+            onClick={restart}
+            type="button"
+          >
+            ←
+          </button>
+          <div className="relative">
+            <CharacterAvatar character={character} size="sm" />
+            <span
+              className="pointer-events-none absolute -inset-0.5 -z-10 rounded-full opacity-70 blur-[6px]"
+              style={{ background: character.accent }}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[0.95rem] font-bold tracking-[-0.03em] text-[#F4F0F2]">
+              {character.name}
+            </div>
+            <div className="truncate text-[11px] text-[#9A9098]">{character.tagline}</div>
+          </div>
+          <button
+            className="rounded-full px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(232,51,109,0.35)]"
+            style={{ background: "#E8336D" }}
             onClick={() => void openConclusionFlow()}
             type="button"
           >
-            결정적 결론 보기
+            결론
           </button>
-        </div>
-      ) : null}
+        </header>
+      </MobileShell>
 
-      {error ? (
-        <div className="mx-auto w-full max-w-[480px] px-4 pb-1 text-center text-xs text-[#FF7A99]">
-          {error}
+      <MobileShell className="flex min-h-0 flex-1 flex-col">
+        <div
+          ref={listRef}
+          className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4"
+        >
+          {messages.map((message) => {
+            const mine = message.role === "user";
+            return (
+              <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                {!mine ? (
+                  <div className="mr-2 mt-1">
+                    <CharacterAvatar character={character} size="sm" />
+                  </div>
+                ) : null}
+                <div
+                  className={`max-w-[78%] px-4 py-3 text-[0.95rem] leading-7 ${
+                    mine
+                      ? "rounded-[22px] rounded-br-md text-white shadow-[0_10px_28px_rgba(232,51,109,0.28)]"
+                      : "saju-bubble-assistant rounded-[22px] rounded-bl-md shadow-[0_8px_24px_rgba(0,0,0,0.28)]"
+                  }`}
+                  style={mine ? { background: character.accent } : undefined}
+                >
+                  {message.content}
+                </div>
+              </div>
+            );
+          })}
+          {sending ? (
+            <div className="flex items-center gap-2 text-sm text-[#9A9098]">
+              <CharacterAvatar character={character} size="sm" />
+              <span className="animate-pulse">{character.name}이(가) 답하는 중…</span>
+            </div>
+          ) : null}
         </div>
-      ) : null}
 
-      <div className="saju-footer mx-auto w-full max-w-[480px] px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-        {userMessageCount === 0 ? (
-          <div className="saju-scroll-x mb-3 flex gap-2 overflow-x-auto pb-1">
-            {QUICK_PROMPTS.map((prompt) => (
-              <button
-                key={prompt}
-                className="shrink-0 rounded-full border border-white/10 bg-[#09090B] px-3 py-2 text-xs font-medium text-[#9A9098] transition hover:border-[#E8336D]/35 hover:text-[#FF7A99]"
-                onClick={() => void handleSend(prompt)}
-                type="button"
-              >
-                {prompt}
-              </button>
-            ))}
+        {canOfferConclusion ? (
+          <div className="px-4">
+            <button
+              className="mb-2 flex min-h-11 w-full items-center justify-center rounded-full border border-[#E8336D]/40 bg-[#E8336D]/12 text-sm font-semibold text-[#FF7A99] transition hover:bg-[#E8336D]/2"
+              onClick={() => void openConclusionFlow()}
+              type="button"
+            >
+              결정적 결론 보기
+            </button>
           </div>
         ) : null}
-        <form
-          className="flex items-end gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void handleSend();
-          }}
-        >
-          <textarea
-            className="saju-input max-h-28 min-h-12 flex-1 resize-none rounded-[18px] px-4 py-3 text-sm leading-6"
-            placeholder="마음을 남겨보세요…"
-            rows={1}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void handleSend();
-              }
+
+        {error ? (
+          <div className="px-4 pb-1 text-center text-xs text-[#FF7A99]">{error}</div>
+        ) : null}
+
+        <div className="saju-footer px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+14px)]">
+          {userMessageCount === 0 ? (
+            <div className="saju-scroll-x mb-3 flex gap-2 overflow-x-auto pb-1">
+              {QUICK_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  className="shrink-0 rounded-full border border-white/10 bg-[#09090B] px-3 py-2 text-xs font-medium text-[#9A9098] transition hover:border-[#E8336D]/35 hover:text-[#FF7A99]"
+                  onClick={() => void handleSend(prompt)}
+                  type="button"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <form
+            className="flex items-end gap-2.5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleSend();
             }}
-          />
-          <button
-            className="saju-cta flex h-12 w-12 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
-            disabled={sending || !input.trim()}
-            type="submit"
           >
-            ↑
-          </button>
-        </form>
-        <p className="mt-2 text-center text-[10px] leading-4 text-[#6B6570]">
-          오락용 AI 채팅 · 실제 예언이 아닙니다
-        </p>
-      </div>
+            <textarea
+              className="saju-input max-h-28 min-h-12 flex-1 resize-none rounded-[20px] px-4 py-3 text-sm leading-6"
+              placeholder="마음을 남겨보세요…"
+              rows={1}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  void handleSend();
+                }
+              }}
+            />
+            <button
+              className="saju-cta flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg disabled:opacity-40"
+              disabled={sending || !input.trim()}
+              type="submit"
+            >
+              ↑
+            </button>
+          </form>
+          <p className="mt-2.5 text-center text-[10px] leading-4 text-[#6B6570]">
+            오락용 AI 채팅 · 실제 예언이 아닙니다
+          </p>
+        </div>
+      </MobileShell>
 
       {showPaywall && conclusion ? (
         <PaywallSheet

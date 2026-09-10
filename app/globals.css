@@ -337,27 +337,27 @@ button {
 }
 
 .saju-shell .saju-header {
-  background: rgba(18, 21, 28, 0.82);
+  background: rgba(18, 21, 28, 0.86);
   border-bottom: 1px solid var(--saju-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .saju-shell .saju-footer {
-  background: rgba(18, 21, 28, 0.92);
+  background: rgba(12, 14, 20, 0.94);
   border-top: 1px solid var(--saju-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .saju-shell .saju-cta {
-  background: var(--saju-pink);
+  background: linear-gradient(180deg, #f0437a 0%, var(--saju-pink) 100%);
   color: #fff;
-  box-shadow: 0 12px 32px rgba(232, 51, 109, 0.4);
+  box-shadow: 0 12px 32px rgba(232, 51, 109, 0.45);
 }
 
 .saju-shell .saju-cta:hover {
-  background: #d12a60;
+  background: linear-gradient(180deg, #e8336d 0%, #d12a60 100%);
 }
 
 .saju-shell .saju-cta:disabled {
@@ -371,9 +371,10 @@ button {
 }
 
 .saju-shell .saju-input {
-  background: var(--saju-card);
+  background: rgba(9, 9, 11, 0.92);
   border: 1px solid var(--saju-border);
   color: var(--saju-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .saju-shell .saju-input::placeholder {
@@ -382,12 +383,12 @@ button {
 
 .saju-shell .saju-input:focus {
   outline: none;
-  border-color: rgba(232, 51, 109, 0.45);
-  box-shadow: 0 0 0 2px rgba(232, 51, 109, 0.2);
+  border-color: rgba(232, 51, 109, 0.5);
+  box-shadow: 0 0 0 2px rgba(232, 51, 109, 0.22);
 }
 
 .saju-shell .saju-bubble-assistant {
-  background: var(--saju-card-elevated);
+  background: linear-gradient(180deg, #1a1e28 0%, var(--saju-card-elevated) 100%);
   border: 1px solid var(--saju-border);
   color: var(--saju-ink);
 }
@@ -409,12 +410,27 @@ button {
 
 .saju-shell .saju-portrait-card {
   background: #0a0b10;
-  border: 1px solid var(--saju-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .saju-shell .saju-portrait-card:focus-visible {
   outline: 2px solid var(--saju-pink);
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+/* Landing carousel: full card + intentional next peek */
+.saju-shell .saju-carousel {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1.25rem;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.saju-shell .saju-carousel-card {
+  /* leave ~3.75rem for next-card peek + gap inside the padded track */
+  flex: 0 0 calc(100% - 3.75rem);
+  width: calc(100% - 3.75rem);
+  max-width: 340px;
 }
 
 .saju-shell .saju-scroll-x {
