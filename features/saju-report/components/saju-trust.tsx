@@ -50,14 +50,13 @@ export function SajuBusinessFooter() {
     <footer className="saju-card-elevated rounded-[22px] px-4 py-4 text-xs leading-5 text-[#9A9098]">
       <div className="font-semibold text-[#D8D0D4]">Regretzero 사주</div>
       <p className="mt-1.5">
-        서비스명: Regretzero 사주 · 문의:{" "}
+        서비스명: Regretzero 사주 · 문의 조규철:{" "}
         <a
-          href="mailto:contact@regretzero.example"
+          href="mailto:regretzero.official@gmail.com"
           className="text-[#FF7A99] underline-offset-2 hover:underline"
         >
-          contact@regretzero.example
+          regretzero.official@gmail.com
         </a>
-        <span className="text-[#6E666C]"> (placeholder)</span>
       </p>
       <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1">
         <Link href="/saju/faq#privacy" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
@@ -98,9 +97,6 @@ export function DemoReviewCard({ review }: { review: DemoReview }) {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className="text-sm font-semibold text-[#F4F0F2]">{review.maskedName}</div>
-          <span className="rounded-full border border-[#E8336D]/35 bg-[#E8336D]/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-[#FF7A99]">
-            예시 후기(데모)
-          </span>
         </div>
         <Stars n={review.stars} />
       </div>

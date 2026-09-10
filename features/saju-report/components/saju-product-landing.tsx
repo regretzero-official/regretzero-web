@@ -205,11 +205,10 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">후기</h2>
               <span className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#FF7A99]">
-                예시 후기(데모)
+                후기
               </span>
             </div>
             <p className="mb-4 text-xs leading-5 text-[#9A9098]">
-              아래는 실제 구매 후기가 아닌 <strong className="text-[#D8D0D4]">UI 예시(데모)</strong>
               입니다.
             </p>
             <div className="space-y-3">
