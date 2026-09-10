@@ -1,4 +1,5 @@
 import type { SajuCharacterId } from "@/features/saju-chat/types";
+import type { SajuChart } from "./manseryeok/types";
 
 export type SajuProductId =
   | "reunion-luck"
@@ -56,6 +57,8 @@ export type SajuReportPayload = {
   source: "template" | "openai" | "gemini";
   generatedAt: string;
   form: SajuBirthForm;
+  /** Real 만세력 chart when computed */
+  chart?: SajuChart;
 };
 
 export type DemoReview = {

@@ -1,5 +1,7 @@
 import { getSajuCharacter } from "@/features/saju-chat/characters";
 import { buildTemplateReport } from "./buildReport";
+import { computeChart } from "./manseryeok/computeChart";
+import { formatChartPlain } from "./manseryeok/formatChart";
 import { getSajuProduct } from "./products";
 import type { SajuBirthForm, SajuProductId, SajuReportPayload, SajuReportSection } from "./types";
 
@@ -14,30 +16,40 @@ function formSummary(form: SajuBirthForm) {
 }
 
 function productOutline(productId: SajuProductId): string {
+  if (productId === "reunion-luck") {
+    return `필수 구조(제목 유지, 각 섹션 충분히 길게 · 전체 본문 약 6000~10000자):
+1. 표지/한줄결론 — 「그 사람, 아직 나를 생각할까?」 훅 + 원국 요약 인용
+2. 1장 · 끌린 이유
+3. 두 사람의 사주 원국 비교 (양쪽 연주·일간 페어 필수)
+4. 이별 진짜 원인
+5. 지워지지 않는 흔적
+6. 2장 · 남은 마음
+7. 떠올리는 순간 · 말 못 하는 감정
+8. 3장 · 연락 확률과 시기
+9. 누가 먼저 연락할까
+10. 다시 만났을 때
+11. 외부 변수 · 새 인연 역전
+12. 4장 · 달라져야 할 것
+13. 행동 플랜 · 연락 가이드
+14. 마지막 기회 · 선생님 마지막 말
+15. 안내(원국=만세력 계산, 해석=오락·위로 — 짧게 한 번만)`;
+  }
   const common = `필수 구조(번호/제목 유지, 각 섹션을 충분히 길게 · 전체 본문 약 6000~10000자 목표):
-1. 표지/한줄결론 — 고객 출생·상대·개월·고민을 생생히 인용
+1. 표지/한줄결론 — 고객 출생·상대·개월·고민·원국 인용
 2. 이번 점사의 질문 정리
-3. 원국/일간 기질 (원국·일간·월지·시주·십성 — 캐릭터 보이스로)
+3. 원국/일간 기질 (제공된 만세력 원국·일간·십성 사용)
 4. 원국 연애 패턴 · 용신/희신/기신 감각
-5. 두 사람 사이 인연의 결 (합·충·형·해 / 원진 느낌)
-6. 십성·합충으로 본 역학 (관성·재성·인성)
-7. 헤어진 진짜 이유 (표면 vs 속마음)
-8. 상대 속마음에 내가 남아있는지 (보관함·공망 감각)
-9. 대운·세운 타임라인 (1·3·6개월 + 올해~내년 창)
-10. 연락 멘트 / 금지 문구
-11. 재접근 전략 3단계
-12. 주의할 함정
-13. 캐릭터 마지막 한마디
-14. 안내(재미·위로용, 짧게 한 번만)`;
-
+5. 두 사람 사이 인연의 결
+6. 헤어진 진짜 이유 / 속마음 / 타임라인 / 연락 / 전략 등 상품 초점
+마지막: 안내(원국=만세력, 해석=오락·위로)`;
   if (productId === "partner-heart") {
-    return `${common}\n강조: 상대 속마음·거리감·보관함 감각·다가갈 온도. 불필요 섹션은 통합하되 분량은 유지.`;
+    return `${common}\n강조: 상대 속마음·거리감·보관함 감각·다가갈 온도.`;
   }
   if (productId === "breakup-decision") {
-    return `${common}\n강조: 남겨둘 이유/놓을 이유, 결정 체크리스트, 자존 회복. 불필요 섹션은 통합하되 분량은 유지.`;
+    return `${common}\n강조: 남겨둘 이유/놓을 이유, 결정 체크리스트, 자존 회복.`;
   }
   if (productId === "reunion-strategy") {
-    return `${common}\n강조: 지금 하면 안 되는 것, 실행 가능한 3단계, 금지 문구. 불필요 섹션은 통합하되 분량은 유지.`;
+    return `${common}\n강조: 지금 하면 안 되는 것, 실행 가능한 3단계, 금지 문구.`;
   }
   return common;
 }
@@ -133,6 +145,7 @@ export async function generateSajuReport(
 ): Promise<SajuReportPayload> {
   const template = buildTemplateReport(productId, form);
   const product = getSajuProduct(productId)!;
+  const chart = template.chart ?? computeChart(form);
   const system = systemPrompt(productId);
   const user = `다음 고객 정보로 **${product.title}** 긴 한국어 상담 리포트를 작성하라.
 제목/본문에 확정 예언처럼 쓰지 말 것. “프리미엄/MVP/프레임” 마케팅 톤 금지.
@@ -142,9 +155,13 @@ export async function generateSajuReport(
 고객 정보:
 ${formSummary(form)}
 
+【만세력 원국 — 반드시 이 기둥·일간·십성·공망·대운·세운을 사용할 것. 임의로 바꾸지 말 것】
+${formatChartPlain(chart)}
+
 ${productOutline(productId)}
 
-톤: 구체적·상담. ${product.characterName}이 직접 말하는 것처럼.`;
+톤: 구체적·상담. ${product.characterName}이 직접 말하는 것처럼.
+원국 숫자는 위 만세력 결과를 인용하고, 해석·조언만 캐릭터 보이스로 풀어라.`;
 
   const openaiKey = process.env.OPENAI_API_KEY;
   if (openaiKey) {
@@ -159,6 +176,7 @@ ${productOutline(productId)}
     if (sections.length >= 4) {
       return {
         ...template,
+        chart,
         sections,
         previewSections: sections.slice(0, 2).map((s, i) => ({ ...s, blurred: i === 1 })),
         oneLiner: template.oneLiner,
@@ -183,6 +201,7 @@ ${productOutline(productId)}
     if (sections.length >= 4) {
       return {
         ...template,
+        chart,
         sections,
         previewSections: sections.slice(0, 2).map((s, i) => ({ ...s, blurred: i === 1 })),
         oneLiner: template.oneLiner,

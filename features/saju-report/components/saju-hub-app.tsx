@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
 import { emptyBirthForm } from "@/features/saju-report/buildReport";
+import { formatChartChip } from "@/features/saju-report/manseryeok/formatChart";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
 import { saveSajuReading } from "@/features/saju-report/my-readings";
 import { getLandingByProductId } from "@/features/saju-report/product-landings";
@@ -43,7 +44,7 @@ function ProductCard({ product }: { product: SajuProduct }) {
       className="saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985]"
       style={{ boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 28px ${product.accent}18` }}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden">
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
         {character ? (
           <Image
             alt={product.characterName}
@@ -67,13 +68,49 @@ function ProductCard({ product }: { product: SajuProduct }) {
           <div className="mt-0.5 text-[11px] text-white/70">{product.characterName}</div>
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-2.5 p-3.5">
-        <p className="line-clamp-3 text-[12px] leading-5 text-[#B8AEB4]">{product.painPoint}</p>
-        <span className="saju-cta mt-auto inline-flex min-h-10 items-center justify-center rounded-full px-3 text-xs font-semibold">
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <p className="line-clamp-2 text-[11px] leading-4 text-[#B8AEB4]">{product.painPoint}</p>
+        <span className="saju-cta mt-auto inline-flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-semibold">
           자세히 보기
         </span>
       </div>
     </Link>
+  );
+}
+
+
+function WonGukChip({ report }: { report: SajuReportPayload }) {
+  if (!report.chart) return null;
+  const c = report.chart;
+  const hour = c.pillars.hour?.korean ?? "시주미상";
+  return (
+    <div
+      className="mt-3 rounded-[14px] border border-[#F0A05A]/35 bg-[#F0A05A]/10 px-3 py-2.5"
+      aria-label="만세력 원국"
+    >
+      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#F0A05A]">
+        원국 · 만세력
+      </div>
+      <div className="mt-1 flex flex-wrap gap-1.5">
+        {[
+          ["년", c.pillars.year.korean],
+          ["월", c.pillars.month.korean],
+          ["일", c.pillars.day.korean],
+          ["시", hour],
+        ].map(([k, v]) => (
+          <span
+            key={k}
+            className="rounded-full border border-white/10 bg-black/25 px-2 py-0.5 text-[11px] font-semibold text-[#F8F4F6]"
+          >
+            {k} {v}
+          </span>
+        ))}
+        <span className="rounded-full border border-[#FF7A99]/40 bg-[#E8336D]/20 px-2 py-0.5 text-[11px] font-bold text-[#FF7A99]">
+          일간 {c.dayMaster}
+        </span>
+      </div>
+      <p className="mt-1.5 text-[10px] leading-4 text-[#9A9098]">{formatChartChip(c)}</p>
+    </div>
   );
 }
 
@@ -113,43 +150,34 @@ function HubLanding({
   return (
     <div className={`space-y-8 ${SAJU_BOTTOM_NAV_PAD}`}>
       <section className="px-5 pt-5">
-        <p className="text-[0.7rem] font-semibold tracking-[0.1em] text-[#FF7A99]">
-          재회 · 속마음 · 이별
-        </p>
-        <h1 className="mt-2.5 text-[1.75rem] font-black leading-[1.18] tracking-[-0.05em] text-[#F8F4F6]">
-          그 사람,
-          <br />
-          아직 나에게
-          <br />
-          <span className="text-[#FF7A99]">마음이 남아 있을까?</span>
-        </h1>
-        <p className="mt-2 text-[13px] leading-5 text-[#9A9098]">
-          밤에 생각날 때, 캐릭터가 길게 읽어줘요.
-        </p>
-
-        {/* image-first: female counselors */}
-        <div className="mt-5 flex justify-center -space-x-5">
+        {/* image-first: large portrait stack before copy */}
+        <div className="flex justify-center -space-x-6">
           {SAJU_CHARACTERS.filter((c) =>
             ["seo-nari", "baek-ryeon", "cha-yuri", "han-bora"].includes(c.id),
           ).map((c, i) => (
             <div
               key={c.id}
-              className="relative h-[112px] w-[90px] overflow-hidden rounded-[20px] border-2 border-[#120E12] shadow-[0_10px_28px_rgba(0,0,0,0.5)]"
+              className="relative h-[148px] w-[118px] overflow-hidden rounded-[22px] border-2 border-[#120E12] shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
               style={{ zIndex: 4 - i }}
             >
               <Image
                 alt={c.name}
                 className="object-cover object-top"
                 fill
-                sizes="90px"
+                sizes="118px"
                 src={c.portraitSrc}
+                priority={i < 2}
               />
             </div>
           ))}
         </div>
-        <p className="mt-2.5 text-center text-[11px] font-semibold text-[#B8AEB4]">
+        <p className="mt-3 text-center text-[11px] font-semibold text-[#B8AEB4]">
           서나리 · 백련 · 차유리 · 한보라
         </p>
+        <h1 className="mt-4 text-center text-[1.55rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
+          그 사람, 아직{" "}
+          <span className="text-[#FF7A99]">나를 생각할까?</span>
+        </h1>
 
         <button
           type="button"
@@ -217,19 +245,18 @@ function HubLanding({
 
       <section className="px-5">
         <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
-        <p className="mt-1 text-xs text-[#9A9098]">누가 읽어주길 원하세요?</p>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
           {SAJU_CHARACTERS.map((c) => (
             <div
               key={c.id}
-              className="saju-char-card relative w-[42%] min-w-[148px] shrink-0 overflow-hidden rounded-[22px]"
+              className="saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px]"
             >
               <div className="relative aspect-[3/4] w-full">
                 <Image
                   alt={c.name}
                   className="object-cover object-top"
                   fill
-                  sizes="160px"
+                  sizes="180px"
                   src={c.portraitSrc}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -243,7 +270,7 @@ function HubLanding({
                     </span>
                   ) : null}
                   <div className="text-sm font-bold text-[#F8F4F6]">{c.name}</div>
-                  <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-white/70">
+                  <div className="mt-0.5 line-clamp-1 text-[11px] leading-4 text-white/70">
                     {c.tagline}
                   </div>
                 </div>
@@ -548,8 +575,9 @@ function PreviewView({
             <div className="mt-2 text-sm leading-6 text-[#D8D0D4]">
               <ReportMarkdown body={report.oneLiner} />
             </div>
+            <WonGukChip report={report} />
             <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
-              재미·위로용이며 확정 예언이 아닙니다.
+              원국은 만세력 · 해석은 오락·위로 (확정 예언 아님)
             </p>
           </div>
         </div>
@@ -655,7 +683,8 @@ function ReportView({
         <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
           <ReportMarkdown body={report.oneLiner} />
         </div>
-        <p className="mt-2 text-center text-[11px] text-[#6E666C]">오락·비예언 · 재미·위로용 콘텐츠입니다.</p>
+        <WonGukChip report={report} />
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 오락·위로</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"

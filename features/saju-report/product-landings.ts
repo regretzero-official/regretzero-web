@@ -23,7 +23,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     slug: "reunion",
     productId: "reunion-luck",
     path: "/saju/reunion",
-    heroHook: "그 사람, 아직 나에게 마음이 남아 있을까?",
+    heroHook: "그 사람, 아직 나를 생각할까?",
     heroSub:
       "헤어진 뒤에도 밤에 생각날 때. 무당 백련이 기운으로 재회 가능성과 타이밍을 길게 짚어줘요.",
     whoFor: [
@@ -47,7 +47,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     faq: [
       {
         q: "진짜 예언인가요?",
-        a: "아니요. 재미·위로용이에요. 실제 만세력·점술·상담을 대신하지 않아요.",
+        a: "아니요. 원국은 만세력으로 계산하고, 해석·조언은 재미·위로용이에요. 절대 결과·전문 상담을 대신하지 않아요.",
       },
       {
         q: "무료로 어디까지 보나요?",

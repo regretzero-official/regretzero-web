@@ -1,7 +1,11 @@
 import { getSajuCharacter } from "@/features/saju-chat/characters";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
 import { getCanonicalSections } from "./canonical-sections";
+import { computeChart } from "./manseryeok/computeChart";
+import { dayMasterLabel } from "./manseryeok/computeChart";
+import type { SajuChart } from "./manseryeok/types";
 import { getSajuProduct } from "./products";
+import { buildReunionNarrativeSections } from "./reunionNarrative";
 import type {
   SajuBirthForm,
   SajuProductId,
@@ -93,7 +97,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "서나리 식으로—표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직해.",
         questionsLead: "네가 진짜로 묻고 싶은 건 한 겹이 아니야. 언니랑 하나씩 풀어보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 이별은 사랑이 없어서보다 속도가 안 맞아서인 경우가 많아. 그 차이를 못 보면 ${p}랑 다시 만나도 같은 벽이야.`,
-        traitLead: "네 결을 감각으로 먼저 말해줄게. (만세력 확정이 아니라, 전통 문체를 빌린 읽기야.)",
+        traitLead: "네 원국을 만세력으로 먼저 짚을게. 해석은 언니 식으로 풀어줄게.",
         traitClose: (p) => `그래서 ${p} 생각도 싸움 한 방보다 누적 피로로 남는 거야. 깊게 사랑하고, 오래 남기고, 참다가 한꺼번에 지치는 타입.`,
         patternClose: (p) => `재회를 원하면 같은 스크립트를 다른 호흡으로 다시 써야 해. ${p}한테 예전의 확인·장문으로 들어가면 합이 다시 충이 돼.`,
         bondAside: (p) => `느낌이 왔어—너희 합은 초반에 예뻤을 거야. 문제는 합이 과해지며 ${p}가 숨을 쉬려 할 때, 네가 버림으로 읽은 구간이야.`,
@@ -123,7 +127,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다.",
         questionsLead: "이번 점사의 핵을 단호히 정리한다.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서가 아니라 속도가 어긋나서다. ${p}와 다시 붙더라도, 같은 호흡이면 같은 벽이다.`,
-        traitLead: "원국·일간을 짧게 읽는다. (검증된 만세력 확정이 아닌, 전통 문체를 빌린 읽기다.)",
+        traitLead: "원국·일간을 만세력으로 짧게 읽는다. 해석은 상담 톤이다.",
         traitClose: (p) => `압축한다—깊게 사랑하고, 오래 남기고, 참다가 한꺼번에 지친다. ${p}와의 이별도 누적 피로로 읽힌다.`,
         patternClose: (p) => `같은 스크립트로 ${p}에게 다시 들어가면 합이 충이 된다. 재회의 용신은 설득이 아니라 안정이다.`,
         bondAside: (p) => `${p}와 너는 나이보다 호흡 차이다. 합이 과하면 충이 된다. 작은 해가 형을 부른 흐름으로 보라.`,
@@ -153,7 +157,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "차유리 식으로—감정 점수 말고, 네가 버티는 구조로 읽어. 자존이 먼저다.",
         questionsLead: "질문부터 팩트로. 감성 에세이 필요 없어.",
         questionsClose: (p) => `지쳐 헤어진 거면 사랑이 없어서가 아니라 속도가 안 맞은 거야. ${p}랑 다시 붙어도 구조 안 바꾸면 또 같아.`,
-        traitLead: "기질 얘기도 짧게. (만세력 확정 아냐. 문체만 빌린 읽기.)",
+        traitLead: "기질은 원국 숫자로 짧게. 해석은 팩트 상담 톤.",
         traitClose: (p) => `한 줄—깊게 사랑하고, 참다가, 한꺼번에 지친다. ${p} 이별도 그 패턴. 인정해야 다음이 있어.`,
         patternClose: (p) => `같은 스크립트로 ${p}한테 가면 또 지친다. 재회 용신은 더 잘해주기가 아니라 덜 매달리는 안정이야.`,
         bondAside: (p) => `${p}랑 너는 합이 예뻤을 수도 있어. 문제는 합이 과해져서 충이 된 구간. 작은 서운함이 쌓인 거.`,
@@ -183,7 +187,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "한보라가 먼저 공감하고, 그다음 현실 한 줄—위험 집착은 말릴게.",
         questionsLead: "네가 묻고 싶은 거, 겹겹이지? 같이 정리해보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 거면, 사랑이 없어서보다 속도가 안 맞은 거야. ${p}랑 다시 만나도 호흡을 바꿔야 해.`,
-        traitLead: "기질은 쉽게 말해줄게. (만세력 확정은 아니고, 읽기용이야.)",
+        traitLead: "기질은 원국 기준으로 쉽게 말해줄게. 해석은 위로·상담이야.",
         traitClose: (p) => `한 줄로—깊게 사랑하고, 오래 남기고, 참다가 지쳐. ${p} 이별도 그 결에 가깝다 보면 돼.`,
         patternClose: (p) => `같은 방식으로 ${p}에게 가면 또 지칠 수 있어. 재회는 설득보다 안정이 먼저야.`,
         bondAside: (p) => `${p}랑 초반 합은 예뻤을 거야. 길어지며 왜 말 없어 / 왜 확인해 로 충이 온 패턴이 흔해.`,
@@ -213,7 +217,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "이도령이 지키는 건 예언이 아니라, 당신이 다치지 않는 여지예요.",
         questionsLead: "묻고 싶은 마음을 하나씩, 부드럽게 정리해 볼게요.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서보다 속도가 어긋나서인 경우가 많아요. ${p}와 다시 만나도 호흡을 바꿔야 해요.`,
-        traitLead: "기질은 짧고 쉽게 말씀드릴게요. (만세력 확정이 아닌 읽기예요.)",
+        traitLead: "기질은 원국 기준으로 짧고 쉽게 말씀드릴게요. 해석은 상담 톤이에요.",
         traitClose: (p) => `깊게 사랑하고, 오래 남기고, 참다가 지치는 결. ${p}와의 이별도 그 결에 닿아 있을 수 있어요.`,
         patternClose: (p) => `같은 방식으로 ${p}에게 다가가면 같은 벽이 올 수 있어요. 재회는 설득보다 안정이 먼저예요.`,
         bondAside: (p) => `${p}와는 초반 합이 따뜻했을 가능성이 커요. 길어지며 확인과 침묵이 충이 된 흐름을 조심하세요.`,
@@ -243,7 +247,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "강세온 식으로—너는 이미 매력 있어. 문제는 타이밍과 온도야.",
         questionsLead: "질문부터 깔끔하게. 네가 진짜 궁금한 것만.",
         questionsClose: (p) => `지쳐 헤어진 거면 속도 문제야. ${p}랑 다시 만나도 호흡 안 바꾸면 또 같아.`,
-        traitLead: "기질은 짧게. (만세력 확정 아님—읽기용.)",
+        traitLead: "기질은 원국 기준으로 짧게. 해석은 상담 톤.",
         traitClose: (p) => `깊게 사랑하고 참다가 지치는 타입. ${p} 이별도 그 결. 이번엔 페이스를 네가 잡아.`,
         patternClose: (p) => `같은 스크립트로 ${p}에게 가면 매력이 죽어. 재회는 설득보다 안정.`,
         bondAside: (p) => `${p}랑 합은 초반에 통했을 거야. 과해지면 충. 작은 서운함부터 정리하자.`,
@@ -274,7 +278,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         frameAside: "한시우 방식은 단순하다. 표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직하다.",
         questionsLead: "질문의 핵만 짧게.",
         questionsClose: (p) => `지쳐 헤어진 인연은 속도 문제다. ${p}와 다시 붙어도 호흡이 같으면 같은 벽이다.`,
-        traitLead: "원국·일간을 짧게 읽는다. (만세력 확정 아님.)",
+        traitLead: "원국·일간을 만세력으로 짧게 읽는다. 해석은 氣 상담이다.",
         traitClose: (p) => `깊게 사랑하고, 참다가, 한꺼번에 지친다. ${p} 이별도 그 결.`,
         patternClose: (p) => `같은 스크립트로 ${p}에게 가면 합이 충이 된다. 용신은 설득이 아니라 안정.`,
         bondAside: (p) => `${p}와는 합이 과하면 충. 작은 해가 형을 부른 흐름으로 보라.`,
@@ -300,8 +304,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
 
 function disclaimerBlock(characterName: string, productTitle: string) {
   return `이 글은 재미·위로 목적의 엔터테인먼트 ${productTitle} 리포트예요.
-실제 운명·재회·상대 심리에 대한 확정 예언이 아니며, 정확한 만세력·전문 상담·의료·법률을 대신하지 않아요.
-원국·일간·십성·합충·용신·대운·세운 같은 표현은 전통 문체를 빌린 **예시용** 읽기이며, 검증된 만세력 결과가 아닙니다.
+**원국(네 기둥·일간·십성·공망·대운·세운)은 출생 기준 만세력으로 계산**했습니다(양력·입춘·절기).
+다만 **해석·조언·가능성 문구는 오락·상담 톤**이며 확정 예언·전문 상담·의료·법률을 대신하지 않아요.
 의사결정의 책임은 본인에게 있고, 원치 않는 연락·스토킹은 권하지 않아요.
 
 — ${characterName} · ${productTitle}`;
@@ -362,45 +366,37 @@ ${voice.questionsClose(p)}
   };
 }
 
-function loveTraitSection(form: SajuBirthForm, voice: VoicePack): SajuReportSection {
+function loveTraitSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection {
   const p = partner(form);
-  const month = safe(form.birthMonth, "3");
-  const time = safe(form.birthTime, "밤 10시");
+  const dm = dayMasterLabel(chart.dayMaster, chart.dayMasterElement);
+  const hourBit = chart.pillars.hour
+    ? `시주 **${chart.pillars.hour.korean}**(${chart.pillars.hour.hanja})`
+    : "시주 미상(출생 시각 없음)";
   return {
     id: "trait",
     title: "원국·일간 기질",
     body: `${voice.traitLead}
-${birthLabel(form)} ${form.gender}의 결을 전통 사주 언어로 옮기면 대략 이런 이미지다.
+${birthLabel(form)} ${form.gender} — 만세력 원국 **${chart.summaryLine}**.
 
-### 3-1. 원국(原局) — 타고난 기운의 바탕
-**원국**이란, 생년월일시로 짜인 네 사주의 ‘기본 설계도’다. 대운·세운이 날씨와 계절이라면, 원국은 집의 구조다.
-네 원국은 연애에서 **깊이·지속·감정 잔향**이 강한 쪽으로 읽힌다. 짧게 스치고 끝나는 인연보다, 한번 물리면 오래 가는 인연에 약하다. ${monthsLabel(form)}이 지나도 ${p} 생각이 남는 결이 여기와 맞닿는다.
+### 3-1. 원국(原局)
+년 **${chart.pillars.year.korean}** · 월 **${chart.pillars.month.korean}** · 일 **${chart.pillars.day.korean}** · ${hourBit}
+대운·세운이 날씨라면 원국은 집의 구조다. ${monthsLabel(form)}이 지나도 ${p} 생각이 남는 결이 여기와 맞닿는다.
 
 ### 3-2. 일간(日干) — ‘나’의 중심
-**일간**은 사주에서 ‘나 자신’을 가리키는 핵심 글자다.
-읽기로는, 네 일간의 결이 **부드럽지만 속이 단단한 나무(木) 기운**—겉은 다정한데, 한번 마음 주면 쉽게 안 빼는 타입.
-木 기운의 연애는 “관심”보다 “뿌리”다. 상대가 멀어지면 가지를 흔들기보다 **뿌리가 흔들린 것처럼** 반응하기 쉽다. 그래서 이별 후에도 밤마다 ${p} 생각이 남는 거다.
+일간 **${dm}** (${chart.dayMasterYinYang}${chart.dayMasterElement}).
+오행 **${chart.dayMasterElement}** 기운의 연애는 “관심”보다 “뿌리”로 읽히기 쉽다. 상대가 멀어지면 가지를 흔들기보다 뿌리가 흔들린 것처럼 반응하기 쉽다.
 
-### 3-3. 월지(月支) — 계절·환경의 결
-**월지**는 태어난 달의 지지로, 성장 환경·사회성·‘바깥에서 보이는 나’와 연결된다.
-${month}월생의 월지 결은 **기운이 올라오되 유지에서 조율이 필요한** 패턴을 만들기 쉽다. ${p}와의 초반이 설렜고, 중후반에 피로가 쌓인 흐름과 맞닿을 수 있다.
+### 3-3. 월지 · 시주
+월주 **${chart.pillars.month.korean}** — 바깥에서 보이는 나·환경의 결.
+${hourBit}. ${chart.hourUnknown ? "시각을 알면 시주까지 더 정확해져요." : "시주는 내면·‘진짜 속’과 연결된다."}
 
-### 3-4. 시주 감각 · ${time}
-**시주**는 태어난 시각의 기둥으로, 내면·‘진짜 속’과 연결된다. ${time}대에 가깝다면, 감정·직감·‘말하지 않은 것’이 중심에 오기 쉽다. 낮에는 괜찮은 척, 밤에 감정이 커진다. 자정 넘은 장문에 약한 이유도 여기에 가깝다.
-(※ 시주 읽기는 출생 시각·시차에 따라 달라질 수 있어요.)
+### 3-4. 십성 요약
+- 년: ${chart.tenGods.year.stem}/${chart.tenGods.year.branch}
+- 월: ${chart.tenGods.month.stem}/${chart.tenGods.month.branch}
+- 일: 일간/${chart.tenGods.day.branch}
+${chart.tenGods.hour ? `- 시: ${chart.tenGods.hour.stem}/${chart.tenGods.hour.branch}` : "- 시: (미상)"}
 
-### 3-5. 십성(十星)으로 본 연애 감각
-**십성**은 일간을 기준으로 나머지 글자가 어떤 ‘역할’을 하는지를 열 가지로 나눈 체계다.
-
-- **비견·겁재**: 나와 비슷한 기운 / 경쟁·나눔·자존
-- **식신·상관**: 표현·재능 / 말·반항·날카로운 감정 표출
-- **편재·정재**: 유동적 끌림·현실 / 안정적 관계·책임 있는 애정
-- **편관·정관**: 강한 자극·압박의 상대 / 격식·책임·‘공식 연인’의 틀
-- **편인·정인**: 직감·예민한 보호 / 이해·학습·감정의 완충
-
-네 연애 감각(예시): 상대에게 **관심·챙김(재성·인성 쪽 사용)**을 많이 쓰는 편. 상대가 감정을 닫으면 “내가 부족한가”로 해석하기 쉽다. 이때 **상관**처럼 말이 날카로워지거나, **정인**처럼 과도하게 이해하고 참는 패턴이 번갈아 나올 수 있다.
-
-**연애 함정**: ‘끝까지 이해해주면 돌아올 것’이라는 믿음. ${p}처럼 지쳐 떠난 상대에게는 그 믿음이 **압박(편관적 무게)**으로 읽힐 수 있다.
+연애 함정: ‘끝까지 이해해주면 돌아올 것’ 믿음이 ${p}처럼 지쳐 떠난 상대에게 **압박**으로 읽힐 수 있다.
 
 ${voice.traitClose(p)}
 
@@ -429,7 +425,9 @@ function lovePatternSection(form: SajuBirthForm, voice: VoicePack): SajuReportSe
 - **기신 감각**: 과한 확인·추궁·자존 싸움(상관 과다, 편관적 압박).
 
 ${voice.patternClose(p)}
-${voice.strategyNudge}`,
+${voice.strategyNudge}
+
+패턴을 바꿀 때 기억할 한 줄: **설득보다 안정**. 같은 스크립트의 3단계(과열)를 반복하면 합이 다시 충이 된다. 헤어진 지 ${monthsLabel(form)} · “${breakupLine(form)}” 메모를 기준으로, 지금은 감정을 더 쓰는 구간이 아니라 기력을 회수하는 구간으로 읽는 편이 맞다.`,
   };
 }
 
@@ -463,31 +461,25 @@ ${voice.bondAside(p)}`,
   };
 }
 
-function sipseongSection(form: SajuBirthForm, voice: VoicePack): SajuReportSection {
+function sipseongSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection {
   const p = partner(form);
   return {
     id: "sipseong",
     title: "십성·합충으로 본 역학",
-    body: `※ 아래는 설득력 있는 읽기다. 실제 만세력 확정값이 아니다.
+    body: `원국 십성(일간 **${dayMasterLabel(chart.dayMaster, chart.dayMasterElement)}** 기준):
+년 ${chart.tenGods.year.stem}/${chart.tenGods.year.branch} · 월 ${chart.tenGods.month.stem}/${chart.tenGods.month.branch} · 일 일간/${chart.tenGods.day.branch}${chart.tenGods.hour ? ` · 시 ${chart.tenGods.hour.stem}/${chart.tenGods.hour.branch}` : " · 시 미상"}.
 
 ### 관성(官星) — “우리라는 틀”
-관성(편관·정관)은 연애에서 **상대·책임·공식적인 관계의 틀**로 읽히는 경우가 많다.
 ${p}와의 관계에서 너는 ‘우리’의 틀을 빨리 원하고, 상대는 틀이 무거우면 숨으려 했을 가능성이 있다.
-재회 국면에서 관성이 다시 살아나려면, “틀을 강요”가 아니라 “틀이 편해 보이는 너”가 필요하다.
 
 ### 재성(財星) — 끌림과 주고받음
-재성(편재·정재)은 **호감·현실적 케어·시간의 투자**로 번역된다.
-너는 정재처럼 성실하게 감정을 썼을 가능성이 크고, ${p}는 그 성실함이 어느 순간 **청구서**처럼 느껴졌을 수 있다.
-지금은 재성을 **많이 쓰기**보다 **적게, 깨끗하게** 쓰는 구간이다. 안부 한 줄이 장문보다 재성 효율이 높다.
+지금은 재성을 **많이 쓰기**보다 **적게, 깨끗하게**. 안부 한 줄이 장문보다 효율이 높다.
 
 ### 인성(印星) — 이해와 완충
-인성(편인·정인)은 **이해·보호·감정의 완충재**다.
-네가 “내가 더 이해하면 돼”로 버틴 구간이 인성 과다 사용일 수 있다. 재회 준비기에는 인성을 ${p}에게만 쓰지 말고, **네 일간(나)을 회복하는 쪽**으로 돌려라.
+인성을 ${p}에게만 쓰지 말고, **네 일간(나)을 회복하는 쪽**으로 돌려라.
 
-### 비견·겁재 / 식신·상관의 변수
-- **비견·겁재**: “내가 맞아 / 왜 나만” 자존 경쟁이 켜지면 재회는 멀어진다.
-- **식신**: 부드러운 표현·유머·가벼운 공유—재접근 창에서 **희신처럼** 쓰기 좋다.
-- **상관**: 날카로운 말·추궁·감정 폭발—지금 구간에서는 **기신에 가깝다.**
+### 공망
+네 공망 지지: **${chart.voidBranches.join("·") || "없음"}**.
 
 ${voice.sipseongAside(p)}
 다음 판은 **인성으로 너부터 회복 → 식신으로 가볍게 접촉 → 관성은 상대가 스스로 느끼게** 두는 순서다.`,
@@ -517,77 +509,56 @@ ${voice.breakupAside(p)}
   };
 }
 
-function remainingHeartSection(form: SajuBirthForm, voice: VoicePack): SajuReportSection {
+function remainingHeartSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection {
   const p = partner(form);
   return {
     id: "remaining",
     title: "상대 속마음에 내가 남아있는지",
     body: `${voice.remainingAside(p)}
 헤어진 지 ${monthsLabel(form)}, 메모상 “${breakupLine(form)}”라면—삭제의 공망보다 **손대기 무서운 공망**에 가깝다.
+네 공망: **${chart.voidBranches.join("·") || "없음"}**.
 
 ### 남아 있다는 쪽의 신호
-- SNS·대화창을 가끔 열지만 먼저 쓰지는 못함.
-- 공통 지인 앞에서 네 이름을 피하거나 너무 무덤덤하게 말함.
-- 새 만남을 급하게 깊게 못 들어감.
-- “그때 우리가…”를 떠올리다가 스스로 끊음.
+- SNS·대화창을 가끔 열지만 먼저 쓰지는 못함
+- 공통 지인 앞에서 네 이름을 피하거나 너무 무덤덤하게 말함
+- 새 만남을 급하게 깊게 못 들어감
 
 ### 거리감이 유지되는 이유
-- 다시 연락하는 순간 **또 그 피로로 돌아갈까 봐** 무서움.
-- 네가 장문으로 감정을 쏟을까 봐 문지방을 못 넘음.
-- 관성의 틀을 다시 쓰기엔, 아직 기력이 안 찬 상태.
+- 다시 연락하는 순간 **또 그 피로로 돌아갈까 봐** 무서움
+- 네가 장문으로 감정을 쏟을까 봐 문지방을 못 넘음
 
-### 공망(空亡) · 공망합 감각 (가볍게)
-**공망**은 “자리가 비어 보이는” 감각—관심은 있는데 손이 안 가는 구간으로 비유할 수 있다.
-지금은 ${p} 쪽에서 너를 **삭제한 공망**이라기보다, **손대기 무서운 공망**에 가깝다.
-**공망합**은 비어 있던 자리가 다시 메워지는 느낌. 세운·월운이 완화되고 네가 저자극으로 다가갈 때, 그 합의 기회가 열린다.
-(※ 공망은 비유로 읽는 감각이다.)
-
-정리: **남아 있다 ≠ 지금 받아줄 준비가 됐다.**
-네 자리가 삭제됐다기보다 **보관함**에 들어가 있을 가능성이 크다.`,
+정리: **남아 있다 ≠ 지금 받아줄 준비가 됐다.** 보관함에 가까울 가능성이 크다.`,
   };
 }
 
-function timelineSection(form: SajuBirthForm, voice: VoicePack): SajuReportSection {
+function timelineSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection {
   const p = partner(form);
   const m = monthsShort(form);
+  const luck = chart.luckPillars
+    ? `대운 ${chart.luckPillars.forward ? "순행" : "역행"} · 시작 ${chart.luckPillars.startAge}세 · ` +
+      chart.luckPillars.pillars.slice(0, 3).map((x) => `${x.age}세 ${x.korean}`).join(" → ")
+    : "대운(성별 남/여 입력 시 표시)";
   return {
     id: "timeline",
     title: "대운·세운 타임라인 · 1 · 3 · 6개월",
-    body: `먼저 용어만 짚는다.
-- **대운(大運)**: 약 10년 단위의 큰 흐름. 연애·인연의 ‘시즌’.
-- **세운(歲運)**: 그해의 흐름.
-- **월운(月運)**: 달 단위의 세부 날씨.
+    body: `- **세운(올해 연주):** ${chart.currentYearPillar.korean}
+- **${luck}**
+- 원국: ${chart.summaryLine}
 
-※ 아래 타임라인은 확정 예언이 아니라, 네 이별 패턴·원국 결·일반적 세운/월운 리듬·헤어진 지 ${monthsLabel(form)}을 겹친 **가능성의 지도**다.
+※ 아래는 확정 예언이 아니라 원국·이별 패턴·세운을 겹친 **가능성의 지도**다. 헤어진 지 ${monthsLabel(form)}.
 
-### ◇ 1개월 (관망·정돈 · 월운上 정리기)
-- 흐름상 **적극 재접근 비추천**.
-- 지금 연락하면 “또 감정 청구서”로 읽힐 위험. 상관·편관이 자극되기 쉬운 구간.
-- 할 일: 생활 리듬·컨디션 정돈, ${p} 없는 하루를 일부러 설계. 인성을 **너에게** 쓰기.
-- 키워드: *식히되, 끊지 마라.*
+### ◇ 1개월 (관망·정돈)
+적극 재접근 비추천. 인성을 너에게.
 
-### ◇ 3개월 전후 (접촉 창 · 세운 완화 + 월운 합 감각)
-- 날카로움이 무뎌지고 **추억의 온도**만 남는 구간.
-- 가벼운 안부인사형 접촉이 붙을 가능성↑. 식신·정재의 ‘가벼운 재성’이 유리.
-- 조건: 네가 **매달림 없는 상태**로 보여야 함.
-- 키워드: *문을 두드리되, 밀고 들어가지 마라.*
+### ◇ 3개월 전후 (접촉 창)
+가벼운 안부인사형 접촉↑. 조건: 매달림 없는 상태.
 
-### ◇ 6개월 (갈림길 · 대운 시즌 안의 분기)
-- 재개 vs 정리 인연이 갈림.
-- 핵심은 로맨스 연출이 아니라 **대화 방식 업그레이드(상관→식신)**.
-- 예전의 “왜 답장이 늦어”가 나오면 흐름은 빨리 식는다.
-- 키워드: *같은 사람, 다른 호흡.*
-
-### 대운상 올해~내년 인연 창 (예시)
-- **올해 하반~연말**: 성급한 재결합보다 **자기 회복·이미지 전환**. 용신 감각(안정)을 쌓는 구간.
-- **내년 상반**: 외부 인연·연락·소개의 ‘움직임’이 커질 수 있는 창. ${p}라면 저자극으로 쌓아 둔 신뢰가 여기서 결실을 볼 여지가 있다.
-- **주의**: 대운이 도와줘도, 월운에서 상관·추궁을 쓰면 창이 일찍 닫힌다.
+### ◇ 6개월 (갈림길)
+재개 vs 정리. 상관→식신.
 
 ### 세운으로 본 지나온 ${m}개월 / 앞으로의 석 달
-- 지나온 구간: 충격→검색 반복→날카로움이 조금 무뎌지는 경계.
-- **다음 30일**: 관망. 기신(추궁·장문·술김) 차단.
-- **30~60일**: 감정 온도 점검. ${p} 생각 빈도가 줄수록 접촉 성공률은 오른다.
-- **60~90일**: 안부형 저자극 접촉 창. 답이 없으면 최소 2주 침묵.
+- **다음 30일**: 관망. 기신(추궁·장문) 차단
+- **30~90일**: 안부형 저자극 접촉 창
 
 ${voice.timelineAside}
 ※ 네 선택이 지도를 바꾼다.`,
@@ -784,7 +755,7 @@ function oneLinerFor(productId: SajuProductId, form: SajuBirthForm): string {
   const p = partner(form);
   switch (productId) {
     case "reunion-luck":
-      return `기운상, **완전히 끝난 인연은 아니다.** 다만 **지금 당장 들이대면** 줄이 더 엉키고, **1~3개월 사이 거리 있는 재접근**이 붙을 여지가 더 크다.`;
+      return `그 사람, 아직 나를 생각할까? 기운상 **완전히 끝난 인연은 아니다.** 다만 **지금 당장 들이대면** 줄이 더 엉키고, **1~3개월 사이 거리 있는 재접근**이 붙을 여지가 더 크다.`;
     case "partner-heart":
       return `느낌이 왔어—${p} 마음에서 네가 **삭제됐다기보다 보관함**에 있을 가능성이 커. 다만 ‘남아 있음’과 ‘다시 열 준비’는 다른 층이야.`;
     case "breakup-decision":
@@ -830,36 +801,32 @@ function sectionsForProduct(
   form: SajuBirthForm,
   voice: VoicePack,
   productTitle: string,
+  chart: SajuChart,
 ): SajuReportSection[] {
+  if (productId === "reunion-luck") {
+    return buildReunionNarrativeSections(
+      form,
+      voice,
+      chart,
+      productTitle,
+      oneLinerFor(productId, form),
+      bulletsFor(productId, form),
+    );
+  }
+
   const base: SajuReportSection[] = [
     commonCover(form, voice, productTitle, oneLinerFor(productId, form), bulletsFor(productId, form)),
     questionsSection(form, voice),
-    loveTraitSection(form, voice),
+    loveTraitSection(form, voice, chart),
     lovePatternSection(form, voice),
   ];
-
-  if (productId === "reunion-luck") {
-    return [
-      ...base,
-      bondSection(form, voice),
-      sipseongSection(form, voice),
-      breakupReasonSection(form, voice),
-      remainingHeartSection(form, voice),
-      timelineSection(form, voice),
-      contactGuideSection(form, voice),
-      strategySection(form, voice),
-      pitfallsSection(form, voice),
-      closingSection(form, voice),
-      noticeSection(voice.name, productTitle),
-    ];
-  }
 
   if (productId === "partner-heart") {
     return [
       ...base,
       bondSection(form, voice),
       breakupReasonSection(form, voice),
-      remainingHeartSection(form, voice),
+      remainingHeartSection(form, voice, chart),
       ...partnerHeartExtra(form, voice),
       contactGuideSection(form, voice),
       pitfallsSection(form, voice),
@@ -883,7 +850,7 @@ function sectionsForProduct(
   return [
     ...base,
     ...strategyProductExtra(form, voice),
-    timelineSection(form, voice),
+    timelineSection(form, voice, chart),
     contactGuideSection(form, voice),
     strategySection(form, voice),
     pitfallsSection(form, voice),
@@ -903,7 +870,8 @@ export function buildTemplateReport(
   const character = getSajuCharacter(product.characterId);
   const characterName = character?.name ?? product.characterName;
   const voice = voicePack(product.characterId, characterName);
-  const built = sectionsForProduct(productId, form, voice, product.title);
+  const chart = computeChart(form);
+  const built = sectionsForProduct(productId, form, voice, product.title, chart);
   const canonical = getCanonicalSections(productId);
   if (built.length !== canonical.length) {
     throw new Error(
@@ -930,6 +898,7 @@ export function buildTemplateReport(
     source: "template",
     generatedAt: new Date().toISOString(),
     form,
+    chart,
   };
 }
 

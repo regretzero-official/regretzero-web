@@ -35,8 +35,12 @@ describe("buildTemplateReport depth", () => {
     const joined = report.sections.map((s) => s.body).join("\n");
     expect(joined).toContain("민재");
     expect(joined).toContain("수진");
-    expect(joined).toContain("예시용");
+    expect(joined).not.toContain("예시용");
+    expect(joined).toMatch(/만세력/);
     expect(joined).toMatch(/엔터테인먼트/);
+    expect(report.chart?.summaryLine).toBeTruthy();
+    expect(report.sections.some((s) => s.id === "origin-compare")).toBe(true);
+    expect(report.sections.length).toBe(15);
   });
 
   it("other products stay substantial with character voice", () => {
