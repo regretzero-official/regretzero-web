@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { SajuBottomNav } from "@/features/saju-report/components/saju-bottom-nav";
 import { SajuBusinessFooter } from "@/features/saju-report/components/saju-trust";
 import { SAJU_FAQ_ITEMS } from "@/features/saju-report/faq";
 import { SAJU_PRODUCT_LANDINGS } from "@/features/saju-report/product-landings";
@@ -29,7 +30,7 @@ export default function SajuFaqPage() {
           </Link>
         </header>
 
-        <main className="flex-1 space-y-8 px-5 pb-16 pt-6">
+        <main className="flex-1 space-y-8 px-5 pb-[calc(env(safe-area-inset-bottom)+88px)] pt-6">
           <section>
             <p className="text-[0.75rem] font-semibold tracking-[0.08em] text-[#FF7A99]">
               자주 묻는 말
@@ -89,6 +90,7 @@ export default function SajuFaqPage() {
             <SajuBusinessFooter />
           </section>
         </main>
+        <SajuBottomNav />
       </div>
     </div>
   );
