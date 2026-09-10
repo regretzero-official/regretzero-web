@@ -2,6 +2,8 @@
 
 import type { SajuCharacter, SajuConclusion } from "@/features/saju-chat/types";
 
+import { CharacterAvatar } from "./character-avatar";
+
 type PaywallSheetProps = {
   character: SajuCharacter;
   preview: SajuConclusion;
@@ -22,20 +24,20 @@ export function PaywallSheet({ character, preview, onClose, onUnlock }: PaywallS
             className="px-5 pb-4 pt-5"
             style={{ background: `linear-gradient(180deg, ${character.accentSoft}, transparent)` }}
           >
-            <div
-              className="text-[11px] font-semibold uppercase tracking-[0.2em]"
-              style={{ color: character.accent }}
-            >
-              결정적 결론
+            <div className="flex items-center gap-3">
+              <CharacterAvatar character={character} size="md" />
+              <div className="min-w-0">
+                <div
+                  className="text-[11px] font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: character.accent }}
+                >
+                  결정적 결론
+                </div>
+                <h2 className="mt-1 text-[1.25rem] font-bold tracking-[-0.04em] text-[#F4F0F2]">
+                  {character.name}의 통찰 잠금
+                </h2>
+              </div>
             </div>
-            <h2 className="mt-2 text-[1.45rem] font-bold tracking-[-0.04em] text-[#F4F0F2]">
-              {character.name}의 깊은 통찰이
-              <br />
-              잠겨 있어요
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-[#9A9098]">
-              대화 속에서 읽힌 재회운 · 관계 흐름 · 오늘 조언을 한눈에 정리해 드려요.
-            </p>
           </div>
 
           <div className="relative mx-4 mb-4 overflow-hidden rounded-[20px] border border-white/10 bg-[#09090B] px-4 py-4">
@@ -58,7 +60,7 @@ export function PaywallSheet({ character, preview, onClose, onUnlock }: PaywallS
 
           <div className="px-5 pb-5">
             <div className="rounded-[16px] border border-white/10 bg-[#09090B] px-4 py-3 text-xs leading-5 text-[#9A9098]">
-              엔터테인먼트용 콘텐츠입니다. 실제 예언·점술이 아니며, 중요한 결정은 스스로의 판단이 우선입니다.
+              엔터테인먼트용 · 실제 예언이 아닙니다
             </div>
             <button
               className="saju-cta mt-4 flex min-h-14 w-full items-center justify-center rounded-full px-5 text-base font-semibold transition active:scale-[0.99]"

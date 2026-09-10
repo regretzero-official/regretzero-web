@@ -25,6 +25,7 @@ export type SajuCharacter = {
   avatarInitial: string;
   avatarEmoji: string;
   vibe: string;
+  portraitSrc: string;
   systemPrompt: string;
 };
 

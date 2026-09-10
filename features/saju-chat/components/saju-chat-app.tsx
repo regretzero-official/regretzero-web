@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -26,35 +27,11 @@ const QUICK_PROMPTS = [
   "오늘은 어떤 마음으로 지내야 할까요?",
 ];
 
-const READING_PRODUCTS = [
-  {
-    id: "reunion",
-    label: "재회운",
-    title: "다시 만날 기운이\n남아 있을까",
-    hint: "이별 이후의 흐름을 읽어드려요",
-    accent: "#E8336D",
-  },
-  {
-    id: "inner",
-    label: "속마음",
-    title: "그 사람의\n진짜 속마음은",
-    hint: "말하지 못한 감정을 풀어봐요",
-    accent: "#FF7A99",
-  },
-  {
-    id: "breakup",
-    label: "이별 결정",
-    title: "헤어짐의 이유,\n그리고 다음",
-    hint: "흔들리는 마음을 정리해 드려요",
-    accent: "#5EEAD4",
-  },
-  {
-    id: "tonight",
-    label: "오늘 밤",
-    title: "지금 이 순간의\n연애 기운",
-    hint: "짧은 위로와 오늘의 조언",
-    accent: "#FF7A99",
-  },
+const READING_PILLS = [
+  { id: "reunion", label: "재회운", accent: "#E8336D" },
+  { id: "inner", label: "속마음", accent: "#FF7A99" },
+  { id: "breakup", label: "이별 결정", accent: "#5EEAD4" },
+  { id: "tonight", label: "오늘 밤", accent: "#FF7A99" },
 ];
 
 function createId() {
@@ -77,6 +54,59 @@ function openingMessage(character: SajuCharacter): SajuChatMessage {
     content: openings[character.id],
     createdAt: new Date().toISOString(),
   };
+}
+
+function PortraitHeroCard({
+  character,
+  onSelect,
+  variant = "carousel",
+}: {
+  character: SajuCharacter;
+  onSelect: () => void;
+  variant?: "carousel" | "select";
+}) {
+  const isSelect = variant === "select";
+
+  return (
+    <button
+      className={`saju-portrait-card group relative shrink-0 overflow-hidden text-left transition active:scale-[0.985] ${
+        isSelect
+          ? "aspect-[3/4] w-full rounded-[22px]"
+          : "aspect-[3/4] w-[72%] max-w-[280px] rounded-[24px]"
+      }`}
+      onClick={onSelect}
+      style={{ boxShadow: `0 18px 48px ${character.accent}22` }}
+      type="button"
+    >
+      <Image
+        alt={character.name}
+        className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+        fill
+        sizes={isSelect ? "(max-width:480px) 45vw, 200px" : "(max-width:480px) 72vw, 280px"}
+        src={character.portraitSrc}
+        priority={!isSelect}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <div className="text-lg font-bold tracking-[-0.03em] text-[#F4F0F2] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]">
+          {character.name}
+        </div>
+        <div className="mt-0.5 truncate text-xs text-[#D8D0D4]/90">{character.tagline}</div>
+        {!isSelect ? (
+          <span className="mt-3 inline-flex rounded-full bg-[#E8336D] px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(232,51,109,0.45)]">
+            대화 시작
+          </span>
+        ) : (
+          <span
+            className="mt-2 inline-flex text-[11px] font-semibold"
+            style={{ color: character.accent }}
+          >
+            탭하여 대화 →
+          </span>
+        )}
+      </div>
+    </button>
+  );
 }
 
 export function SajuChatApp() {
@@ -248,99 +278,49 @@ export function SajuChatApp() {
             </span>
           </header>
 
-          <div className="flex flex-1 flex-col px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#FF7A99]">
-              Dark Romance · AI Character
-            </p>
-            <h1 className="mt-3 text-[2.05rem] font-bold leading-[1.2] tracking-[-0.05em] text-[#F4F0F2]">
-              오늘 밤,
-              <br />
-              마음이 묻는 운명
-            </h1>
-            <p className="mt-4 text-[0.98rem] leading-7 text-[#9A9098]">
-              재회운 · 속마음 · 이별의 이유를 캐릭터와 나누는
-              <br />
-              밤의 사주 감성 채팅. 결론은 더 깊이 열어드려요.
-            </p>
+          <div className="flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4">
+            <div className="px-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#FF7A99]">
+                Dark Romance
+              </p>
+              <h1 className="mt-2 text-[1.85rem] font-bold leading-[1.2] tracking-[-0.05em] text-[#F4F0F2]">
+                오늘 밤, 누구의
+                <br />
+                목소리를 들을까요
+              </h1>
+            </div>
 
-            <section className="mt-8">
-              <div className="mb-3 flex items-end justify-between">
-                <h2 className="text-sm font-bold tracking-[-0.02em] text-[#F4F0F2]">오늘의 리딩</h2>
-                <span className="text-[11px] font-medium text-[#5EEAD4]">Entertainment</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {READING_PRODUCTS.map((product) => (
-                  <button
-                    key={product.id}
-                    className="saju-product-card flex min-h-[148px] flex-col rounded-[20px] p-4 text-left transition active:scale-[0.98]"
-                    onClick={() => setStep("select")}
-                    type="button"
-                  >
-                    <span
-                      className="inline-flex w-fit rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide"
-                      style={{
-                        background: `${product.accent}22`,
-                        color: product.accent,
-                      }}
-                    >
-                      {product.label}
-                    </span>
-                    <span className="mt-3 whitespace-pre-line text-[0.95rem] font-bold leading-snug tracking-[-0.03em] text-[#F4F0F2]">
-                      {product.title}
-                    </span>
-                    <span className="mt-auto pt-3 text-[11px] leading-4 text-[#6B6570]">
-                      {product.hint}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="mt-8">
-              <div className="mb-3 flex items-end justify-between">
-                <h2 className="text-sm font-bold tracking-[-0.02em] text-[#F4F0F2]">도령 캐릭터</h2>
+            <div className="mt-3 flex flex-wrap gap-2 px-5">
+              {READING_PILLS.map((pill) => (
                 <button
-                  className="text-[11px] font-semibold text-[#FF7A99]"
+                  key={pill.id}
+                  className="rounded-full border border-white/10 bg-[#09090B]/80 px-3 py-1.5 text-[11px] font-semibold transition active:scale-[0.97]"
                   onClick={() => setStep("select")}
+                  style={{ color: pill.accent }}
                   type="button"
                 >
-                  전체 보기
+                  {pill.label}
                 </button>
-              </div>
-              <div className="saju-scroll-x -mx-5 flex gap-3 overflow-x-auto px-5 pb-1">
+              ))}
+            </div>
+
+            <section className="mt-5">
+              <div className="saju-scroll-x flex gap-3 overflow-x-auto px-5 pb-2">
                 {SAJU_CHARACTERS.map((c) => (
-                  <button
+                  <PortraitHeroCard
                     key={c.id}
-                    className="saju-char-card flex w-[72%] max-w-[260px] shrink-0 flex-col rounded-[24px] p-4 text-left transition active:scale-[0.98]"
-                    onClick={() => startWithCharacter(c.id)}
-                    type="button"
-                  >
-                    <div className="flex items-center gap-3">
-                      <CharacterAvatar character={c} size="lg" />
-                      <div className="min-w-0">
-                        <div className="text-lg font-bold tracking-[-0.03em] text-[#F4F0F2]">
-                          {c.name}
-                        </div>
-                        <div className="mt-0.5 truncate text-xs text-[#9A9098]">{c.tagline}</div>
-                      </div>
-                    </div>
-                    <span
-                      className="mt-4 inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold"
-                      style={{ background: c.accentSoft, color: c.accent }}
-                    >
-                      {c.vibe}
-                    </span>
-                    <span className="mt-4 text-xs font-semibold text-[#FF7A99]">대화 시작 →</span>
-                  </button>
+                    character={c}
+                    onSelect={() => startWithCharacter(c.id)}
+                    variant="carousel"
+                  />
                 ))}
               </div>
             </section>
 
-            <div className="mt-auto space-y-3 pt-10">
-              <div className="rounded-[16px] border border-white/10 bg-[#09090B]/90 px-4 py-3 text-xs leading-5 text-[#9A9098]">
-                엔터테인먼트용입니다. 실제 예언·점술·심리 진단이 아니며, 중요한 결정은 스스로의 판단을
-                우선하세요.
-              </div>
+            <div className="mt-auto space-y-3 px-5 pt-6">
+              <p className="text-center text-[10px] leading-4 text-[#6B6570]">
+                엔터테인먼트용 · 실제 예언이 아닙니다
+              </p>
               <button
                 className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full px-5 text-base font-semibold transition active:scale-[0.99]"
                 onClick={() => setStep("select")}
@@ -366,37 +346,22 @@ export function SajuChatApp() {
           >
             ← 소개로
           </button>
-          <h1 className="mt-5 text-[1.75rem] font-bold leading-tight tracking-[-0.04em] text-[#F4F0F2]">
-            오늘 밤, 누구의 목소리를
-            <br />
-            듣고 싶나요?
+          <h1 className="mt-4 text-[1.55rem] font-bold leading-tight tracking-[-0.04em] text-[#F4F0F2]">
+            캐릭터 선택
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#9A9098]">
-            세 명의 캐릭터가 각자의 결로 마음을 받아줍니다.
-          </p>
 
-          <div className="mt-6 space-y-3">
-            {SAJU_CHARACTERS.map((c) => (
-              <button
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            {SAJU_CHARACTERS.map((c, index) => (
+              <div
                 key={c.id}
-                className="saju-char-card flex w-full items-start gap-4 rounded-[24px] px-4 py-4 text-left transition active:scale-[0.99]"
-                onClick={() => startWithCharacter(c.id)}
-                type="button"
+                className={index === SAJU_CHARACTERS.length - 1 && SAJU_CHARACTERS.length % 2 === 1 ? "col-span-2 mx-auto w-[48%]" : undefined}
               >
-                <CharacterAvatar character={c} size="lg" />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-lg font-bold tracking-[-0.03em] text-[#F4F0F2]">
-                    {c.name}
-                  </span>
-                  <span className="mt-1 block text-sm text-[#9A9098]">{c.tagline}</span>
-                  <span
-                    className="mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: c.accentSoft, color: c.accent }}
-                  >
-                    {c.vibe}
-                  </span>
-                </span>
-              </button>
+                <PortraitHeroCard
+                  character={c}
+                  onSelect={() => startWithCharacter(c.id)}
+                  variant="select"
+                />
+              </div>
             ))}
           </div>
         </div>

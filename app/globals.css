@@ -407,6 +407,16 @@ button {
   border: 1px solid var(--saju-border);
 }
 
+.saju-shell .saju-portrait-card {
+  background: #0a0b10;
+  border: 1px solid var(--saju-border);
+}
+
+.saju-shell .saju-portrait-card:focus-visible {
+  outline: 2px solid var(--saju-pink);
+  outline-offset: 2px;
+}
+
 .saju-shell .saju-scroll-x {
   scrollbar-width: none;
   -ms-overflow-style: none;
