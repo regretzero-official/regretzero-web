@@ -29,6 +29,7 @@ import {
   DemoReviewCard,
   LockedSectionsPaywall,
   SajuBusinessFooter,
+  SajuCredibilitySection,
   SajuTrustStrip,
 } from "./saju-trust";
 
@@ -124,10 +125,7 @@ function HubLanding({
         </h1>
         <p className="mt-3 text-sm leading-6 text-[#9A9098]">
           헤어진 뒤에도 밤에 생각날 때.
-          여자의 마음은 여자가 잘 알지—캐릭터가 사주 흐름으로 재회운과 속마음을 길게 풀어드려요.
-        </p>
-        <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
-          재미·위로용 콘텐츠예요. 실제 예언이나 상담을 대신하지 않아요.
+          서나리·백련·차유리·한보라가 각자 다른 결로, 재회운과 속마음을 길게 상담해줘요.
         </p>
         <button
           type="button"
@@ -138,6 +136,46 @@ function HubLanding({
         </button>
         <div className="mt-5">
           <SajuTrustStrip />
+        </div>
+      </section>
+
+      <SajuCredibilitySection />
+
+
+      <section className="px-5" aria-labelledby="saju-heritage">
+        <h2 id="saju-heritage" className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
+          해석의 뿌리
+        </h2>
+        <p className="mt-1 text-xs leading-5 text-[#9A9098]">
+          밤에 흔들리는 마음을, 감만으로 위로하지 않아요.
+        </p>
+        <div className="mt-4 saju-card-elevated rounded-[22px] px-4 py-4">
+          <div className="text-[11px] font-bold tracking-[0.14em] text-[#FF7A99]">REGRETZERO MYEONGRI LINE</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-[#F4F0F2]">
+            자평명리 · 만세력 전통을  디지털로 옮긴 Regretzero 명리 라인
+          </p>
+          <p className="mt-2 text-[13px] leading-6 text-[#B8AEB4]">
+            적천수·자평 계통에서 다뤄 온 일간·십성·합충·대운·세운 문법을
+            현대 연애·재회 질문에 맞게 다시 짰어요.
+            캐릭터는 말투와 온도를 담당하고, 해석의 뼈대는 명리 라인의 체크를 거쳐요.
+          </p>
+          <div className="mt-3 grid gap-2">
+            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
+              <span className="font-semibold text-[#F4F0F2]">명리 골격</span>
+              — 원국·대운·세운으로 ‘남아 있는 마음 / 연락 타이밍’을 구조적으로 읽음
+            </div>
+            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
+              <span className="font-semibold text-[#F4F0F2]">감수 체크</span>
+              — 과장·단정·공포 조장을 걸러 내고, 행동 가이드는 ‘참고’로 명시
+            </div>
+            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
+              <span className="font-semibold text-[#F4F0F2]">상담 톤</span>
+              — 점쟁이·무당·언니·도령 보이스로, 같은 뼈대를 다른 결로 전달
+            </div>
+          </div>
+          <p className="mt-3 text-[11px] leading-5 text-[#6E666C]">
+            Regretzero 명리 라인은 브랜드 해석 체계예요. 확정 예언이 아니며, 결정은 본인 몫입니다.
+          </p>
         </div>
       </section>
 
@@ -194,7 +232,7 @@ function HubLanding({
       <section className="px-5">
         <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
         <p className="mt-1 text-xs text-[#9A9098]">
-          여자 가이드는 여자의 마음을 안에서 알아요. 누가 읽어주길 원하는지에 따라 결이 달라요
+          직감 언니·무당·깍쟁이·아이돌… 누가 옆에 앉아 상담할지에 따라 결이 달라요
         </p>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
           {SAJU_CHARACTERS.map((c) => (

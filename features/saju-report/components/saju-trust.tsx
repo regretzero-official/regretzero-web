@@ -25,7 +25,7 @@ export function SajuTrustStrip() {
       className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-[14px] border border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] leading-5 text-[#9A9098]"
       role="note"
     >
-      <span className="font-semibold text-[#D8D0D4]">엔터테인먼트</span>
+      <span className="font-semibold text-[#D8D0D4]">재미·위로</span>
       <span aria-hidden className="text-white/20">
         ·
       </span>
@@ -41,6 +41,53 @@ export function SajuTrustStrip() {
         FAQ
       </Link>
     </div>
+  );
+}
+
+
+/** Hub credibility — why ask here (no fake accuracy %) */
+export function SajuCredibilitySection() {
+  const items = [
+    {
+      title: "방법을 숨기지 않아요",
+      body: "출생·이별 개월·고민·상대 정보를 바탕으로, 일간·십성·합충·대운·세운 같은 전통 명리 문법을 빌려 긴 상담 글로 풀어요. 만세력 확정값이나 예언을 팔지 않아요.",
+    },
+    {
+      title: "네 문장을 다시 불러와요",
+      body: "이름·상황·고민을 리포트 안에 구체로 인용해요. 막연한 “잘 될 거예요”만 나열하지 않아요.",
+    },
+    {
+      title: "캐릭터가 상담하듯",
+      body: "서나리·백련·차유리·한보라… 말투가 달라요. 같은 고민도 직감 언니와 팩트 언니가 다르게 짚어요.",
+    },
+    {
+      title: "재미·위로용이에요",
+      body: "적중률 %를 내세우지 않아요. 밤에 흔들릴 때 기준을 잡는 참고·위로 콘텐츠예요. 결정은 언제나 본인 몫이에요.",
+    },
+  ];
+  return (
+    <section className="px-5" aria-labelledby="saju-credibility-heading">
+      <h2
+        id="saju-credibility-heading"
+        className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]"
+      >
+        왜 믿고 물어볼 수 있을까요?
+      </h2>
+      <p className="mt-1 text-xs leading-5 text-[#9A9098]">
+        가짜 적중률 없이, 어떻게 읽는지부터 밝혀둘게요.
+      </p>
+      <ul className="mt-4 space-y-3">
+        {items.map((item) => (
+          <li
+            key={item.title}
+            className="saju-card rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3.5"
+          >
+            <div className="text-sm font-semibold text-[#FF7A99]">{item.title}</div>
+            <p className="mt-1.5 text-[13px] leading-5 text-[#B8AEB4]">{item.body}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
