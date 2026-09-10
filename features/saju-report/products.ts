@@ -8,7 +8,7 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     id: "reunion-luck",
     title: "재회운 사주",
     shortTitle: "재회운",
-    painPoint: "그 사람, 아직 나에게 마음이 남아 있을까?",
+    painPoint: "그 사람, 아직 나를 생각할까?",
     description: "무당 백련이 기운으로 재회 가능성과 타이밍을 길게 짚어줘요.",
     characterId: "baek-ryeon",
     characterName: "백련",

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
 import { emptyBirthForm } from "@/features/saju-report/buildReport";
+import { formatChartChip } from "@/features/saju-report/manseryeok/formatChart";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
 import { saveSajuReading } from "@/features/saju-report/my-readings";
 import { getLandingByProductId } from "@/features/saju-report/product-landings";
@@ -43,7 +44,7 @@ function ProductCard({ product }: { product: SajuProduct }) {
       className="saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985]"
       style={{ boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 28px ${product.accent}18` }}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden">
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
         {character ? (
           <Image
             alt={product.characterName}
@@ -67,13 +68,49 @@ function ProductCard({ product }: { product: SajuProduct }) {
           <div className="mt-0.5 text-[11px] text-white/70">{product.characterName}</div>
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-2.5 p-3.5">
-        <p className="line-clamp-3 text-[12px] leading-5 text-[#B8AEB4]">{product.painPoint}</p>
-        <span className="saju-cta mt-auto inline-flex min-h-10 items-center justify-center rounded-full px-3 text-xs font-semibold">
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <p className="line-clamp-2 text-[11px] leading-4 text-[#B8AEB4]">{product.painPoint}</p>
+        <span className="saju-cta mt-auto inline-flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-semibold">
           자세히 보기
         </span>
       </div>
     </Link>
+  );
+}
+
+
+function WonGukChip({ report }: { report: SajuReportPayload }) {
+  if (!report.chart) return null;
+  const c = report.chart;
+  const hour = c.pillars.hour?.korean ?? "시주미상";
+  return (
+    <div
+      className="mt-3 rounded-[14px] border border-[#F0A05A]/35 bg-[#F0A05A]/10 px-3 py-2.5"
+      aria-label="만세력 원국"
+    >
+      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#F0A05A]">
+        원국 · 만세력
+      </div>
+      <div className="mt-1 flex flex-wrap gap-1.5">
+        {[
+          ["년", c.pillars.year.korean],
+          ["월", c.pillars.month.korean],
+          ["일", c.pillars.day.korean],
+          ["시", hour],
+        ].map(([k, v]) => (
+          <span
+            key={k}
+            className="rounded-full border border-white/10 bg-black/25 px-2 py-0.5 text-[11px] font-semibold text-[#F8F4F6]"
+          >
+            {k} {v}
+          </span>
+        ))}
+        <span className="rounded-full border border-[#FF7A99]/40 bg-[#E8336D]/20 px-2 py-0.5 text-[11px] font-bold text-[#FF7A99]">
+          일간 {c.dayMaster}
+        </span>
+      </div>
+      <p className="mt-1.5 text-[10px] leading-4 text-[#9A9098]">{formatChartChip(c)}</p>
+    </div>
   );
 }
 
@@ -111,73 +148,50 @@ function HubLanding({
   }, [filter, query]);
 
   return (
-    <div className={`space-y-10 ${SAJU_BOTTOM_NAV_PAD}`}>
-      <section className="px-5 pt-6">
-        <p className="text-[0.75rem] font-semibold tracking-[0.08em] text-[#FF7A99]">
-          재회 · 속마음 · 이별
+    <div className={`space-y-8 ${SAJU_BOTTOM_NAV_PAD}`}>
+      <section className="px-5 pt-5">
+        {/* image-first: large portrait stack before copy */}
+        <div className="flex justify-center -space-x-6">
+          {SAJU_CHARACTERS.filter((c) =>
+            ["seo-nari", "baek-ryeon", "cha-yuri", "han-bora"].includes(c.id),
+          ).map((c, i) => (
+            <div
+              key={c.id}
+              className="relative h-[148px] w-[118px] overflow-hidden rounded-[22px] border-2 border-[#120E12] shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
+              style={{ zIndex: 4 - i }}
+            >
+              <Image
+                alt={c.name}
+                className="object-cover object-top"
+                fill
+                sizes="118px"
+                src={c.portraitSrc}
+                priority={i < 2}
+              />
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-center text-[11px] font-semibold text-[#B8AEB4]">
+          서나리 · 백련 · 차유리 · 한보라
         </p>
-        <h1 className="mt-3 text-[1.85rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
-          그 사람,
-          <br />
-          아직 나에게
-          <br />
-          <span className="text-[#FF7A99]">마음이 남아 있을까?</span>
+        <h1 className="mt-4 text-center text-[1.55rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
+          그 사람, 아직{" "}
+          <span className="text-[#FF7A99]">나를 생각할까?</span>
         </h1>
-        <p className="mt-3 text-sm leading-6 text-[#9A9098]">
-          헤어진 뒤에도 밤에 생각날 때.
-          서나리·백련·차유리·한보라가 각자 다른 결로, 재회운과 속마음을 길게 상담해줘요.
-        </p>
+
         <button
           type="button"
           onClick={onScrollProducts}
-          className="saju-cta mt-5 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold"
+          className="saju-cta mt-5 flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold"
         >
           무료로 시작하기
         </button>
-        <div className="mt-5">
+        <div className="mt-3">
           <SajuTrustStrip />
         </div>
       </section>
 
       <SajuCredibilitySection />
-
-
-      <section className="px-5" aria-labelledby="saju-heritage">
-        <h2 id="saju-heritage" className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-          해석의 뿌리
-        </h2>
-        <p className="mt-1 text-xs leading-5 text-[#9A9098]">
-          밤에 흔들리는 마음을, 감만으로 위로하지 않아요.
-        </p>
-        <div className="mt-4 saju-card-elevated rounded-[22px] px-4 py-4">
-          <div className="text-[11px] font-bold tracking-[0.14em] text-[#FF7A99]">REGRETZERO MYEONGRI LINE</div>
-          <p className="mt-2 text-sm font-bold leading-6 text-[#F4F0F2]">
-            자평명리 · 만세력 전통을  디지털로 옮긴 Regretzero 명리 라인
-          </p>
-          <p className="mt-2 text-[13px] leading-6 text-[#B8AEB4]">
-            적천수·자평 계통에서 다뤄 온 일간·십성·합충·대운·세운 문법을
-            현대 연애·재회 질문에 맞게 다시 짰어요.
-            캐릭터는 말투와 온도를 담당하고, 해석의 뼈대는 명리 라인의 체크를 거쳐요.
-          </p>
-          <div className="mt-3 grid gap-2">
-            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
-              <span className="font-semibold text-[#F4F0F2]">명리 골격</span>
-              — 원국·대운·세운으로 ‘남아 있는 마음 / 연락 타이밍’을 구조적으로 읽음
-            </div>
-            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
-              <span className="font-semibold text-[#F4F0F2]">감수 체크</span>
-              — 과장·단정·공포 조장을 걸러 내고, 행동 가이드는 ‘참고’로 명시
-            </div>
-            <div className="rounded-[14px] border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-5 text-[#B8AEB4]">
-              <span className="font-semibold text-[#F4F0F2]">상담 톤</span>
-              — 점쟁이·무당·언니·도령 보이스로, 같은 뼈대를 다른 결로 전달
-            </div>
-          </div>
-          <p className="mt-3 text-[11px] leading-5 text-[#6E666C]">
-            Regretzero 명리 라인은 브랜드 해석 체계예요. 확정 예언이 아니며, 결정은 본인 몫입니다.
-          </p>
-        </div>
-      </section>
 
       <section id="products" className="scroll-mt-20 px-5">
         <div className="mb-4 flex items-end justify-between gap-3">
@@ -231,21 +245,18 @@ function HubLanding({
 
       <section className="px-5">
         <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
-        <p className="mt-1 text-xs text-[#9A9098]">
-          직감 언니·무당·깍쟁이·아이돌… 누가 옆에 앉아 상담할지에 따라 결이 달라요
-        </p>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
           {SAJU_CHARACTERS.map((c) => (
             <div
               key={c.id}
-              className="saju-char-card relative w-[42%] min-w-[148px] shrink-0 overflow-hidden rounded-[22px]"
+              className="saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px]"
             >
               <div className="relative aspect-[3/4] w-full">
                 <Image
                   alt={c.name}
                   className="object-cover object-top"
                   fill
-                  sizes="160px"
+                  sizes="180px"
                   src={c.portraitSrc}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -259,7 +270,7 @@ function HubLanding({
                     </span>
                   ) : null}
                   <div className="text-sm font-bold text-[#F8F4F6]">{c.name}</div>
-                  <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-white/70">
+                  <div className="mt-0.5 line-clamp-1 text-[11px] leading-4 text-white/70">
                     {c.tagline}
                   </div>
                 </div>
@@ -564,8 +575,9 @@ function PreviewView({
             <div className="mt-2 text-sm leading-6 text-[#D8D0D4]">
               <ReportMarkdown body={report.oneLiner} />
             </div>
+            <WonGukChip report={report} />
             <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
-              재미·위로용이며 확정 예언이 아닙니다.
+              원국은 만세력 · 해석은 오락·위로 (확정 예언 아님)
             </p>
           </div>
         </div>
@@ -671,7 +683,8 @@ function ReportView({
         <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
           <ReportMarkdown body={report.oneLiner} />
         </div>
-        <p className="mt-2 text-center text-[11px] text-[#6E666C]">오락·비예언 · 재미·위로용 콘텐츠입니다.</p>
+        <WonGukChip report={report} />
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 오락·위로</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"

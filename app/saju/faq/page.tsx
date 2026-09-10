@@ -81,8 +81,8 @@ export default function SajuFaqPage() {
           </section>
 
           <section className="saju-card-elevated rounded-[22px] px-4 py-4 text-xs leading-5 text-[#9A9098]">
-            본 서비스는 오락·위로 목적의 엔터테인먼트입니다. 실제 만세력·점술·의료·법률 조언이
-            아니며, 원치 않는 연락·스토킹을 권장하지 않습니다. 현재 잠금 해제는{" "}
+            원국은 만세력으로 계산하고, 해석·조언은 오락·위로용 엔터테인먼트입니다. 확정
+            예언·의료·법률을 대체하지 않으며, 원치 않는 연락·스토킹을 권장하지 않습니다. 현재 잠금 해제는{" "}
             <strong className="text-[#D8D0D4]">데모</strong>이며 실제 결제가 이루어지지 않습니다.
           </section>
 
