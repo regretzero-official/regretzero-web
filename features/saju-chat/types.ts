@@ -1,4 +1,13 @@
-export type SajuCharacterId = "lee-doryeong" | "han-siwoo" | "kang-seon";
+export type SajuCharacterId =
+  | "lee-doryeong"
+  | "han-siwoo"
+  | "kang-seon"
+  | "seo-nari"
+  | "baek-ryeon"
+  | "cha-yuri"
+  | "han-bora";
+
+export type SajuRoleLabel = "점쟁이" | "무당" | "깍쟁이" | "아이돌" | "도령";
 
 export type SajuChatRole = "user" | "assistant";
 
@@ -27,6 +36,8 @@ export type SajuCharacter = {
   vibe: string;
   portraitSrc: string;
   systemPrompt: string;
+  /** Optional guide archetype label shown in hub/chat UI */
+  roleLabel?: SajuRoleLabel;
 };
 
 export type SajuFlowStep = "landing" | "select" | "chat" | "paywall" | "conclusion";

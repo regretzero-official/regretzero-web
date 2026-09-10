@@ -102,7 +102,7 @@ function HubLanding({
         </h1>
         <p className="mt-3 text-sm leading-6 text-[#9A9098]">
           헤어진 뒤에도 밤에 생각날 때.
-          도령이 사주 흐름으로 재회운과 속마음을 길게 풀어드려요.
+          여자의 마음은 여자가 잘 알지—캐릭터가 사주 흐름으로 재회운과 속마음을 길게 풀어드려요.
         </p>
         <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
           재미·위로용 콘텐츠예요. 실제 예언이나 상담을 대신하지 않아요.
@@ -138,8 +138,10 @@ function HubLanding({
       </section>
 
       <section className="px-5">
-        <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 도령</h2>
-        <p className="mt-1 text-xs text-[#9A9098]">누가 읽어주길 원하는지에 따라 결이 달라요</p>
+        <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
+        <p className="mt-1 text-xs text-[#9A9098]">
+          여자 가이드는 여자의 마음을 안에서 알아요. 누가 읽어주길 원하는지에 따라 결이 달라요
+        </p>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
           {SAJU_CHARACTERS.map((c) => (
             <div
@@ -156,6 +158,14 @@ function HubLanding({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-3">
+                  {c.roleLabel ? (
+                    <span
+                      className="mb-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                      style={{ background: c.accent }}
+                    >
+                      {c.roleLabel}
+                    </span>
+                  ) : null}
                   <div className="text-sm font-bold text-[#F8F4F6]">{c.name}</div>
                   <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-white/70">
                     {c.tagline}
@@ -169,7 +179,7 @@ function HubLanding({
           href="/saju/chat"
           className="mt-4 flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#FF7A99] transition hover:bg-white/8"
         >
-          도령과 대화(베타) →
+          캐릭터와 대화(베타) →
         </Link>
       </section>
 
@@ -675,7 +685,7 @@ export function SajuHubApp() {
             href="/saju/chat"
             className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
           >
-            대화(베타)
+            캐릭터와 대화(베타)
           </Link>
         </header>
 

@@ -7,7 +7,15 @@ import type { SajuCharacterId, SajuChatMessage } from "@/features/saju-chat/type
 
 export const runtime = "nodejs";
 
-const VALID_IDS: SajuCharacterId[] = ["lee-doryeong", "han-siwoo", "kang-seon"];
+const VALID_IDS: SajuCharacterId[] = [
+  "seo-nari",
+  "baek-ryeon",
+  "cha-yuri",
+  "han-bora",
+  "lee-doryeong",
+  "han-siwoo",
+  "kang-seon",
+];
 
 function isCharacterId(value: unknown): value is SajuCharacterId {
   return typeof value === "string" && (VALID_IDS as string[]).includes(value);
