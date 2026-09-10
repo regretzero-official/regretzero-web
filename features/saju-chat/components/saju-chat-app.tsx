@@ -326,12 +326,12 @@ export function SajuChatApp() {
           <header className="saju-header sticky top-0 z-20 flex items-center justify-between px-5 py-3">
             <Link
               className="text-sm font-semibold text-[#9A9098] transition hover:text-[#FF7A99]"
-              href="/"
+              href="/saju"
             >
-              ← Regretzero
+              ← 사주 리포트
             </Link>
             <span className="saju-pill rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.14em]">
-              NIGHT SAJU
+              대화 베타
             </span>
           </header>
 

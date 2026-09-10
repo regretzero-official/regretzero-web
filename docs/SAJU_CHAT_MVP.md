@@ -1,6 +1,7 @@
-# Saju Character Chat MVP (`/saju`)
+# Saju Character Chat (Beta) — `/saju/chat`
 
-Korean freemium AI character chat for love / breakup / reunion with light saju framing.
+Secondary Korean freemium AI character chat for love / breakup / reunion.
+Primary product surface is now the **report hub** at [`/saju`](./SAJU_REPORT_HUB.md).
 
 ## Run locally
 
@@ -9,7 +10,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000/saju](http://localhost:3000/saju).
+Open [http://localhost:3000/saju/chat](http://localhost:3000/saju/chat).
 
 ## Optional OpenAI-compatible API
 

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { SajuChatApp } from "@/features/saju-chat/components/saju-chat-app";
+import { SajuHubApp } from "@/features/saju-report/components/saju-hub-app";
 
 export const metadata: Metadata = {
-  title: "밤의 사주 캐릭터 채팅",
+  title: "사주 리포트 허브 · 재회운·속마음·이별 결정",
   description:
-    "이도령 · 한시우 · 강세온과 나누는 재회운·속마음·이별 감성 채팅. 엔터테인먼트용이며 실제 예언이 아닙니다.",
+    "이도령 · 한시우 · 강세온의 긴 사주 리포트. 재회운·상대 속마음·이별 결정·행동 전략. 엔터테인먼트용이며 실제 예언이 아닙니다.",
   robots: {
     index: false,
     follow: false,
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function SajuPage() {
-  return <SajuChatApp />;
+  return <SajuHubApp />;
 }

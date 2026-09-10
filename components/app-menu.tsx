@@ -57,9 +57,9 @@ export const MORE_MENU_SECTIONS: AppMenuSection[] = [
       },
       {
         badge: "SAJU",
-        description: "가벼운 연애·재회 감성 캐릭터 채팅 (오락용).",
+        description: "재회운·속마음 긴 사주 리포트 허브 (오락용).",
         href: "/saju",
-        title: "사주 캐릭터 채팅",
+        title: "사주 리포트",
       },
     ],
   },
