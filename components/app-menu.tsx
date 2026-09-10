@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { HelpCircle, Info, Mail, X } from "lucide-react";
+import { HelpCircle, Info, Mail, Sparkles, X } from "lucide-react";
 
 export type AppMenuVariant = "dark" | "floating" | "inline" | "light";
 
@@ -55,6 +55,12 @@ export const MORE_MENU_SECTIONS: AppMenuSection[] = [
         href: "mailto:regretzero.official@gmail.com",
         title: "제휴·문의",
       },
+      {
+        badge: "SAJU",
+        description: "가벼운 연애·재회 감성 캐릭터 채팅 (오락용).",
+        href: "/saju",
+        title: "사주 캐릭터 채팅",
+      },
     ],
   },
 ];
@@ -63,6 +69,7 @@ const SUPPORT_ICON_MAP: Record<string, typeof HelpCircle> = {
   ABOUT: Info,
   GUIDE: HelpCircle,
   MAIL: Mail,
+  SAJU: Sparkles,
 };
 
 function isInternalHref(href: string) {
