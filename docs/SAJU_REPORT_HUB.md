@@ -4,6 +4,17 @@ Foxbunny-**style** (not a clone) product hub + paid long-report flow for love / 
 
 Core female-guide line: **여자의 마음은 여자가 잘 알지.**
 
+## Per-product landings
+
+| Route | Product | Character |
+| --- | --- | --- |
+| `/saju/reunion` | 재회운 | 백련 |
+| `/saju/heart` | 속마음 | 서나리 |
+| `/saju/breakup` | 이별 결정 | 차유리 |
+| `/saju/strategy` | 재회 행동 전략 | 한보라 |
+
+Hub cards link to these landings first. Sticky CTA on a landing deep-links into the hub form via `/saju?product=<id>` (e.g. `reunion-luck`).
+
 ## Flow
 
 1. Hub: 2-col product cards, character portraits, **예시 후기(데모)**, sticky CTA

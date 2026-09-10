@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { SajuHubApp } from "@/features/saju-report/components/saju-hub-app";
+import { getSajuProduct } from "@/features/saju-report/products";
+import type { SajuProductId } from "@/features/saju-report/types";
 
 export const metadata: Metadata = {
   title: "사주 리포트 허브 · 재회운·속마음·이별 결정",
@@ -12,6 +14,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SajuPage() {
-  return <SajuHubApp />;
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export default async function SajuPage({
+  searchParams,
+}: {
+  searchParams?: Promise<SearchParams> | SearchParams;
+}) {
+  const resolved = searchParams ? await Promise.resolve(searchParams) : {};
+  const raw = resolved.product;
+  const productParam = Array.isArray(raw) ? raw[0] : raw;
+  const matched = getSajuProduct(productParam);
+  const initialProductId = (matched?.id ?? null) as SajuProductId | null;
+
+  return <SajuHubApp initialProductId={initialProductId} />;
 }

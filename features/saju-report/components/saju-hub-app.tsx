@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
 import { emptyBirthForm } from "@/features/saju-report/buildReport";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
+import { getLandingByProductId } from "@/features/saju-report/product-landings";
 import { SAJU_PRODUCTS, SAJU_REPORT_PRICE, getSajuProduct } from "@/features/saju-report/products";
 import type {
   SajuBirthForm,
@@ -31,18 +32,13 @@ function Stars({ n }: { n: number }) {
   );
 }
 
-function ProductCard({
-  product,
-  onSelect,
-}: {
-  product: SajuProduct;
-  onSelect: () => void;
-}) {
+function ProductCard({ product }: { product: SajuProduct }) {
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
+  const landing = getLandingByProductId(product.id);
+  const href = landing?.path ?? `/saju?product=${product.id}`;
   return (
-    <button
-      type="button"
-      onClick={onSelect}
+    <Link
+      href={href}
       className="saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985]"
       style={{ boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 28px ${product.accent}18` }}
     >
@@ -73,18 +69,16 @@ function ProductCard({
       <div className="flex flex-1 flex-col gap-2.5 p-3.5">
         <p className="line-clamp-3 text-[12px] leading-5 text-[#B8AEB4]">{product.painPoint}</p>
         <span className="saju-cta mt-auto inline-flex min-h-10 items-center justify-center rounded-full px-3 text-xs font-semibold">
-          무료로 시작하기
+          자세히 보기
         </span>
       </div>
-    </button>
+    </Link>
   );
 }
 
 function HubLanding({
-  onPickProduct,
   onScrollProducts,
 }: {
-  onPickProduct: (id: SajuProductId) => void;
   onScrollProducts: () => void;
 }) {
   return (
@@ -128,11 +122,7 @@ function HubLanding({
         </div>
         <div className="grid grid-cols-2 gap-3">
           {SAJU_PRODUCTS.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onSelect={() => onPickProduct(product.id)}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
@@ -589,9 +579,13 @@ function ReportView({
   );
 }
 
-export function SajuHubApp() {
-  const [step, setStep] = useState<SajuReportStep>("hub");
-  const [productId, setProductId] = useState<SajuProductId | null>(null);
+export function SajuHubApp({
+  initialProductId = null,
+}: {
+  initialProductId?: SajuProductId | null;
+} = {}) {
+  const [step, setStep] = useState<SajuReportStep>(initialProductId ? "form" : "hub");
+  const [productId, setProductId] = useState<SajuProductId | null>(initialProductId);
   const [form, setForm] = useState<SajuBirthForm>(() => emptyBirthForm());
   const [preview, setPreview] = useState<SajuReportPayload | null>(null);
   const [report, setReport] = useState<SajuReportPayload | null>(null);
@@ -611,14 +605,11 @@ export function SajuHubApp() {
     }
   }, []);
 
-  const pickProduct = useCallback((id: SajuProductId) => {
-    setProductId(id);
-    setError(null);
-    setPreview(null);
-    setReport(null);
+  useEffect(() => {
+    if (!initialProductId) return;
+    setProductId(initialProductId);
     setStep("form");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [initialProductId]);
 
   const scrollProducts = useCallback(() => {
     document.getElementById("saju-products")?.scrollIntoView({ behavior: "smooth" });
@@ -697,7 +688,7 @@ export function SajuHubApp() {
           ) : null}
 
           {step === "hub" ? (
-            <HubLanding onPickProduct={pickProduct} onScrollProducts={scrollProducts} />
+            <HubLanding onScrollProducts={scrollProducts} />
           ) : null}
 
           {step === "form" && product ? (
@@ -733,13 +724,12 @@ export function SajuHubApp() {
                 예시 · 지금 보는 중
               </span>
             </div>
-            <button
-              type="button"
-              onClick={scrollProducts}
+            <Link
+              href="/saju/reunion"
               className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
             >
               재회운 무료로 보기
-            </button>
+            </Link>
           </div>
         ) : null}
       </div>
