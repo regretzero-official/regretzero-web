@@ -10,6 +10,8 @@ import {
 } from "@/features/saju-report/product-landings";
 import { getSajuProduct } from "@/features/saju-report/products";
 
+import { SajuEntryGate, SajuEntryReplayLink } from "./saju-entry-overlay";
+
 function Stars({ n }: { n: number }) {
   return (
     <span className="tracking-tight text-[#FF7A99]" aria-label={`${n}점`}>
@@ -35,7 +37,7 @@ function LockIcon() {
   );
 }
 
-export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
+function LandingBody({ slug }: { slug: SajuLandingSlug }) {
   const landing = getLandingBySlug(slug);
   const product = landing ? getSajuProduct(landing.productId) : null;
   if (!landing || !product) {
@@ -60,10 +62,10 @@ export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
             {product.shortTitle}
           </div>
           <Link
-            href="/"
+            href="/saju/faq"
             className="text-[11px] font-semibold text-[#9A9098] underline-offset-2 hover:underline"
           >
-            홈
+            FAQ
           </Link>
         </header>
 
@@ -107,6 +109,12 @@ export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
                 </div>
               </div>
             </div>
+            <p className="mt-3 text-center text-[11px] text-[#6E666C]">
+              <SajuEntryReplayLink
+                slug={slug}
+                className="underline-offset-2 hover:text-[#FF7A99] hover:underline"
+              />
+            </p>
           </section>
 
           {/* 2. Who / deliverables */}
@@ -240,7 +248,15 @@ export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
 
           {/* 6. FAQ / disclaimer */}
           <section className="px-5">
-            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">자주 묻는 말</h2>
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">자주 묻는 말</h2>
+              <Link
+                href="/saju/faq"
+                className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
+              >
+                전체 FAQ →
+              </Link>
+            </div>
             <div className="mt-3 space-y-2">
               {landing.faq.map((item) => (
                 <details
@@ -285,5 +301,13 @@ export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function SajuProductLanding({ slug }: { slug: SajuLandingSlug }) {
+  return (
+    <SajuEntryGate slug={slug}>
+      <LandingBody slug={slug} />
+    </SajuEntryGate>
   );
 }
