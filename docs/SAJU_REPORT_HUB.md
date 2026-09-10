@@ -12,8 +12,11 @@ Core female-guide line: **여자의 마음은 여자가 잘 알지.**
 | `/saju/heart` | 속마음 | 서나리 |
 | `/saju/breakup` | 이별 결정 | 차유리 |
 | `/saju/strategy` | 재회 행동 전략 | 한보라 |
+| `/saju/faq` | 공통 FAQ | — |
 
 Hub cards link to these landings first. Sticky CTA on a landing deep-links into the hub form via `/saju?product=<id>` (e.g. `reunion-luck`).
+
+First visit to a product landing shows an optional cinematic **입장 연출** (character portrait + voice line + concern chips). Seen state is stored in `localStorage` (`rz-saju-entry-seen`). Replay with `?entry=1`. `prefers-reduced-motion` shows a static overlay (no ken-burns / slide).
 
 ## Flow
 

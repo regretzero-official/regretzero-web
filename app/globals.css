@@ -442,6 +442,46 @@ button {
   display: none;
 }
 
+/* Cinematic character entry overlay */
+.saju-entry-overlay .saju-entry-portrait {
+  transform: scale(1.06);
+  animation: saju-entry-kenburns 12s ease-out forwards;
+}
+
+.saju-entry-overlay .saju-entry-panel {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.saju-entry-overlay .saju-entry-panel-ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes saju-entry-kenburns {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saju-entry-overlay .saju-entry-portrait {
+    animation: none;
+    transform: none;
+  }
+
+  .saju-entry-overlay .saju-entry-panel {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+
 .saju-shell ::selection {
   background: rgba(232, 51, 109, 0.35);
   color: #fff;

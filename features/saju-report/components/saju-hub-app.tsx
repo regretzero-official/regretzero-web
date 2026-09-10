@@ -215,6 +215,17 @@ function HubLanding({
           본 서비스는 오락·위로 목적의 엔터테인먼트입니다. 실제 만세력·점술·의료·법률 조언이
           아니며, 원치 않는 연락·스토킹을 권장하지 않습니다.
         </div>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[12px] font-semibold text-[#9A9098]">
+          <Link href="/saju/faq" className="text-[#FF7A99] underline-offset-2 hover:underline">
+            FAQ
+          </Link>
+          <Link href="/saju/chat" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
+            캐릭터와 대화(베타)
+          </Link>
+          <Link href="/" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
+            홈
+          </Link>
+        </div>
       </section>
     </div>
   );
@@ -673,10 +684,10 @@ export function SajuHubApp({
           </Link>
           <div className="text-sm font-bold tracking-[-0.03em] text-[#F4F0F2]">밤의 사주</div>
           <Link
-            href="/saju/chat"
+            href="/saju/faq"
             className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
           >
-            캐릭터와 대화(베타)
+            FAQ
           </Link>
         </header>
 
@@ -719,10 +730,16 @@ export function SajuHubApp({
 
         {step === "hub" ? (
           <div className="saju-footer fixed bottom-0 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3">
-            <div className="mb-2 flex justify-center">
+            <div className="mb-2 flex items-center justify-center gap-3">
               <span className="rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold text-[#FF7A99] backdrop-blur">
                 예시 · 지금 보는 중
               </span>
+              <Link
+                href="/saju/faq"
+                className="text-[10px] font-semibold text-[#9A9098] underline-offset-2 hover:text-[#FF7A99] hover:underline"
+              >
+                FAQ
+              </Link>
             </div>
             <Link
               href="/saju/reunion"
