@@ -52,9 +52,10 @@ function ReportReader({
             <h1 className="text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">{report.title}</h1>
           </div>
         </div>
-        <p className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
-          {report.oneLiner}
-        </p>
+        <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
+          <ReportMarkdown body={report.oneLiner} />
+        </div>
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">오락·비예언 · 재미·위로용 콘텐츠입니다.</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"
@@ -201,7 +202,7 @@ export function SajuMyApp() {
                               {r.title}
                             </div>
                             <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-[#9A9098]">
-                              {r.oneLiner}
+                              {r.oneLiner.replace(/\*\*/g, "")}
                             </p>
                             <span className="mt-2 inline-flex text-[11px] font-semibold text-[#FF7A99]">
                               다시 열기 →

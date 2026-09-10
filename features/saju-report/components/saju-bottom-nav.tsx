@@ -148,4 +148,4 @@ export function SajuBottomNav() {
 
 /** Extra bottom padding so content clears the fixed bottom nav */
 export const SAJU_BOTTOM_NAV_PAD =
-  "pb-[calc(env(safe-area-inset-bottom)+72px)]";
+  "pb-[calc(env(safe-area-inset-bottom)+96px)]";

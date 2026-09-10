@@ -1,5 +1,11 @@
 export { SAJU_PRODUCTS, SAJU_REPORT_PRICE, getSajuProduct } from "./products";
 export {
+  CANONICAL_SECTIONS,
+  getCanonicalSections,
+  getCanonicalSectionCount,
+  displaySectionTitle,
+} from "./canonical-sections";
+export {
   SAJU_PRODUCT_LANDINGS,
   getLandingBySlug,
   getLandingByProductId,

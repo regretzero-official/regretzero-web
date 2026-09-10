@@ -20,18 +20,32 @@ type CheckoutSheetProps = {
   unlocking: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  sectionCount?: number;
 };
+
+function TestPayBadge() {
+  return (
+    <div
+      className="rounded-[14px] border border-[#F0A05A]/45 bg-[#F0A05A]/15 px-3 py-2.5 text-center text-[12px] font-bold tracking-[-0.01em] text-[#F0A05A]"
+      role="status"
+    >
+      테스트 결제 · 실제 청구 없음
+    </div>
+  );
+}
 
 export function CheckoutSheet({
   product,
   unlocking,
   onClose,
   onConfirm,
+  sectionCount,
 }: CheckoutSheetProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [method, setMethod] = useState<PayMethodId>("card");
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
   const priceLabel = `₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`;
+  const sectionsN = sectionCount ?? product.sections.length;
 
   return (
     <div className="fixed inset-0 z-[90] flex items-end justify-center sm:items-center">
@@ -63,7 +77,9 @@ export function CheckoutSheet({
             </button>
           </div>
 
-          <div className="px-5 py-4">
+          <div className="space-y-3 px-5 py-4">
+            <TestPayBadge />
+
             {step === 1 ? (
               <div className="space-y-4">
                 <div className="flex gap-3 rounded-[18px] border border-white/10 bg-[#09090B] p-3.5">
@@ -94,9 +110,6 @@ export function CheckoutSheet({
                     {priceLabel}
                   </span>
                 </div>
-                <p className="rounded-[14px] border border-[#E8336D]/25 bg-[#E8336D]/10 px-3 py-2 text-[11px] leading-5 text-[#FF7A99]">
-                  지금은 테스트 결제(실제 청구 없음)
-                </p>
               </div>
             ) : null}
 
@@ -145,9 +158,12 @@ export function CheckoutSheet({
                     <li>
                       · 수단: {PAY_METHODS.find((m) => m.id === method)?.label}
                     </li>
-                    <li>· 섹션 약 {product.sections.length}개 · 긴 해석</li>
+                    <li>· 섹션 {sectionsN}개 · 긴 해석</li>
                   </ul>
                 </div>
+                <p className="rounded-[14px] border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] leading-5 text-[#9A9098]">
+                  <strong className="text-[#D8D0D4]">오락·비예언</strong> · 재미·위로용이며 확정 예언·전문 상담을 대신하지 않아요.
+                </p>
                 <p className="text-[11px] leading-5 text-[#9A9098]">
                   확인하면 이 기기 localStorage에 잠금이 풀리고,{" "}
                   <strong className="text-[#D8D0D4]">내 사주</strong>에 저장됩니다.

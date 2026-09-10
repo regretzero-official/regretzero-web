@@ -191,7 +191,7 @@ export function LockedSectionsPaywall({
         </div>
       </div>
       <p className="mt-1.5 text-[11px] leading-5 text-[#9A9098]">
-        지금 {previewUnlockedCount}개만 열려 있고, 나머지 {lockedCount}개 제목이 잠겨 있어요. 잠금 해제 시 약 {total}개 섹션 · 긴 해석을 받습니다.
+        지금 {previewUnlockedCount}개만 열려 있고, 나머지 {lockedCount}개가 잠겨 있어요. 잠금 해제 시 {total}개 섹션 · 긴 해석을 받습니다.
       </p>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
         <div

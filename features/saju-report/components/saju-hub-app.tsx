@@ -359,7 +359,7 @@ function BirthFormView({
       </div>
 
       <form
-        className="mt-5 space-y-4 px-5"
+        className="mt-5 space-y-4 px-5 pb-8"
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
@@ -398,9 +398,9 @@ function BirthFormView({
         <div className="grid grid-cols-3 gap-2">
           {(
             [
-              ["birthYear", "년", "1995"],
-              ["birthMonth", "월", "3"],
-              ["birthDay", "일", "14"],
+              ["birthYear", "출생 연도", "1995"],
+              ["birthMonth", "출생 월", "3"],
+              ["birthDay", "출생 일", "14"],
             ] as const
           ).map(([key, label, ph]) => (
             <label key={key} className="block">
@@ -418,7 +418,7 @@ function BirthFormView({
 
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 시간</span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 시간 <span className="font-normal text-[#6E666C]">(선택)</span></span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthTime}
@@ -427,7 +427,7 @@ function BirthFormView({
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 지역</span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 지역 <span className="font-normal text-[#6E666C]">(선택 · 비우면 서울로 읽기)</span></span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthPlace}
@@ -448,7 +448,7 @@ function BirthFormView({
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생년</span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생 연도 <span className="font-normal text-[#6E666C]">(선택)</span></span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               inputMode="numeric"
@@ -550,13 +550,23 @@ function PreviewView({
             <div className="absolute inset-0 bg-gradient-to-t from-[#12151C] via-[#12151C]/50 to-transparent" />
           </div>
           <div className="bg-[#12151C] px-4 pb-4 pt-1">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF7A99]">
-              무료 미리보기
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF7A99]">
+                무료 미리보기
+              </div>
+              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#9A9098]">
+                오락·비예언
+              </span>
             </div>
             <h1 className="mt-1 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
               {report.title}
             </h1>
-            <p className="mt-2 text-sm leading-6 text-[#D8D0D4]">{report.oneLiner}</p>
+            <div className="mt-2 text-sm leading-6 text-[#D8D0D4]">
+              <ReportMarkdown body={report.oneLiner} />
+            </div>
+            <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
+              재미·위로용이며 확정 예언이 아닙니다.
+            </p>
           </div>
         </div>
       </div>
@@ -586,10 +596,13 @@ function PreviewView({
         ) : null}
 
         <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-          <LockedSectionsPaywall sections={product.sections} previewUnlockedCount={1} />
+          <LockedSectionsPaywall
+            sections={report.sections.map((s) => s.title)}
+            previewUnlockedCount={1}
+          />
           <p className="mt-3 text-xs leading-5 text-[#9A9098]">
             잠금 해제 시{" "}
-            <strong className="text-[#D8D0D4]">약 {product.sections.length}개 섹션 · 긴 해석</strong>
+            <strong className="text-[#D8D0D4]">{report.sections.length}개 섹션 · 긴 해석</strong>
             과 내 사주 저장
           </p>
           <button
@@ -611,6 +624,7 @@ function PreviewView({
           unlocking={unlocking}
           onClose={onCloseCheckout}
           onConfirm={onConfirmUnlock}
+          sectionCount={report.sections.length}
         />
       ) : null}
     </div>
@@ -654,9 +668,10 @@ function ReportView({
             <h1 className="text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">{report.title}</h1>
           </div>
         </div>
-        <p className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
-          {report.oneLiner}
-        </p>
+        <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
+          <ReportMarkdown body={report.oneLiner} />
+        </div>
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">오락·비예언 · 재미·위로용 콘텐츠입니다.</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"

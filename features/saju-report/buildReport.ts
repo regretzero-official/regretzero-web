@@ -1,5 +1,6 @@
 import { getSajuCharacter } from "@/features/saju-chat/characters";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
+import { getCanonicalSections } from "./canonical-sections";
 import { getSajuProduct } from "./products";
 import type {
   SajuBirthForm,
@@ -317,7 +318,7 @@ function commonCover(
   const y = you(form);
   return {
     id: "cover",
-    title: "1. 표지 / 한줄결론",
+    title: "표지 / 한줄결론",
     body: `${voice.openerAside(p)}
 
 ${voice.coverBridge(y, birthLabel(form), form.gender, monthsLabel(form), breakupLine(form))}
@@ -341,7 +342,7 @@ function questionsSection(form: SajuBirthForm, voice: VoicePack): SajuReportSect
   const p = partner(form);
   return {
     id: "questions",
-    title: "2. 이번 점사의 질문 정리",
+    title: "이번 점사의 질문 정리",
     body: `${voice.questionsLead}
 
 1. **관계는 다시 열릴 수 있는가?** — “가능/불가능”이 아니라, *어떤 조건에서 가능성이 살아나는가.*
@@ -367,7 +368,7 @@ function loveTraitSection(form: SajuBirthForm, voice: VoicePack): SajuReportSect
   const time = safe(form.birthTime, "밤 10시");
   return {
     id: "trait",
-    title: "3. 원국·일간 기질",
+    title: "원국·일간 기질",
     body: `${voice.traitLead}
 ${birthLabel(form)} ${form.gender}의 결을 전통 사주 언어로 옮기면 대략 이런 이미지다.
 
@@ -391,13 +392,11 @@ ${month}월생의 월지 결은 **기운이 올라오되 유지에서 조율이 
 ### 3-5. 십성(十星)으로 본 연애 감각
 **십성**은 일간을 기준으로 나머지 글자가 어떤 ‘역할’을 하는지를 열 가지로 나눈 체계다.
 
-| 십성 | 쉬운 말 |
-|------|---------|
-| 비견·겁재 | 나와 비슷한 기운 / 경쟁·나눔·자존 |
-| 식신·상관 | 표현·재능 / 말·반항·날카로운 감정 표출 |
-| 편재·정재 | 유동적 끌림·현실 / 안정적 관계·책임 있는 애정 |
-| 편관·정관 | 강한 자극·압박의 상대 / 격식·책임·‘공식 연인’의 틀 |
-| 편인·정인 | 직감·예민한 보호 / 이해·학습·감정의 완충 |
+- **비견·겁재**: 나와 비슷한 기운 / 경쟁·나눔·자존
+- **식신·상관**: 표현·재능 / 말·반항·날카로운 감정 표출
+- **편재·정재**: 유동적 끌림·현실 / 안정적 관계·책임 있는 애정
+- **편관·정관**: 강한 자극·압박의 상대 / 격식·책임·‘공식 연인’의 틀
+- **편인·정인**: 직감·예민한 보호 / 이해·학습·감정의 완충
 
 네 연애 감각(예시): 상대에게 **관심·챙김(재성·인성 쪽 사용)**을 많이 쓰는 편. 상대가 감정을 닫으면 “내가 부족한가”로 해석하기 쉽다. 이때 **상관**처럼 말이 날카로워지거나, **정인**처럼 과도하게 이해하고 참는 패턴이 번갈아 나올 수 있다.
 
@@ -413,7 +412,7 @@ function lovePatternSection(form: SajuBirthForm, voice: VoicePack): SajuReportSe
   const p = partner(form);
   return {
     id: "pattern",
-    title: "4. 원국 연애 패턴 · 용신 감각",
+    title: "원국 연애 패턴 · 용신 감각",
     body: `네 원국에서 보이는 연애 패턴을, ${p} 이전에도 비슷한 결로 겪었을 법한 **스크립트**로 읽는다.
 
 1. **진입**: 상대의 빈자리·무심함·말수의 적음이 오히려 끌림이 된다.
@@ -422,7 +421,7 @@ function lovePatternSection(form: SajuBirthForm, voice: VoicePack): SajuReportSe
 4. **차단**: 상대가 지쳐 거리를 둔다. 너는 “버림”으로 읽고, 그는 “숨”으로 읽는다.
 5. **잔향**: 헤어진 뒤에도 밤에 감정이 다시 차오른다. 지금 ${monthsLabel(form)}은 **4→5단계**에 걸쳐 있을 가능성이 크다.
 
-재회를 원한다면, 같은 스크립트의 3단계를 **다른 호흡**으로 다시 쓰야 한다. 같은 방식으로 들어가면, 합이 다시 충이 된다.
+재회를 원한다면, 같은 스크립트의 3단계를 **다른 호흡**으로 다시 써야 한다. 같은 방식으로 들어가면, 합이 다시 충이 된다.
 
 ### 용신·희신·기신 (읽기)
 - **용신 감각**: 감정·관계를 안정적으로 붙잡아 주는 기운(정관·정인 쪽의 차분한 틀).
@@ -440,7 +439,7 @@ function bondSection(form: SajuBirthForm, voice: VoicePack): SajuReportSection {
   const ageBit = py ? `${p}(${py}년생)와 ` : `${p}와 `;
   return {
     id: "bond",
-    title: "5. 두 사람 사이 인연의 결 (합·충·형·해)",
+    title: "두 사람 사이 인연의 결 (합·충·형·해)",
     body: `${ageBit}너는 나이 차이보다 **호흡 차이**가 핵심이다.
 전통 사주에서 글자끼리의 관계를 **합(合)·충(沖)·형(刑)·해(害)**로 본다.
 쉽게 말하면—합은 붙음, 충은 부딪침, 형은 꼬임·상처, 해는 불편·배신감의 결이다.
@@ -468,7 +467,7 @@ function sipseongSection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
   const p = partner(form);
   return {
     id: "sipseong",
-    title: "6. 십성·합충으로 본 역학",
+    title: "십성·합충으로 본 역학",
     body: `※ 아래는 설득력 있는 읽기다. 실제 만세력 확정값이 아니다.
 
 ### 관성(官星) — “우리라는 틀”
@@ -499,7 +498,7 @@ function breakupReasonSection(form: SajuBirthForm, voice: VoicePack): SajuReport
   const p = partner(form);
   return {
     id: "breakup-reason",
-    title: "7. 헤어진 진짜 이유 — 표면 vs 속마음",
+    title: "헤어진 진짜 이유 — 표면 vs 속마음",
     body: `### 표면
 - 대화가 줄고, 만나면 편하기보다 피곤했다.
 - “잠깐 쉬자”, “이쯤에서 정리하자” 같은 말이 나왔을 가능성.
@@ -522,7 +521,7 @@ function remainingHeartSection(form: SajuBirthForm, voice: VoicePack): SajuRepor
   const p = partner(form);
   return {
     id: "remaining",
-    title: "8. 상대 속마음에 내가 남아있는지",
+    title: "상대 속마음에 내가 남아있는지",
     body: `${voice.remainingAside(p)}
 헤어진 지 ${monthsLabel(form)}, 메모상 “${breakupLine(form)}”라면—삭제의 공망보다 **손대기 무서운 공망**에 가깝다.
 
@@ -553,7 +552,7 @@ function timelineSection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
   const m = monthsShort(form);
   return {
     id: "timeline",
-    title: "9. 대운·세운 타임라인 · 1 · 3 · 6개월",
+    title: "대운·세운 타임라인 · 1 · 3 · 6개월",
     body: `먼저 용어만 짚는다.
 - **대운(大運)**: 약 10년 단위의 큰 흐름. 연애·인연의 ‘시즌’.
 - **세운(歲運)**: 그해의 흐름.
@@ -599,7 +598,7 @@ function contactGuideSection(form: SajuBirthForm, voice: VoicePack): SajuReportS
   const p = partner(form);
   return {
     id: "contact",
-    title: "10. 연락 멘트 / 금지 문구",
+    title: "연락 멘트 / 금지 문구",
     body: `**지금 당장(이 주~이번 달)의 장문·감정 폭발형 연락은 비추천.**
 꼭 보내야 한다면, “확인받으려는 연락”인지 “흘려보내려는 연락”인지 구분해. 확인용이면 보내지 마.
 사주 감각으로—지금은 상관·편관이 나오기 쉽고, 식신·정재가 나오기 어려운 타이밍이다.
@@ -629,7 +628,7 @@ function strategySection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
   const p = partner(form);
   return {
     id: "strategy",
-    title: "11. 재접근 전략 3단계",
+    title: "재접근 전략 3단계",
     body: `### 1단계 — 네 기운부터 회수 (지금~1개월)
 ${p}를 설득하지 마. 일상에서 그를 ‘필수 변수’에서 빼.
 운동·일·외모·친구 약속으로 “나 없이도 굴러간다”는 신호를 네 몸부터 만들어.
@@ -655,7 +654,7 @@ function pitfallsSection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
   const p = partner(form);
   return {
     id: "pitfalls",
-    title: "12. 주의할 함정",
+    title: "주의할 함정",
     body: `${voice.pitfallsLead}
 
 1. **해석 중독**: ${p}의 모든 행동을 “좋아한다/아니다”로만 읽기. 공망을 끝으로 단정하지 마.
@@ -675,7 +674,7 @@ function closingSection(form: SajuBirthForm, voice: VoicePack): SajuReportSectio
   const p = partner(form);
   return {
     id: "closing",
-    title: `13. ${voice.name}의 마지막 한마디`,
+    title: "캐릭터 마지막 한마디",
     body: `${voice.closingHook(p, monthsLabel(form))}
 
 ${voice.closingBody}
@@ -687,7 +686,7 @@ ${voice.signOff}`,
 function noticeSection(characterName: string, productTitle: string): SajuReportSection {
   return {
     id: "notice",
-    title: "14. 안내",
+    title: "안내",
     body: disclaimerBlock(characterName, productTitle),
   };
 }
@@ -904,7 +903,17 @@ export function buildTemplateReport(
   const character = getSajuCharacter(product.characterId);
   const characterName = character?.name ?? product.characterName;
   const voice = voicePack(product.characterId, characterName);
-  const sections = sectionsForProduct(productId, form, voice, product.title);
+  const built = sectionsForProduct(productId, form, voice, product.title);
+  const canonical = getCanonicalSections(productId);
+  if (built.length !== canonical.length) {
+    throw new Error(
+      `Section count mismatch for ${productId}: built=${built.length} canonical=${canonical.length}`,
+    );
+  }
+  const sections = built.map((s, i) => ({
+    ...s,
+    title: canonical[i] ?? s.title,
+  }));
   const previewSections = sections.slice(0, 2).map((s, i) => ({
     ...s,
     blurred: i === 1,

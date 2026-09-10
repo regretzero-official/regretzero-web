@@ -1,3 +1,4 @@
+import { CANONICAL_SECTIONS } from "./canonical-sections";
 import type { SajuProduct } from "./types";
 
 export const SAJU_REPORT_PRICE = 9900;
@@ -15,19 +16,7 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     priceWon: SAJU_REPORT_PRICE,
     badge: "BEST",
     accent: "#F0A05A",
-    sections: [
-      "한줄결론",
-      "원국·일간 기질",
-      "십성·합충 역학",
-      "헤어진 이유",
-      "속마음",
-      "대운·세운 타임라인",
-      "연락 멘트/금지",
-      "전략 3단계",
-      "함정",
-      "캐릭터 마지막 한마디",
-      "엔터 고지",
-    ],
+    sections: [...CANONICAL_SECTIONS["reunion-luck"]],
   },
   {
     id: "partner-heart",
@@ -41,18 +30,7 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     priceWon: SAJU_REPORT_PRICE,
     badge: "위로",
     accent: "#C4A1FF",
-    sections: [
-      "한줄결론",
-      "원국·일간 기질",
-      "인연의 결 · 합충",
-      "헤어진 이유",
-      "속마음·보관함",
-      "다가갈 온도",
-      "연락 멘트/금지",
-      "함정",
-      "캐릭터 마지막 한마디",
-      "엔터 고지",
-    ],
+    sections: [...CANONICAL_SECTIONS["partner-heart"]],
   },
   {
     id: "breakup-decision",
@@ -66,17 +44,7 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     priceWon: SAJU_REPORT_PRICE,
     badge: "현실",
     accent: "#38BDF8",
-    sections: [
-      "한줄결론",
-      "원국·일간 기질",
-      "헤어진 이유",
-      "남겨둘 이유 / 놓을 이유",
-      "결정 체크리스트",
-      "자존 회복 루틴",
-      "함정",
-      "캐릭터 마지막 한마디",
-      "엔터 고지",
-    ],
+    sections: [...CANONICAL_SECTIONS["breakup-decision"]],
   },
   {
     id: "reunion-strategy",
@@ -90,17 +58,7 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     priceWon: SAJU_REPORT_PRICE,
     badge: "실행",
     accent: "#FB7185",
-    sections: [
-      "한줄결론",
-      "원국·일간 기질",
-      "지금 하면 안 되는 것",
-      "대운·세운 타임라인",
-      "연락 멘트/금지",
-      "전략 3단계",
-      "함정",
-      "캐릭터 마지막 한마디",
-      "엔터 고지",
-    ],
+    sections: [...CANONICAL_SECTIONS["reunion-strategy"]],
   },
 ];
 
