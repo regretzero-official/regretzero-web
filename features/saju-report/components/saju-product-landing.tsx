@@ -11,31 +11,12 @@ import {
 import { getSajuProduct } from "@/features/saju-report/products";
 
 import { SajuEntryGate, SajuEntryReplayLink } from "./saju-entry-overlay";
-
-function Stars({ n }: { n: number }) {
-  return (
-    <span className="tracking-tight text-[#FF7A99]" aria-label={`${n}점`}>
-      {"★".repeat(n)}
-      <span className="text-white/20">{"★".repeat(Math.max(0, 5 - n))}</span>
-    </span>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      aria-hidden
-      className="h-3.5 w-3.5 shrink-0 text-[#FF7A99]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
+import {
+  DemoReviewCard,
+  LockIcon,
+  SajuBusinessFooter,
+  SajuTrustStrip,
+} from "./saju-trust";
 
 function LandingBody({ slug }: { slug: SajuLandingSlug }) {
   const landing = getLandingBySlug(slug);
@@ -115,6 +96,9 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
                 className="underline-offset-2 hover:text-[#FF7A99] hover:underline"
               />
             </p>
+            <div className="mt-4">
+              <SajuTrustStrip />
+            </div>
           </section>
 
           {/* 2. Who / deliverables */}
@@ -156,11 +140,16 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
 
           {/* 3. Preview outline with locks */}
           <section className="px-5">
-            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-              미리보기 구성
-            </h2>
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
+                미리보기 구성
+              </h2>
+              <span className="text-[11px] font-semibold text-[#FF7A99]">
+                약 {product.sections.length}개 섹션 · 긴 해석
+              </span>
+            </div>
             <p className="mt-1 text-xs leading-5 text-[#9A9098]">
-              일부는 무료로 열리고, 나머지는 잠금으로 표시돼요.
+              일부는 무료로 열리고, 나머지는 잠금 아이콘으로 표시돼요.
             </p>
             <ol className="mt-4 space-y-2">
               {product.sections.map((title, index) => {
@@ -225,23 +214,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
             </p>
             <div className="space-y-3">
               {reviewList.map((r) => (
-                <article key={r.id} className="saju-card rounded-[20px] px-4 py-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-semibold text-[#F4F0F2]">{r.maskedName}</div>
-                    <Stars n={r.stars} />
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {r.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-2.5 text-sm leading-6 text-[#B8AEB4]">{r.body}</p>
-                </article>
+                <DemoReviewCard key={r.id} review={r} />
               ))}
             </div>
           </section>
@@ -273,9 +246,8 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
                 </details>
               ))}
             </div>
-            <div className="saju-card-elevated mt-5 rounded-[22px] px-4 py-4 text-xs leading-5 text-[#9A9098]">
-              본 서비스는 오락·위로 목적의 엔터테인먼트입니다. 실제 만세력·점술·의료·법률 조언이
-              아니며, 원치 않는 연락·스토킹을 권장하지 않습니다.
+            <div className="mt-5">
+              <SajuBusinessFooter />
             </div>
           </section>
 

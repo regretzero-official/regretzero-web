@@ -44,6 +44,17 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 
 Do **not** commit secrets. Use `.env.local` locally.
 
+## Trust UX
+
+- Compact trust strip on hub + product landings: 엔터테인먼트 · 미리보기 무료 · 본문 유료/데모 · FAQ
+- Preview paywall lists locked sections with lock icons + “약 N개 섹션 · 긴 해석”
+- Demo reviews: dates, masked ids, saju-element chips; labeled **예시 후기(데모)**
+- Footer business block on `/saju` and FAQ: Regretzero 사주 · placeholder contact · FAQ anchors for privacy/refund/terms
+
 ## Disclaimer
 
 UI states entertainment only — not real prophecy. Demo reviews are clearly labeled **예시 후기(데모)**.
+
+## Report depth
+
+Unlocked Korean templates aim ~6k–10k characters with richer sections (원국/일간, 십성·합충, 대운·세운, 멘트/금지, 전략 3단계, 함정, 캐릭터 마지막 한마디, 엔터 고지). Character voice follows `characterId`. LLM path (OPENAI/GEMINI) targets the same depth.

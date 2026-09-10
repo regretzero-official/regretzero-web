@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { SajuBusinessFooter } from "@/features/saju-report/components/saju-trust";
 import { SAJU_FAQ_ITEMS } from "@/features/saju-report/faq";
 import { SAJU_PRODUCT_LANDINGS } from "@/features/saju-report/product-landings";
 
@@ -47,7 +48,8 @@ export default function SajuFaqPage() {
             {SAJU_FAQ_ITEMS.map((item) => (
               <details
                 key={item.id}
-                className="saju-card group rounded-[16px] px-3.5 py-3 open:pb-3.5"
+                id={item.id}
+                className="saju-card group scroll-mt-20 rounded-[16px] px-3.5 py-3 open:pb-3.5"
                 open={item.id === "what"}
               >
                 <summary className="cursor-pointer list-none text-sm font-semibold text-[#F4F0F2] [&::-webkit-details-marker]:hidden">
@@ -81,6 +83,10 @@ export default function SajuFaqPage() {
             본 서비스는 오락·위로 목적의 엔터테인먼트입니다. 실제 만세력·점술·의료·법률 조언이
             아니며, 원치 않는 연락·스토킹을 권장하지 않습니다. 현재 잠금 해제는{" "}
             <strong className="text-[#D8D0D4]">데모</strong>이며 실제 결제가 이루어지지 않습니다.
+          </section>
+
+          <section>
+            <SajuBusinessFooter />
           </section>
         </main>
       </div>

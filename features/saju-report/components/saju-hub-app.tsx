@@ -22,15 +22,12 @@ import {
 } from "@/features/saju-report/unlock";
 
 import { ReportMarkdown } from "./report-markdown";
-
-function Stars({ n }: { n: number }) {
-  return (
-    <span className="tracking-tight text-[#FF7A99]" aria-label={`${n}점`}>
-      {"★".repeat(n)}
-      <span className="text-white/20">{"★".repeat(Math.max(0, 5 - n))}</span>
-    </span>
-  );
-}
+import {
+  DemoReviewCard,
+  LockedSectionsPaywall,
+  SajuBusinessFooter,
+  SajuTrustStrip,
+} from "./saju-trust";
 
 function ProductCard({ product }: { product: SajuProduct }) {
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
@@ -108,6 +105,9 @@ function HubLanding({
         >
           무료로 시작하기
         </button>
+        <div className="mt-5">
+          <SajuTrustStrip />
+        </div>
       </section>
 
       <section id="saju-products" className="px-5">
@@ -186,35 +186,13 @@ function HubLanding({
         </p>
         <div className="space-y-3">
           {SAJU_DEMO_REVIEWS.map((r) => (
-            <article
-              key={r.id}
-              className="saju-card rounded-[20px] px-4 py-4"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-semibold text-[#F4F0F2]">{r.maskedName}</div>
-                <Stars n={r.stars} />
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {r.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-2.5 text-sm leading-6 text-[#B8AEB4]">{r.body}</p>
-            </article>
+            <DemoReviewCard key={r.id} review={r} />
           ))}
         </div>
       </section>
 
       <section className="px-5">
-        <div className="saju-card-elevated rounded-[22px] px-4 py-4 text-xs leading-5 text-[#9A9098]">
-          본 서비스는 오락·위로 목적의 엔터테인먼트입니다. 실제 만세력·점술·의료·법률 조언이
-          아니며, 원치 않는 연락·스토킹을 권장하지 않습니다.
-        </div>
+        <SajuBusinessFooter />
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[12px] font-semibold text-[#9A9098]">
           <Link href="/saju/faq" className="text-[#FF7A99] underline-offset-2 hover:underline">
             FAQ
@@ -507,14 +485,10 @@ function PreviewView({
         ) : null}
 
         <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-          <div className="text-sm font-semibold text-[#F4F0F2]">전체 리포트에 포함</div>
-          <ul className="mt-2 space-y-1.5 text-sm text-[#B8AEB4]">
-            {product.sections.map((s) => (
-              <li key={s}>· {s}</li>
-            ))}
-          </ul>
+          <LockedSectionsPaywall sections={product.sections} previewUnlockedCount={1} />
           <p className="mt-3 text-xs leading-5 text-[#9A9098]">
-            데모 결제 · 실제 결제 연동 전 · localStorage 잠금 해제
+            데모 결제 · 실제 결제 연동 전 · localStorage 잠금 해제 ·{" "}
+            <strong className="text-[#D8D0D4]">약 {product.sections.length}개 섹션 · 긴 해석</strong>
           </p>
           <button
             type="button"

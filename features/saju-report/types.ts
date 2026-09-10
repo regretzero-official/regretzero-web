@@ -62,6 +62,11 @@ export type DemoReview = {
   id: string;
   maskedName: string;
   stars: number;
+  /** Product / character tags */
   tags: string[];
+  /** Saju-element chips e.g. 木 · 대운 · 보관함 */
+  elementChips: string[];
+  /** Display date e.g. 2026.08.14 */
+  dateLabel: string;
   body: string;
 };
