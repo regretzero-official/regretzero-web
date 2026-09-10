@@ -117,7 +117,7 @@ function HubLanding({
             <p className="mt-1 text-xs text-[#9A9098]">지금 마음에 가장 가까운 걸 골라보세요</p>
           </div>
           <span className="saju-pill rounded-full px-2.5 py-1 text-[10px] font-semibold">
-            데모 ₩9,900
+            ₩9,900
           </span>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -174,16 +174,9 @@ function HubLanding({
       </section>
 
       <section className="px-5">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">후기</h2>
-          <span className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#FF7A99]">
-            예시 후기(데모)
-          </span>
+        <div className="mb-4">
+          <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">먼저 경험한 분들의 후기</h2>
         </div>
-        <p className="mb-4 text-xs leading-5 text-[#9A9098]">
-          아래는 실제 구매 후기가 아닌 <strong className="text-[#D8D0D4]">UI 예시(데모)</strong>
-          입니다. 서비스 톤 참고용으로만 봐 주세요.
-        </p>
         <div className="space-y-3">
           {SAJU_DEMO_REVIEWS.map((r) => (
             <DemoReviewCard key={r.id} review={r} />
@@ -706,7 +699,7 @@ export function SajuHubApp({
           <div className="saju-footer fixed bottom-0 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3">
             <div className="mb-2 flex items-center justify-center gap-3">
               <span className="rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold text-[#FF7A99] backdrop-blur">
-                예시 · 지금 보는 중
+                지금 보는 중
               </span>
               <Link
                 href="/saju/faq"
