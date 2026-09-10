@@ -297,16 +297,126 @@ button {
 }
 
 
-/* Saju character chat (/saju) — soft romance shell, scoped */
+/* Saju character chat (/saju) — dark romantic occult shell, scoped */
 .saju-shell {
-  --saju-cream: #FFF9F6;
-  --saju-rose: #C45C7A;
-  --saju-ink: #2A1A22;
-  --saju-muted: #8A6A76;
+  --saju-canvas: #08090d;
+  --saju-shell-bg: #12151c;
+  --saju-card: #09090b;
+  --saju-card-elevated: #161920;
+  --saju-pink: #e8336d;
+  --saju-pink-light: #ff7a99;
+  --saju-mint: #5eead4;
+  --saju-ink: #f4f0f2;
+  --saju-muted: #9a9098;
+  --saju-subtle: #6b6570;
+  --saju-border: rgba(255, 255, 255, 0.08);
+  --saju-border-strong: rgba(232, 51, 109, 0.35);
+  color-scheme: dark;
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse at top left, rgba(255, 214, 228, 0.45), transparent 42%),
-    radial-gradient(ellipse at bottom right, rgba(255, 232, 210, 0.55), transparent 46%),
-    linear-gradient(180deg, #FFF9F6 0%, #FFF5F2 48%, #F8F0EA 100%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232, 51, 109, 0.18), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(94, 234, 212, 0.06), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 10% 70%, rgba(255, 122, 153, 0.08), transparent 45%),
+    var(--saju-canvas);
   color: var(--saju-ink);
+}
+
+.saju-shell .saju-app {
+  background: var(--saju-shell-bg);
+  border-color: var(--saju-border);
+}
+
+.saju-shell .saju-card {
+  background: var(--saju-card);
+  border: 1px solid var(--saju-border);
+}
+
+.saju-shell .saju-card-elevated {
+  background: var(--saju-card-elevated);
+  border: 1px solid var(--saju-border);
+}
+
+.saju-shell .saju-header {
+  background: rgba(18, 21, 28, 0.82);
+  border-bottom: 1px solid var(--saju-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.saju-shell .saju-footer {
+  background: rgba(18, 21, 28, 0.92);
+  border-top: 1px solid var(--saju-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.saju-shell .saju-cta {
+  background: var(--saju-pink);
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(232, 51, 109, 0.4);
+}
+
+.saju-shell .saju-cta:hover {
+  background: #d12a60;
+}
+
+.saju-shell .saju-cta:disabled {
+  opacity: 0.4;
+}
+
+.saju-shell .saju-pill {
+  border: 1px solid var(--saju-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--saju-pink-light);
+}
+
+.saju-shell .saju-input {
+  background: var(--saju-card);
+  border: 1px solid var(--saju-border);
+  color: var(--saju-ink);
+}
+
+.saju-shell .saju-input::placeholder {
+  color: var(--saju-subtle);
+}
+
+.saju-shell .saju-input:focus {
+  outline: none;
+  border-color: rgba(232, 51, 109, 0.45);
+  box-shadow: 0 0 0 2px rgba(232, 51, 109, 0.2);
+}
+
+.saju-shell .saju-bubble-assistant {
+  background: var(--saju-card-elevated);
+  border: 1px solid var(--saju-border);
+  color: var(--saju-ink);
+}
+
+.saju-shell .saju-product-card {
+  background:
+    linear-gradient(160deg, rgba(232, 51, 109, 0.12) 0%, transparent 42%),
+    var(--saju-card);
+  border: 1px solid var(--saju-border);
+}
+
+.saju-shell .saju-char-card {
+  background:
+    linear-gradient(165deg, rgba(255, 122, 153, 0.14) 0%, transparent 40%),
+    linear-gradient(200deg, rgba(94, 234, 212, 0.06) 0%, transparent 50%),
+    var(--saju-card);
+  border: 1px solid var(--saju-border);
+}
+
+.saju-shell .saju-scroll-x {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.saju-shell .saju-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+.saju-shell ::selection {
+  background: rgba(232, 51, 109, 0.35);
+  color: #fff;
 }

@@ -13,14 +13,16 @@ export function CharacterAvatar({
   return (
     <div
       aria-hidden
-      className={`relative flex shrink-0 items-center justify-center rounded-full border border-white/70 shadow-[0_8px_24px_rgba(80,40,60,0.12)] ${dim}`}
+      className={`relative flex shrink-0 items-center justify-center rounded-full border border-white/15 shadow-[0_8px_28px_rgba(0,0,0,0.45)] ${dim}`}
       style={{
-        background: `linear-gradient(145deg, ${character.accentSoft}, #fff8f4 55%, ${character.accent}33)`,
+        background: `linear-gradient(145deg, ${character.accentSoft}, #12151c 52%, ${character.accent}40)`,
         color: character.accent,
       }}
     >
       <span className="font-semibold tracking-[-0.04em]">{character.avatarInitial}</span>
-      <span className="absolute -bottom-1 -right-1 text-[0.95rem] drop-shadow-sm">{character.avatarEmoji}</span>
+      <span className="absolute -bottom-1 -right-1 text-[0.95rem] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
+        {character.avatarEmoji}
+      </span>
     </div>
   );
 }
