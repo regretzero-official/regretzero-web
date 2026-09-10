@@ -371,7 +371,7 @@ function breakupDecisionExtra(form: SajuBirthForm): SajuReportSection[] {
 2. 답이 없어도 2주는 버틸 수 있나?
 3. ${p} 없는 한 달의 나를 상상할 수 있나?
 
-강세온 식으로 말하면—결정은 “사랑 점수”가 아니라 **네 자존이 버티는 구조**로 내려라.`,
+차유리 식으로 말하면—결정은 “사랑 점수”가 아니라 **네 자존이 버티는 구조**로 내려라.`,
     },
     {
       id: "self-routine",

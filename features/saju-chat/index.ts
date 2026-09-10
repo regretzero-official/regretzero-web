@@ -7,4 +7,5 @@ export type {
   SajuChatMessage,
   SajuConclusion,
   SajuFlowStep,
+  SajuRoleLabel,
 } from "./types";

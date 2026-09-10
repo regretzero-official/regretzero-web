@@ -40,6 +40,14 @@ function createId() {
 
 function openingMessage(character: SajuCharacter): SajuChatMessage {
   const openings: Record<SajuCharacterId, string> = {
+    "seo-nari":
+      "왔어? 나는 느낌이 왔어—오늘 밤 마음이 좀 복잡하지. 괜찮아, 카톡하듯 천천히 말해. 여자 마음은 여자가 잘 알거든.",
+    "baek-ryeon":
+      "왔구나. 기운이 흩어진 게 보여. 흔들리지 마—숨부터 고르고, 무슨 일인지 말해. 내가 읽을게.",
+    "cha-yuri":
+      "여기까지 온 너, 이미 반은 했어. 그 남자 얘기든 네 속이든—팩트로 정리해줄게. 말해봐.",
+    "han-bora":
+      "헐 진짜 여기까지 왔네. 일단 네 마음부터—무슨 얘기든 해봐. 내가 공감하고, 그다음에 현실적으로 같이 보자.",
     "lee-doryeong":
       "어서 오세요. 오늘 밤 마음이 조금 차가운가요? 괜찮아요—천천히 말해 주세요. 제가 다정하게 들어드릴게요.",
     "han-siwoo":
@@ -116,7 +124,7 @@ function PortraitHeroCard({
             className="mb-2 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.04em] text-white"
             style={{ background: character.accent }}
           >
-            {character.vibe.split("·")[0]?.trim() || "Night"}
+            {character.roleLabel || character.vibe.split("·")[0]?.trim() || "Night"}
           </span>
         ) : null}
 
