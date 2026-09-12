@@ -28,7 +28,7 @@ describe("buildTemplateReport depth", () => {
     const report = buildTemplateReport("reunion-luck", form);
     const len = bodyLen("reunion-luck");
     expect(report.sections.length).toBeGreaterThanOrEqual(12);
-    expect(len).toBeGreaterThanOrEqual(35000);
+    expect(len).toBeGreaterThanOrEqual(38000);
     expect(report.characterName).toBe("백련");
     expect(report.sections.some((s) => s.id === "notice")).toBe(true);
     expect(report.sections.some((s) => /한줄결론|한 줄 결론/.test(s.title))).toBe(true);
@@ -43,18 +43,29 @@ describe("buildTemplateReport depth", () => {
     expect(report.sections.length).toBe(15);
     expect(joined).toMatch(/근거 한 줄/);
     expect(joined).toMatch(/기운이 보여/);
+    expect(joined).toMatch(/밤의 점사|밤이다|기억의 장면|대화창/);
+    expect(joined).toMatch(/다음에 네가 할 선택/);
     expect(joined).not.toMatch(/십성으로 보면/);
     expect(joined).not.toMatch(/호흡 누적/);
     expect(joined).not.toMatch(/용신 감각/);
+    expect(joined).not.toMatch(/### 용신·희신·기신/);
+    expect(joined).not.toMatch(/- 년: .+\/- 월: .+\/- 일:/s);
   });
 
   it("other products stay substantial with character voice", () => {
-    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(5000);
+    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(5500);
     expect(buildTemplateReport("partner-heart", form).characterName).toBe("서나리");
-    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(4500);
+    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(5500);
     expect(buildTemplateReport("breakup-decision", form).characterName).toBe("차유리");
-    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(5000);
+    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(5500);
     expect(buildTemplateReport("reunion-strategy", form).characterName).toBe("한보라");
+    const seo = buildTemplateReport("partner-heart", form).sections.map((s) => s.body).join("\n");
+    const cha = buildTemplateReport("breakup-decision", form).sections.map((s) => s.body).join("\n");
+    const bora = buildTemplateReport("reunion-strategy", form).sections.map((s) => s.body).join("\n");
+    expect(seo).toMatch(/느낌이 왔어|잔향|언니/);
+    expect(cha).toMatch(/팩트|아껴도 돼|퍼줘/);
+    expect(bora).toMatch(/헐|네 마음부터/);
+    expect(seo).toMatch(/다음에 네가 할 선택|읽는 장면|장면/);
   });
 });
 
