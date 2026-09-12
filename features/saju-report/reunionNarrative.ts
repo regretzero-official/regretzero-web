@@ -83,7 +83,12 @@ export function buildReunionNarrativeSections(
   const p = partner(form);
   const y = you(form);
   const dm = dayMasterLabel(chart.dayMaster, chart.dayMasterElement);
-  const partnerDm = chart.partnerYearPillar
+  const pc = chart.partnerChart;
+  const partnerFullDm =
+    pc?.detailLevel === "full" && pc.dayMaster && pc.dayMasterElement
+      ? dayMasterLabel(pc.dayMaster, pc.dayMasterElement)
+      : null;
+  const partnerYearSense = chart.partnerYearPillar
     ? `${chart.partnerYearPillar.stem}${chart.partnerYearPillar.stemElement}`
     : null;
 
@@ -98,7 +103,13 @@ ${voice.coverBridge(y, birthLabel(form), form.gender, monthsLabel(form), breakup
 > ${concernLine(form)}
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
-${partnerDm ? `상대 연주 감각: **${chart.partnerYearPillar!.korean}** (연간 ${partnerDm} 결)` : ""}
+${partnerFullDm
+  ? `상대 원국: **${pc!.summaryLine}** · 일간 **${partnerFullDm}**`
+  : partnerYearSense
+    ? `상대 연주 감각: **${chart.partnerYearPillar!.korean}** (연간 ${partnerYearSense} 결)`
+    : form.partnerName.trim()
+      ? `상대(${p}): 이름만 — 출생 정보가 더 있으면 원국 비교가 깊어져요.`
+      : ""}
 
 **흐름상 결론만 먼저.**
 
@@ -131,6 +142,45 @@ ${chart.tenGods.hour ? `- 시주 ${chart.tenGods.hour.stem}/${chart.tenGods.hour
 이별 메모(${breakupLine(form)}) 이전의 ‘예쁨’은 가짜가 아니다. 다만 같은 기운이 과열되면 합이 충이 된다.`,
   };
 
+  const partnerBlock = (() => {
+    if (pc?.detailLevel === "full" && partnerFullDm) {
+      const ph =
+        pc.hourUnknown || !pc.pillars.hour
+          ? "시주 미상 (상대 출생 시각을 몰라 시주는 제외했어요)"
+          : `시주 ${pc.pillars.hour.korean}(${pc.pillars.hour.hanja})`;
+      return `**${p}**
+- 연주 **${pc.pillars.year.korean}** · 월주 **${pc.pillars.month?.korean ?? "?"}** · 일주 **${pc.pillars.day?.korean ?? "?"}** · 일간 **${partnerFullDm}**
+- ${ph}
+- 요약: ${pc.summaryLine}`;
+    }
+    if (chart.partnerYearPillar && partnerYearSense) {
+      return `**${p}**
+- 연주 **${chart.partnerYearPillar.korean}** (연간 ${partnerYearSense} 결)
+- 월·일·시주가 더 있으면 일간 페어·원국 비교가 정확해져요.`;
+    }
+    if (form.partnerName.trim()) {
+      return `**${p}**
+- 이름만 있어 원국 비교는 **소프트 비교**(이름·이별 패턴 중심)로 읽어요.
+- 상대 생년월일(+시간)을 알면 「두 사람의 사주 원국 비교」가 훨씬 깊어져요.`;
+    }
+    return `**상대**
+- 이름·출생 미상 — 원국 비교는 네 쪽 축만으로 읽어요.`;
+  })();
+
+  const dayMasterPair = (() => {
+    if (partnerFullDm && pc) {
+      return `- 너: **${dm}** (${chart.dayMasterYinYang}${chart.dayMasterElement})
+- ${p}: **${partnerFullDm}** (${pc.dayMasterYinYang ?? ""}${pc.dayMasterElement ?? ""})
+- 일간 페어로 두 사람의 중심 기운을 겹쳐 보는 창이다.`;
+    }
+    if (partnerYearSense && chart.partnerYearPillar) {
+      return `- 너: **${dm}** (${chart.dayMasterYinYang}${chart.dayMasterElement})
+- ${p}: 연주 **${chart.partnerYearPillar.korean}** 결 (${partnerYearSense}) — 연도만으로는 일간 페어를 단정하지 않아요.`;
+    }
+    return `- 너: **${dm}** (${chart.dayMasterYinYang}${chart.dayMasterElement})
+- ${p}: 출생 정보가 더 있으면 일간 페어를 정확히 겹쳐 볼 수 있어요.`;
+  })();
+
   const compare: SajuReportSection = {
     id: "origin-compare",
     title: "두 사람의 사주 원국 비교",
@@ -140,16 +190,14 @@ ${chart.tenGods.hour ? `- 시주 ${chart.tenGods.hour.stem}/${chart.tenGods.hour
 - 연주 **${chart.pillars.year.korean}** · 월주 **${chart.pillars.month.korean}** · 일주 **${chart.pillars.day.korean}** · 일간 **${dm}**
 - ${hourLine(chart)}
 
-**${p}**
-- ${chart.partnerYearPillar ? `연주 **${chart.partnerYearPillar.korean}** (연간 ${partnerDm} 결)` : "출생연도 미상 — 연주 비교 생략"}
-- 일주 전체는 생월일시가 더 있으면 정확해져요.
+${partnerBlock}
 
 양력 ${chart.solar.year}-${String(chart.solar.month).padStart(2, "0")}-${String(chart.solar.day).padStart(2, "0")} 기준 만세력(입춘·절기)으로 계산했어요.
-${chart.hourUnknown ? "출생 시각이 없어 시주는 빼 두었습니다." : ""}
+${chart.hourUnknown ? "네 출생 시각이 없어 시주는 빼 두었습니다." : ""}
+${pc?.detailLevel === "full" && pc.hourUnknown ? "상대 출생 시각이 없어 상대 시주는 빼 두었습니다." : ""}
 
 ### 일간 페어 감각
-- 너: **${dm}** (${chart.dayMasterYinYang}${chart.dayMasterElement})
-${partnerDm ? `- ${p}: 연주 **${chart.partnerYearPillar!.korean}** 결 (${partnerDm})` : `- ${p}: 연도만으로는 일간 페어를 단정하지 않아요.`}
+${dayMasterPair}
 
 ### 공망 · 세운
 - 네 공망: **${chart.voidBranches.join("·") || "없음"}** — ‘관심은 있는데 손이 안 가는’ 구간의 비유

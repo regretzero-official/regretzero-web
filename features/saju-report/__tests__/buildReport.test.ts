@@ -77,3 +77,42 @@ describe("character voice distinctness", () => {
   });
 });
 
+describe("partner chart in reunion origin-compare", () => {
+  it("full partner YMD shows both pillars and day masters", () => {
+    const full = {
+      ...form,
+      partnerBirthMonth: "7",
+      partnerBirthDay: "21",
+      partnerBirthTime: "15:00",
+    };
+    const report = buildTemplateReport("reunion-luck", full);
+    const compare = report.sections.find((s) => s.id === "origin-compare")!.body;
+    expect(report.chart?.partnerChart?.detailLevel).toBe("full");
+    expect(compare).toContain("민재");
+    expect(compare).toMatch(/일간/);
+    expect(compare).toContain(report.chart!.partnerChart!.summaryLine.split("/")[0]);
+    expect(compare).toMatch(/일간 페어/);
+  });
+
+  it("year-only partner keeps year-pillar compare", () => {
+    const report = buildTemplateReport("reunion-luck", form);
+    const compare = report.sections.find((s) => s.id === "origin-compare")!.body;
+    expect(report.chart?.partnerChart?.detailLevel).toBe("year-only");
+    expect(compare).toMatch(/연주/);
+    expect(compare).toMatch(/월·일·시주가 더 있으면|연도만으로는/);
+  });
+
+  it("name-only partner soft compare", () => {
+    const soft = {
+      ...form,
+      partnerBirthYear: "",
+      partnerBirthMonth: "",
+      partnerBirthDay: "",
+      partnerBirthTime: "",
+    };
+    const report = buildTemplateReport("reunion-luck", soft);
+    const compare = report.sections.find((s) => s.id === "origin-compare")!.body;
+    expect(report.chart?.partnerChart).toBeUndefined();
+    expect(compare).toMatch(/소프트 비교|이름만/);
+  });
+});

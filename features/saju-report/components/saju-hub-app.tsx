@@ -448,9 +448,12 @@ function BirthFormView({
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-[16px] border border-white/8 bg-white/[0.03] p-3 space-y-3">
+          <p className="text-[11px] leading-5 text-[#6E666C]">
+            상대 출생은 모두 선택이에요. 연도만 있어도 연주 비교가 되고, 월·일(+시간)까지 있으면 「두 사람의 사주 원국 비교」가 더 깊어져요.
+          </p>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름</span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름 <span className="font-normal text-[#6E666C]">(선택)</span></span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.partnerName}
@@ -458,14 +461,37 @@ function BirthFormView({
               placeholder="예: 민재"
             />
           </label>
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                ["partnerBirthYear", "상대 출생 연도", "1993"],
+                ["partnerBirthMonth", "상대 출생 월", "7"],
+                ["partnerBirthDay", "상대 출생 일", "21"],
+              ] as const
+            ).map(([key, label, ph]) => (
+              <label key={key} className="block">
+                <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">
+                  {label} <span className="font-normal text-[#6E666C]">(선택)</span>
+                </span>
+                <input
+                  className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
+                  inputMode="numeric"
+                  value={form[key]}
+                  onChange={(e) => patch({ [key]: e.target.value })}
+                  placeholder={ph}
+                />
+              </label>
+            ))}
+          </div>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생 연도 <span className="font-normal text-[#6E666C]">(선택)</span></span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">
+              상대 출생 시간 <span className="font-normal text-[#6E666C]">(선택 · 모르면 비우기)</span>
+            </span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              inputMode="numeric"
-              value={form.partnerBirthYear}
-              onChange={(e) => patch({ partnerBirthYear: e.target.value })}
-              placeholder="1993"
+              value={form.partnerBirthTime}
+              onChange={(e) => patch({ partnerBirthTime: e.target.value })}
+              placeholder="예: 오후 3시 / 모름"
             />
           </label>
         </div>

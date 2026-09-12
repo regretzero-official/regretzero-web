@@ -34,6 +34,10 @@ export type SajuBirthForm = {
   birthPlace: string;
   partnerName: string;
   partnerBirthYear: string;
+  /** Optional — with year enables fuller partner 원국 */
+  partnerBirthMonth: string;
+  partnerBirthDay: string;
+  partnerBirthTime: string;
   monthsApart: string;
   breakupNote: string;
   concern: string;
