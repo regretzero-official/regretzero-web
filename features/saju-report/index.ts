@@ -1,4 +1,12 @@
-export { SAJU_PRODUCTS, SAJU_REPORT_PRICE, getSajuProduct } from "./products";
+export {
+  SAJU_PRODUCTS,
+  SAJU_REPORT_PRICE,
+  CHARACTER_PRIMARY_PRODUCT,
+  getSajuProduct,
+  getProductCounselors,
+  resolveProductCounselor,
+  isCounselorForProduct,
+} from "./products";
 export {
   CANONICAL_SECTIONS,
   getCanonicalSections,

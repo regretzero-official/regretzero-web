@@ -211,7 +211,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p} 생각이 남는다면, 그건 약함이 아니라 깊이예요. 다만 깊이가 무게가 되지 않게, 제가 옆에서 지켜드릴게요.`,
+        openerAside: (p) => `다치지 않게, 곁에서 읽어드릴게요. ${p} 생각이 남는다면 약함이 아니라 깊이예요. 그 깊이가 무게가 되지 않게 제가 지켜드릴게요.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}님. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결에 가까워요. 헤어진 지 ${months}, “${breakup}”의 잔향이 아직 남아 있을 수 있어요.`,
         coverClose: "확정 예언은 하지 않아요. 그래도 원국·이별·침묵의 결을 겹치면 위 방향이 가장 설득력 있어요.",
         frameAside: "이도령이 지키는 건 예언이 아니라, 당신이 다치지 않는 여지예요.",
@@ -241,7 +241,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p} 생각난다고 네가 작아질 필요는 없어. 자신감 있게—들이대는 자신감이 아니라, 정돈된 자신감.`,
+        openerAside: (p) => `괜찮아. 같이 정리하자. ${p} 생각난다고 네가 작아질 필요는 없어—들이대는 자신감이 아니라, 정돈된 자신감.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 결이지. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있을 수 있어.`,
         coverClose: "예언은 안 해. 그래도 네 결 + 이별 결 + 침묵 패턴이면 위 방향이 제일 설득력 있어.",
         frameAside: "강세온 식으로—너는 이미 매력 있어. 문제는 타이밍과 온도야.",
@@ -272,7 +272,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `너, 밤에 또 ${p} 생각했지. 氣는 거짓말 잘 안 해. 다만 지금 들이대면 흐름이 또 엉킨다.`,
+        openerAside: (p) => `급할수록 한 박자 쉬어. 너, 밤에 또 ${p} 생각했지. 氣는 거짓말 잘 안 해—지금 들이대면 흐름이 또 엉킨다.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 있다.`,
         coverClose: "단정은 안 한다. 氣는 고정값이 아니니까. 그래도 원국·이별·침묵을 겹치면 위 방향이 가장 설득력 있다.",
         frameAside: "한시우 방식은 단순하다. 표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직하다.",
@@ -941,14 +941,18 @@ function sectionsForProduct(
 export function buildTemplateReport(
   productId: SajuProductId,
   form: SajuBirthForm,
+  selectedCharacterId?: SajuCharacterId | string | null,
 ): SajuReportPayload {
   const product = getSajuProduct(productId);
   if (!product) {
     throw new Error("Unknown product");
   }
-  const character = getSajuCharacter(product.characterId);
+  const resolvedId = product.counselorIds.includes(selectedCharacterId as SajuCharacterId)
+    ? (selectedCharacterId as SajuCharacterId)
+    : product.characterId;
+  const character = getSajuCharacter(resolvedId);
   const characterName = character?.name ?? product.characterName;
-  const voice = voicePack(product.characterId, characterName);
+  const voice = voicePack(resolvedId, characterName);
   const chart = computeChart(form);
   const built = sectionsForProduct(productId, form, voice, product.title, chart);
   const canonical = getCanonicalSections(productId);
@@ -968,7 +972,7 @@ export function buildTemplateReport(
 
   return {
     productId,
-    characterId: product.characterId,
+    characterId: resolvedId,
     characterName,
     title: `${product.title} 리포트｜${characterName}`,
     oneLiner: oneLinerFor(productId, form),
