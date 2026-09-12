@@ -25,7 +25,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/reunion",
     heroHook: "그 사람, 아직 나를 생각할까?",
     heroSub:
-      "헤어진 뒤에도 밤에 생각날 때. 무당 백련이 기운으로 재회 가능성과 타이밍을 길게 짚어줘요.",
+      "헤어진 뒤에도 밤에 생각날 때. 기본은 무당 백련, 이도령도 선택해요.",
     whoFor: [
       "연락이 끊긴 전 연인에게 아직 마음이 남은 사람",
       "재회할 수 있는지, 상대 속마음과 함께 보고 싶은 사람",
@@ -67,7 +67,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/heart",
     heroHook: "연락 없는 그 사람, 속마음은 뭘까요?",
     heroSub:
-      "읽씹·잠수·애매한 거리. 점쟁이 서나리가 직감으로 남은 마음과 거리감의 이유를 짚어줘요.",
+      "읽씹·잠수·애매한 거리. 기본은 점쟁이 서나리, 이도령·강세온도 있어요.",
     whoFor: [
       "상대가 나를 어떻게 생각하는지 답답한 사람",
       "표면 태도와 속마음이 달라 보여 혼란스러운 사람",
@@ -109,7 +109,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/breakup",
     heroHook: "이 사람, 붙잡아야 할까 끝내야 할까?",
     heroSub:
-      "마음만 흔들릴 때. 깍쟁이 차유리가 팩트로, 후회 덜한 쪽을 짚어줘요.",
+      "마음만 흔들릴 때. 기본은 깍쟁이 차유리, 강세온도 선택해요.",
     whoFor: [
       "헤어질지 말지 몇 달째 같은 생각만 반복하는 사람",
       "남겨둘 이유와 놓을 이유가 한꺼번에 떠오르는 사람",
@@ -151,7 +151,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/strategy",
     heroHook: "지금 연락해도 될까? 첫 문장부터 같이 골라봐요.",
     heroSub:
-      "마음만 앞서갈 때. 아이돌 한보라가 공감 먼저, 재접근 타이밍·해도 되는 말까지 짚어줘요.",
+      "마음만 앞서갈 때. 기본은 아이돌 한보라, 한시우도 선택해요.",
     whoFor: [
       "재회하고 싶은데 첫 톡이 막히는 사람",
       "연락했다가 더 멀어질까 봐 두려운 사람",
@@ -197,6 +197,8 @@ export function getLandingByProductId(productId: SajuProductId | string | null |
   return SAJU_PRODUCT_LANDINGS.find((l) => l.productId === productId) ?? null;
 }
 
-export function hubDeepLink(productId: SajuProductId) {
-  return `/saju?product=${productId}` as const;
+export function hubDeepLink(productId: SajuProductId, characterId?: string | null) {
+  const base = `/saju?product=${productId}`;
+  if (characterId) return `${base}&character=${characterId}` as const;
+  return base;
 }

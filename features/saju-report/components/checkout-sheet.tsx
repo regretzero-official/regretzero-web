@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
+import type { SajuCharacterId } from "@/features/saju-chat/types";
 import { SAJU_REPORT_PRICE } from "@/features/saju-report/products";
 import type { SajuProduct } from "@/features/saju-report/types";
 
@@ -17,6 +18,7 @@ type PayMethodId = (typeof PAY_METHODS)[number]["id"];
 
 type CheckoutSheetProps = {
   product: SajuProduct;
+  characterId?: SajuCharacterId | null;
   unlocking: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -36,6 +38,7 @@ function TestPayBadge() {
 
 export function CheckoutSheet({
   product,
+  characterId,
   unlocking,
   onClose,
   onConfirm,
@@ -43,7 +46,9 @@ export function CheckoutSheet({
 }: CheckoutSheetProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [method, setMethod] = useState<PayMethodId>("card");
-  const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
+  const resolvedId = characterId ?? product.characterId;
+  const character = SAJU_CHARACTERS.find((c) => c.id === resolvedId);
+  const characterName = character?.name ?? product.characterName;
   const priceLabel = `₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`;
   const sectionsN = sectionCount ?? product.sections.length;
 
@@ -96,7 +101,7 @@ export function CheckoutSheet({
                   ) : null}
                   <div className="min-w-0 flex-1">
                     <div className="text-[11px] font-semibold text-[#FF7A99]">
-                      {product.characterName}
+                      {characterName}
                     </div>
                     <div className="mt-0.5 text-sm font-bold text-[#F4F0F2]">{product.title}</div>
                     <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#9A9098]">
@@ -153,7 +158,7 @@ export function CheckoutSheet({
                   <div className="font-semibold text-[#F4F0F2]">잠금 해제 요약</div>
                   <ul className="mt-2 space-y-1 text-[13px] text-[#B8AEB4]">
                     <li>· 상품: {product.title}</li>
-                    <li>· 캐릭터: {product.characterName}</li>
+                    <li>· 캐릭터: {characterName}</li>
                     <li>· 금액: {priceLabel}</li>
                     <li>
                       · 수단: {PAY_METHODS.find((m) => m.id === method)?.label}

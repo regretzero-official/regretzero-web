@@ -5,13 +5,24 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
+import type { SajuCharacterId } from "@/features/saju-chat/types";
 import { emptyBirthForm } from "@/features/saju-report/buildReport";
 import { formatChartChip } from "@/features/saju-report/manseryeok/formatChart";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
 import { saveSajuReading } from "@/features/saju-report/my-readings";
-import { getLandingByProductId } from "@/features/saju-report/product-landings";
+import {
+  getLandingByProductId,
+  hubDeepLink,
+} from "@/features/saju-report/product-landings";
 import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
-import { SAJU_PRODUCTS, SAJU_REPORT_PRICE, getSajuProduct } from "@/features/saju-report/products";
+import {
+  CHARACTER_PRIMARY_PRODUCT,
+  SAJU_PRODUCTS,
+  SAJU_REPORT_PRICE,
+  getProductCounselors,
+  getSajuProduct,
+  resolveProductCounselor,
+} from "@/features/saju-report/products";
 import type {
   SajuBirthForm,
   SajuProduct,
@@ -25,6 +36,7 @@ import {
 } from "@/features/saju-report/unlock";
 
 import { CheckoutSheet } from "./checkout-sheet";
+import { CounselorSwitcher } from "./counselor-switcher";
 import { ReportMarkdown } from "./report-markdown";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
 import {
@@ -66,7 +78,10 @@ function ProductCard({ product }: { product: SajuProduct }) {
           <div className="text-[0.95rem] font-bold leading-tight tracking-[-0.03em] text-[#F8F4F6]">
             {product.title}
           </div>
-          <div className="mt-0.5 text-[11px] text-white/70">{product.characterName}</div>
+          <div className="mt-0.5 text-[11px] text-white/70">
+            {product.characterName}
+            {product.counselorIds.length > 1 ? " +" : ""}
+          </div>
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3">
@@ -143,7 +158,10 @@ function HubLanding({
     return SAJU_PRODUCTS.filter((p) => {
       if (!productMatchesFilter(p, filter)) return false;
       if (!q) return true;
-      const hay = `${p.title} ${p.shortTitle} ${p.painPoint} ${p.characterName} ${p.badge}`.toLowerCase();
+      const counselorNames = p.counselorIds
+        .map((id) => SAJU_CHARACTERS.find((c) => c.id === id)?.name ?? "")
+        .join(" ");
+      const hay = `${p.title} ${p.shortTitle} ${p.painPoint} ${p.characterName} ${counselorNames} ${p.badge}`.toLowerCase();
       return hay.includes(q);
     });
   }, [filter, query]);
@@ -152,28 +170,32 @@ function HubLanding({
     <div className={`space-y-8 ${SAJU_BOTTOM_NAV_PAD}`}>
       <section className="px-5 pt-5">
         {/* image-first: large portrait stack before copy */}
-        <div className="flex justify-center -space-x-6">
-          {SAJU_CHARACTERS.filter((c) =>
-            ["seo-nari", "baek-ryeon", "cha-yuri", "han-bora"].includes(c.id),
-          ).map((c, i) => (
+        <div className="flex justify-center -space-x-4">
+          {SAJU_CHARACTERS.map((c, i) => (
             <div
               key={c.id}
-              className="relative h-[148px] w-[118px] overflow-hidden rounded-[22px] border-2 border-[#120E12] shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
-              style={{ zIndex: 4 - i }}
+              className="relative h-[112px] w-[84px] overflow-hidden rounded-[18px] border-2 border-[#120E12] shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
+              style={{ zIndex: SAJU_CHARACTERS.length - i }}
             >
               <Image
                 alt={c.name}
                 className="object-cover object-top"
                 fill
-                sizes="118px"
+                sizes="84px"
                 src={c.portraitSrc}
-                priority={i < 2}
+                priority={i < 4}
               />
             </div>
           ))}
         </div>
-        <p className="mt-3 text-center text-[11px] font-semibold text-[#B8AEB4]">
+        <p className="mt-3 text-center text-[11px] font-semibold leading-5 text-[#B8AEB4]">
           서나리 · 백련 · 차유리 · 한보라
+          <br />
+          <span className="text-[#9A9098]">이도령 · 한시우 · 강세온</span>
+        </p>
+        <p className="mt-2 text-center text-[11px] font-medium tracking-[-0.01em] text-[#9A9098]">
+          여자의 마음은 여자가 잘 알지
+          <span className="text-[#6E666C]"> · 도령도 곁에</span>
         </p>
         <h1 className="mt-4 text-center text-[1.55rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
           그 사람, 아직{" "}
@@ -247,37 +269,42 @@ function HubLanding({
       <section className="px-5">
         <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
-          {SAJU_CHARACTERS.map((c) => (
-            <div
-              key={c.id}
-              className="saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px]"
-            >
-              <div className="relative aspect-[3/4] w-full">
-                <Image
-                  alt={c.name}
-                  className="object-cover object-top"
-                  fill
-                  sizes="180px"
-                  src={c.portraitSrc}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3">
-                  {c.roleLabel ? (
-                    <span
-                      className="mb-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-                      style={{ background: c.accent }}
-                    >
-                      {c.roleLabel}
-                    </span>
-                  ) : null}
-                  <div className="text-sm font-bold text-[#F8F4F6]">{c.name}</div>
-                  <div className="mt-0.5 line-clamp-1 text-[11px] leading-4 text-white/70">
-                    {c.tagline}
+          {SAJU_CHARACTERS.map((c) => {
+            const productId = CHARACTER_PRIMARY_PRODUCT[c.id];
+            const href = hubDeepLink(productId, c.id);
+            return (
+              <Link
+                key={c.id}
+                href={href}
+                className="saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px] transition active:scale-[0.985]"
+              >
+                <div className="relative aspect-[3/4] w-full">
+                  <Image
+                    alt={c.name}
+                    className="object-cover object-top"
+                    fill
+                    sizes="180px"
+                    src={c.portraitSrc}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-3">
+                    {c.roleLabel ? (
+                      <span
+                        className="mb-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                        style={{ background: c.accent }}
+                      >
+                        {c.roleLabel}
+                      </span>
+                    ) : null}
+                    <div className="text-sm font-bold text-[#F8F4F6]">{c.name}</div>
+                    <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-white/70">
+                      {c.hook || c.tagline}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              </Link>
+            );
+          })}
         </div>
         <Link
           href="/saju/chat"
@@ -324,6 +351,8 @@ function freePreviewScopeLine(product: SajuProduct, freeCount = 1) {
 
 function BirthFormView({
   product,
+  characterId,
+  onCharacterChange,
   form,
   setForm,
   onBack,
@@ -331,6 +360,8 @@ function BirthFormView({
   loading,
 }: {
   product: SajuProduct;
+  characterId: SajuCharacterId;
+  onCharacterChange: (id: SajuCharacterId) => void;
   form: SajuBirthForm;
   setForm: (next: SajuBirthForm) => void;
   onBack: () => void;
@@ -338,7 +369,8 @@ function BirthFormView({
   loading: boolean;
 }) {
   const patch = (partial: Partial<SajuBirthForm>) => setForm({ ...form, ...partial });
-  const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
+  const counselors = getProductCounselors(product);
+  const character = SAJU_CHARACTERS.find((c) => c.id === characterId);
   const scopeLine = freePreviewScopeLine(product, 1);
 
   return (
@@ -365,7 +397,7 @@ function BirthFormView({
           ) : null}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]">
-              <span>{product.characterName}</span>
+              <span>{character?.name ?? product.characterName}</span>
               {character?.roleLabel ? (
                 <span className="rounded-full border border-[#FF7A99]/35 bg-[#E8336D]/15 px-1.5 py-0.5 tracking-[0.08em] text-[#FF7A99]">
                   {character.roleLabel}
@@ -379,7 +411,13 @@ function BirthFormView({
         </div>
       </div>
 
-      <div className="px-5 pt-3">
+      <div className="px-5 pt-3 space-y-3">
+        <CounselorSwitcher
+          counselors={counselors}
+          selectedId={characterId}
+          size="sm"
+          onSelect={(id) => onCharacterChange(id as SajuCharacterId)}
+        />
         <p className="text-sm leading-6 text-[#9A9098]">
           생년월일과 지금 상황을 자세히 적을수록, 해석이 더 구체해져요. 결과는 공개되지 않으며, 잠금 해제 후 이 기기 「내 사주」에 남길 수 있어요.
         </p>
@@ -599,7 +637,7 @@ function PreviewView({
   onCloseCheckout: () => void;
   onConfirmUnlock: () => void;
 }) {
-  const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
+  const character = SAJU_CHARACTERS.find((c) => c.id === report.characterId);
   const clear = report.previewSections[0];
   const blurred = report.previewSections[1] ?? report.sections[1];
 
@@ -700,6 +738,7 @@ function PreviewView({
       {checkoutOpen ? (
         <CheckoutSheet
           product={product}
+          characterId={report.characterId}
           unlocking={unlocking}
           onClose={onCloseCheckout}
           onConfirm={onConfirmUnlock}
@@ -802,11 +841,16 @@ function ReportView({
 
 export function SajuHubApp({
   initialProductId = null,
+  initialCharacterId = null,
 }: {
   initialProductId?: SajuProductId | null;
+  initialCharacterId?: SajuCharacterId | null;
 } = {}) {
   const [step, setStep] = useState<SajuReportStep>(initialProductId ? "form" : "hub");
   const [productId, setProductId] = useState<SajuProductId | null>(initialProductId);
+  const [characterId, setCharacterId] = useState<SajuCharacterId | null>(
+    initialCharacterId,
+  );
   const [form, setForm] = useState<SajuBirthForm>(() => emptyBirthForm());
   const [preview, setPreview] = useState<SajuReportPayload | null>(null);
   const [report, setReport] = useState<SajuReportPayload | null>(null);
@@ -820,6 +864,11 @@ export function SajuHubApp({
     [productId],
   );
 
+  const resolvedCharacterId = useMemo(() => {
+    if (!product) return null;
+    return resolveProductCounselor(product, characterId ?? product.characterId);
+  }, [product, characterId]);
+
   useEffect(() => {
     const unlocked = readSajuReportUnlock();
     if (unlocked.unlocked && unlocked.productId) {
@@ -830,8 +879,12 @@ export function SajuHubApp({
   useEffect(() => {
     if (!initialProductId) return;
     setProductId(initialProductId);
+    const nextProduct = getSajuProduct(initialProductId);
+    if (nextProduct) {
+      setCharacterId(resolveProductCounselor(nextProduct, initialCharacterId));
+    }
     setStep("form");
-  }, [initialProductId]);
+  }, [initialProductId, initialCharacterId]);
 
   const scrollProducts = useCallback(() => {
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
@@ -847,17 +900,22 @@ export function SajuHubApp({
 
   const fetchReport = useCallback(
     async (previewOnly: boolean) => {
-      if (!productId) return null;
+      if (!productId || !resolvedCharacterId) return null;
       const res = await fetch("/api/saju/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, form, previewOnly }),
+        body: JSON.stringify({
+          productId,
+          form,
+          previewOnly,
+          characterId: resolvedCharacterId,
+        }),
       });
       if (!res.ok) throw new Error("report_failed");
       const data = (await res.json()) as { report: SajuReportPayload };
       return data.report;
     },
-    [productId, form],
+    [productId, form, resolvedCharacterId],
   );
 
   const handlePreview = useCallback(async () => {
@@ -923,9 +981,11 @@ export function SajuHubApp({
             <HubLanding onScrollProducts={scrollProducts} />
           ) : null}
 
-          {step === "form" && product ? (
+          {step === "form" && product && resolvedCharacterId ? (
             <BirthFormView
               product={product}
+              characterId={resolvedCharacterId}
+              onCharacterChange={setCharacterId}
               form={form}
               setForm={setForm}
               loading={loading}

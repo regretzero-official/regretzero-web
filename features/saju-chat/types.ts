@@ -7,7 +7,14 @@ export type SajuCharacterId =
   | "cha-yuri"
   | "han-bora";
 
-export type SajuRoleLabel = "점쟁이" | "무당" | "깍쟁이" | "아이돌" | "도령";
+export type SajuRoleLabel =
+  | "점쟁이"
+  | "무당"
+  | "깍쟁이"
+  | "아이돌"
+  | "귀공자"
+  | "밤 가이드"
+  | "남친감";
 
 export type SajuChatRole = "user" | "assistant";
 
@@ -29,6 +36,8 @@ export type SajuCharacter = {
   id: SajuCharacterId;
   name: string;
   tagline: string;
+  /** Short hub / switcher hook one-liner */
+  hook: string;
   accent: string;
   accentSoft: string;
   avatarInitial: string;

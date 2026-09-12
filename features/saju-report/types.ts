@@ -15,8 +15,11 @@ export type SajuProduct = {
   shortTitle: string;
   painPoint: string;
   description: string;
+  /** Default narrator (female-core) */
   characterId: SajuCharacterId;
   characterName: string;
+  /** All counselors for this product — default first, then male alternates */
+  counselorIds: SajuCharacterId[];
   priceLabel: string;
   priceWon: number;
   badge: string;

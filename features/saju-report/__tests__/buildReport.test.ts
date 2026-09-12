@@ -116,3 +116,35 @@ describe("partner chart in reunion origin-compare", () => {
     expect(compare).toMatch(/소프트 비교|이름만/);
   });
 });
+
+describe("male counselor selection", () => {
+  it("narrates reunion-luck as lee-doryeong when selected", () => {
+    const report = buildTemplateReport("reunion-luck", form, "lee-doryeong");
+    expect(report.characterId).toBe("lee-doryeong");
+    expect(report.characterName).toBe("이도령");
+    const cover = report.sections.find((s) => s.id === "cover")!.body;
+    expect(cover).toMatch(/다치지 않게|곁에서 읽어/);
+    expect(cover).toContain("이도령");
+  });
+
+  it("narrates reunion-strategy as han-siwoo when selected", () => {
+    const report = buildTemplateReport("reunion-strategy", form, "han-siwoo");
+    expect(report.characterId).toBe("han-siwoo");
+    expect(report.characterName).toBe("한시우");
+    const cover = report.sections.find((s) => s.id === "cover")!.body;
+    expect(cover).toMatch(/급할수록 한 박자|氣/);
+  });
+
+  it("narrates partner-heart and breakup-decision as kang-seon when selected", () => {
+    const heart = buildTemplateReport("partner-heart", form, "kang-seon");
+    const breakup = buildTemplateReport("breakup-decision", form, "kang-seon");
+    expect(heart.characterName).toBe("강세온");
+    expect(breakup.characterName).toBe("강세온");
+    expect(heart.sections.find((s) => s.id === "cover")!.body).toMatch(/괜찮아\. 같이 정리하자|같이 정리/);
+  });
+
+  it("falls back to default when character is not on product", () => {
+    const report = buildTemplateReport("reunion-luck", form, "cha-yuri");
+    expect(report.characterId).toBe("baek-ryeon");
+  });
+});
