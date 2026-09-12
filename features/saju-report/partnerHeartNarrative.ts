@@ -21,7 +21,7 @@ import {
   you,
 } from "./novelHelpers";
 
-/** 상대 속마음 — 웹소설형 장편 (서나리 기본, voicePack으로 이도령/강세온 가능) */
+/** 상대 속마음 — Foxbunny식 긴 점사 상담 (서나리 기본, voicePack으로 이도령/강세온 가능) */
 export function buildPartnerHeartNarrativeSections(
   form: SajuBirthForm,
   voice: NarrativeVoice,
@@ -45,19 +45,17 @@ export function buildPartnerHeartNarrativeSections(
   const cover: SajuReportSection = {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `밤이다.
-
-점사방 불이 낮게 깔리고, 네 폰 화면만 차갑게 빛난다. 대화창은 닫혀 있는데도, 손가락은 이미 ${p} 이름을 기억한다. ${vn}${topicParticle(vn)} 그 손을 내려다보며 먼저 말하지 않는다. 네가 숨을 한 번 고를 때까지.
+    body: `${y}. ${vn}${topicParticle(vn)} 바로 점사할게.
 
 ${voice.openerAside(p)}
 
 ${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
 
-네가 적어 준 고민의 핵이, 향 연기처럼 방에 남는다.
+네가 적어 준 고민의 핵:
 > ${concern}
 
 「지금 그 사람 마음은… 뭐지.」
-그 문장을 백 번 굴리는 자정—${vn}${topicParticle(vn)} 그 시간을 무시하지 않아. 그 시간 안에 네 진심이 있고, 동시에 네 불안도 있어. 둘을 한 덩어리로 뭉치면 판단이 흐려져. 그래서 오늘은 **결론부터** 짚고, 그다음에 장면으로 풀어줄게. 체크리스트 강의가 아니라, **읽는 이야기**로.
+그 문장을 백 번 굴리는 밤—${vn}${topicParticle(vn)} 그 시간을 무시하지 않아. 진심과 불안이 한몸에 있어. 둘을 뭉치면 판단이 흐려져. 그래서 오늘은 **한줄 결론부터** 짚고, 그다음 원국·심리·행동으로 길게 풀어줄게. 체크리스트 강의가 아니라, **점쟁이가 사주를 보고 예언·풀이해주는 상담**으로.
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
 
@@ -67,11 +65,11 @@ ${oneLiner}
 
 ${bullets.map((b) => `- ${b}`).join("\n")}
 
-이 리포트는 짧게 끝내지 않을게. “기다려”, “연락하지 마” — 말은 맞는데 **장면이 없으면** 밤에 무너져. 그래서 ${vn}${topicParticle(vn)} 웹소설처럼 길게 말해. ${p}가 너를 보관함에 둘 때 몸이 어떻게 굳는지, 네가 자정에 장문을 쓸 때 손이 어떻게 가는지. 읽다가 “내 얘기다” 싶으면, 그게 맞는 호흡이야.
+이 리포트는 짧게 끝내지 않을게. “기다려”, “연락하지 마” — 말은 맞는데 **풀어주는 말이 없으면** 밤에 무너져. 그래서 ${vn}${topicParticle(vn)} 점사처럼 길게 말해. ${p}가 너를 보관함에 둘 때의 심리, 네가 자정에 장문을 쓰고 싶을 때의 감정, 다가갈 온도·타이밍. 읽다가 “내 얘기다” 싶으면, 그게 맞는 호흡이야.
 
 ${voice.coverClose}
 
-촛불이 한 번 흔들린다. 다음 장—네가 진짜로 묻고 싶은 질문으로.
+자, 네가 진짜로 묻고 싶은 질문부터 정리하자.
 
 — ${vn} · ${productTitle}`,
   };
@@ -81,7 +79,7 @@ ${voice.coverClose}
     title: "1장 · 이번 점사의 질문",
     body: L(
       4,
-      `${voice.questionsLead ?? "질문이 겹겹이지? 장면마다 하나씩 풀자."}
+      `${voice.questionsLead ?? "질문이 겹겹이지? 하나씩 풀자."}
 
 1. **${p} 마음에 내가 남아 있는가?** — 남아 있다면 *그리움인지, 죄책감인지, 습관인지* 구분.
 2. **거리감의 핵은 뭔가?** — 미움보다 *피로·자기보호*일 가능성이 큰지.
@@ -178,8 +176,6 @@ ${voice.breakupAside?.(p) ?? ""}
     body: L(
       5,
       `${voice.remainingAside?.(p) ?? ""}
-보관함의 문이 희미하게 보인다. 열리진 않았다. 그래도 비어 있진 않다.
-
 **${p} 마음에 네가 ‘삭제’됐다기보다 ‘보관함’에 있을 가능성이 커.**
 남아 있음 ≠ 지금 열어줄 준비.
 
@@ -304,16 +300,16 @@ ${voice.signOff}`,
   ];
 
   const pads: Record<string, { beat: string; scene: string }> = {
-    questions: { beat: "질문 정리", scene: `밤의 질문들이 겹겹이 쌓인다. ${p} 속마음, 거리감, 온도—핵만 남긴다.` },
-    trait: { beat: "일간 기질", scene: "원국이 책상 위에 놓인다. 시험 점수가 아니라, 깊게 남는 결을 읽는 점사다." },
-    pattern: { beat: "잔향 스크립트", scene: "같은 스크립트의 3단계(과열) 앞에서, 다른 숨을 쉬는 연습이 시작된다." },
+    questions: { beat: "질문 정리", scene: `흐름상 질문의 핵만 남긴다. ${p} 속마음, 거리감, 온도.` },
+    trait: { beat: "일간 기질", scene: "원국을 보면—시험 점수가 아니라, 깊게 남는 결을 읽는 점사다." },
+    pattern: { beat: "잔향 스크립트", scene: "같은 스크립트의 3단계(과열) 앞에서, 다른 숨을 쉬는 상담이 시작된다." },
     bond: { beat: "인연의 결", scene: "온기와 숨 막힘 사이. 정은 있는데 마음이 상하기 쉬운 그 결." },
-    "breakup-reason": { beat: "이별 원인", scene: "‘잠깐 쉬자’가 남긴 잔향. 미움보다 속도·피로." },
-    remaining: { beat: "남은 속마음", scene: "보관함의 문이 희미하다. 열려 있진 않다. 그래도 비어 있진 않다." },
-    "heart-temp": { beat: "다가갈 온도", scene: "온기는 2~3도. 고열은 일기장에만." },
-    contact: { beat: "연락 가이드", scene: "전송 버튼 앞에서 숨이 멈춘다. 멘트보다 네 상태." },
+    "breakup-reason": { beat: "이별 원인", scene: "‘잠깐 쉬자’가 남긴 잔향. 미움보다 속도·피로로 읽어." },
+    remaining: { beat: "남은 속마음", scene: "보관함—열려 있진 않다. 그래도 비어 있진 않다. 흐름상 그렇게 보여." },
+    "heart-temp": { beat: "다가갈 온도", scene: "온기는 2~3도. 고열은 일기장에만. 상담 결론이다." },
+    contact: { beat: "연락 가이드", scene: "멘트보다 네 상태. 전송 전 30초만 물어." },
     pitfalls: { beat: "함정", scene: "확인하고 싶을 때가 제일 보내면 안 되는 때다." },
-    closing: { beat: "마지막 말", scene: "촛불이 낮아진다. 속마음은 지도로, 하루는 네가 산다." },
+    closing: { beat: "마지막 말", scene: "속마음은 지도로, 하루는 네가 산다. 그게 점사의 본편이야." },
   };
 
   return applyPads(sections, pads, form, p, chart, vn, "heart");

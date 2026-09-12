@@ -21,7 +21,7 @@ import {
   you,
 } from "./novelHelpers";
 
-/** 재회 행동 전략 — 웹소설형 장편 (한보라 기본, voicePack으로 한시우 가능) */
+/** 재회 행동 전략 — Foxbunny식 긴 점사 상담 (한보라 기본, voicePack으로 한시우 가능) */
 export function buildReunionStrategyNarrativeSections(
   form: SajuBirthForm,
   voice: NarrativeVoice,
@@ -50,9 +50,9 @@ export function buildReunionStrategyNarrativeSections(
   const cover: SajuReportSection = {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `밤이다.
+    body: `${y}. ${vn}${topicParticle(vn)} 전략 점사 시작할게.
 
-전략이 필요한 밤. 응원도 필요하지만, 위험한 집착은 말릴게. ${vn}의 호흡으로 가자.
+응원도 필요하지만, 위험한 집착은 말릴게. ${vn}의 호흡으로 가자.
 
 ${voice.openerAside(p)}
 
@@ -72,7 +72,7 @@ ${oneLiner}
 
 ${bullets.map((b) => `- ${b}`).join("\n")}
 
-이 리포트는 실행 가이드를 웹소설처럼 길게 풀어줄게. 금지 목록, 1·3·6개월 지도, 멘트, 3단계 전략. 같이 가자.
+이 리포트는 실행 가이드를 점사 상담처럼 길게 풀어줄게. 금지 목록, 1·3·6개월 지도, 멘트, 3단계 전략. 같이 가자.
 
 ${voice.coverClose}
 

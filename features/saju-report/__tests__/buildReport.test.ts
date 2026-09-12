@@ -43,8 +43,11 @@ describe("buildTemplateReport depth", () => {
     expect(report.sections.length).toBe(15);
     expect(joined).toMatch(/근거 한 줄/);
     expect(joined).toMatch(/기운이 보여/);
-    expect(joined).toMatch(/밤의 점사|밤이다|기억의 장면|대화창/);
+    expect(joined).toMatch(/밤의 점사|점사로|대화창|흐름상/);
     expect(joined).toMatch(/다음에 네가 할 선택/);
+    expect(joined).toMatch(/점사로 한 번 더|점사처럼|점사할게/);
+    expect(joined).not.toMatch(/웹소설처럼/);
+    expect(joined).not.toMatch(/방 안이 고요하다/);
     expect(joined).not.toMatch(/십성으로 보면/);
     expect(joined).not.toMatch(/호흡 누적/);
     expect(joined).not.toMatch(/용신 감각/);
@@ -52,7 +55,7 @@ describe("buildTemplateReport depth", () => {
     expect(joined).not.toMatch(/- 년: .+\/- 월: .+\/- 일:/s);
   });
 
-  it("other products are Foxbunny-length web-novel with character voice", () => {
+  it("other products are Foxbunny-length 점사 counseling with character voice", () => {
     expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("partner-heart", form).characterName).toBe("서나리");
     expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(35000);

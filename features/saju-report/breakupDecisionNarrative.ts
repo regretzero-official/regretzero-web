@@ -21,7 +21,7 @@ import {
   you,
 } from "./novelHelpers";
 
-/** 이별 결정 — 웹소설형 장편 (차유리 기본, voicePack으로 강세온 가능) */
+/** 이별 결정 — Foxbunny식 긴 점사 상담 (차유리 기본, voicePack으로 강세온 가능) */
 export function buildBreakupDecisionNarrativeSections(
   form: SajuBirthForm,
   voice: NarrativeVoice,
@@ -45,9 +45,9 @@ export function buildBreakupDecisionNarrativeSections(
   const cover: SajuReportSection = {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `밤이다.
+    body: `${y}. ${vn}${topicParticle(vn)} 결정 점사 들어갈게.
 
-결정이 필요한 밤. 폰은 켜져 있고, 마음은 반반이다. ${vn}${topicParticle(vn)} 눈물 웹소설 대신 **자존 웹소설**로 가자고 말한다.
+마음이 반반일 때일수록, 눈물 상담 말고 **자존 상담**으로 가자.
 
 ${voice.openerAside(p)}
 
@@ -67,7 +67,7 @@ ${oneLiner}
 
 ${bullets.map((b) => `- ${b}`).join("\n")}
 
-이 리포트는 짧게 끝내지 않을게. “그냥 잊어”는 말이 되고, **장면이 없으면** 밤에 또 ${p}를 열어. 그래서 길게 말해. 남겨둘 조건, 놓을 조건, 자존이 버티는 루틴. 팩트로.
+이 리포트는 짧게 끝내지 않을게. “그냥 잊어”는 말이 되고, **풀어주는 말이 없으면** 밤에 또 ${p}를 열어. 그래서 점사처럼 길게 말해. 남겨둘 조건, 놓을 조건, 자존이 버티는 루틴. 팩트로.
 
 ${voice.coverClose}
 

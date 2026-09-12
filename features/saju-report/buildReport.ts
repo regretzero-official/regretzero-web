@@ -95,10 +95,10 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         id: characterId,
         name: characterName,
         openerAside: (p) => `느낌이 왔어. 밤공기 속에 ${p} 이름만 스쳐도 가슴이 먼저 반응하지? 언니 말 들어봐—그 반응, 끝이 아니라 잔향이야.`,
-        coverBridge: (y, birth, gender, months, breakup) => `${y}, ${birth}, ${gender}. 낮엔 괜찮은 척해도 밤에 감정이 더 깊게 남는 결이야. 헤어진 지 ${months}—“${breakup}”이 아직 몸 안쪽에 남아 있을 가능성이 커. 오늘 이야기는 카톡처럼, 근데 장면처럼 길게 읽어줄게.`,
+        coverBridge: (y, birth, gender, months, breakup) => `${y}, ${birth}, ${gender}. 낮엔 괜찮은 척해도 밤에 감정이 더 깊게 남는 결이야. 헤어진 지 ${months}—“${breakup}”이 아직 몸 안쪽에 남아 있을 가능성이 커. 오늘은 카톡처럼 쉽게, 점사처럼 길게 풀어줄게.`,
         coverClose: `단정 예언은 안 해. 느낌이 흐름이지 고정값이 아니야. 그래도 네 원국·이별·침묵의 결을 겹치면 위 방향이 제일 설득력 있어.`,
         frameAside: "서나리 식으로—표면 감정은 거짓말하기 쉽고, 가슴의 온도·잔향이 더 정직해.",
-        questionsLead: "네가 진짜로 묻고 싶은 건 한 겹이 아니야. 장면마다 하나씩, 언니랑 풀어보자.",
+        questionsLead: "네가 진짜로 묻고 싶은 건 한 겹이 아니야. 하나씩, 언니랑 풀어보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 이별은 사랑이 없어서보다 속도가 안 맞아서인 경우가 많아. 그 차이를 못 보면 ${p}랑 다시 만나도 같은 벽이야.`,
         traitLead: "네 원국을 만세력으로 먼저 짚을게. 해석은 언니 식으로 풀어줄게.",
         traitClose: (p) => `그래서 ${p} 생각도 싸움 한 방보다 누적 피로로 남는 거야. 깊게 사랑하고, 오래 남기고, 참다가 한꺼번에 지치는 타입.`,
@@ -125,7 +125,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         id: characterId,
         name: characterName,
         openerAside: (p) => `기운이 보여. 밤의 점사다. ${p} 쪽으로 아직 줄이 남아 있어. 다만 지금 흔들면 줄이 더 엉킨다. 흔들리지 마.`,
-        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어. 오늘은 강의가 아니라, 장면으로 읽어줄게.`,
+        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어. 오늘은 강의가 아니라, 점사로 풀어줄게.`,
         coverClose: "확정 예언은 하지 않는다. 기운은 흐른다. 그래도 원국·이별·침묵의 결을 겹치면, 위 방향이 가장 설득력 있다.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다. 점사는 짧고 단호하게.",
         questionsLead: "이번 밤의 점사—핵을 단호히 정리한다.",
@@ -154,11 +154,11 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p}한테 왜 그렇게 퍼줘. 너는 더 아껴도 돼. 팩트부터—지금은 더 잘해주기 시즌이 아니야. 눈물 웹소설 말고, 자존 웹소설로 가자.`,
-        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 타입이지? 헤어진 지 ${months}. “${breakup}”—로맨스 포장 말고 소모로 읽어. 장면은 길게, 결정은 짧게.`,
+        openerAside: (p) => `${p}한테 왜 그렇게 퍼줘. 너는 더 아껴도 돼. 팩트부터—지금은 더 잘해주기 시즌이 아니야. 눈물 상담 말고, 자존 상담으로 가자.`,
+        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 타입이지? 헤어진 지 ${months}. “${breakup}”—로맨스 포장 말고 소모로 읽어. 점사는 길게, 결정은 짧게.`,
         coverClose: "예언 안 해. 근데 네 원국 결 + 이별 결 + 침묵 패턴 겹치면, 위 방향이 제일 현실적이야.",
         frameAside: "차유리 식으로—감정 점수 말고, 네가 버티는 구조로 읽어. 자존이 먼저다. dry하게.",
-        questionsLead: "질문부터 팩트로. 감성 에세이 필요 없어. 장면만 딱.",
+        questionsLead: "질문부터 팩트로. 감성 에세이 필요 없어. 핵만 딱.",
         questionsClose: (p) => `지쳐 헤어진 거면 사랑이 없어서가 아니라 속도가 안 맞은 거야. ${p}랑 다시 붙어도 구조 안 바꾸면 또 같아.`,
         traitLead: "기질은 원국 숫자로 짧게. 해석은 팩트 상담 톤.",
         traitClose: (p) => `한 줄—깊게 사랑하고, 참다가, 한꺼번에 지친다. ${p} 이별도 그 패턴. 인정해야 다음이 있어.`,
@@ -184,11 +184,11 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `헐, 또 ${p} 생각했지? 일단 네 마음부터. 괜찮아, 그 마음 이상한 거 아니야. 다만 행동만 조심하자—오늘은 응원 웹소설처럼, 근데 현실 pep 넣어서.`,
-        coverBridge: (y, birth, gender, months, breakup) => `${y}! ${birth}, ${gender}. 낮엔 괜찮은 척하다가 밤에 감정이 커지는 결에 가까워. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있을 수 있어. 장면은 따뜻하게, 선택은 또렷하게 가자.`,
+        openerAside: (p) => `헐, 또 ${p} 생각했지? 일단 네 마음부터. 괜찮아, 그 마음 이상한 거 아니야. 다만 행동만 조심하자—오늘은 응원 점사처럼, 근데 현실 pep 넣어서.`,
+        coverBridge: (y, birth, gender, months, breakup) => `${y}! ${birth}, ${gender}. 낮엔 괜찮은 척하다가 밤에 감정이 커지는 결에 가까워. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있을 수 있어. 점사는 따뜻하게, 선택은 또렷하게 가자.`,
         coverClose: "확정 예언은 안 할게. 그래도 네 결 + 이별 결 + 침묵 패턴을 겹치면, 위 방향이 제일 설득력 있어.",
         frameAside: "한보라가 먼저 공감하고, 그다음 현실 한 줄—위험 집착은 말릴게.",
-        questionsLead: "네가 묻고 싶은 거, 겹겹이지? 장면마다 같이 정리해보자.",
+        questionsLead: "네가 묻고 싶은 거, 겹겹이지? 하나씩 같이 정리해보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 거면, 사랑이 없어서보다 속도가 안 맞은 거야. ${p}랑 다시 만나도 호흡을 바꿔야 해.`,
         traitLead: "기질은 원국 기준으로 쉽게 말해줄게. 해석은 위로·상담이야.",
         traitClose: (p) => `한 줄로—깊게 사랑하고, 오래 남기고, 참다가 지쳐. ${p} 이별도 그 결에 가깝다 보면 돼.`,
@@ -364,7 +364,7 @@ function questionsSection(form: SajuBirthForm, voice: VoicePack): SajuReportSect
 ${voice.frameAside}
 ${voice.questionsClose(p)}
 
-*(근거 한 줄)* 이번 점사는 ${p}와의 인연에서 ‘어디서 숨이 막히고, 어디서 숨통이 트이는지’를 본다. 틀·끌림·완충—이름은 나중에, 장면이 먼저야.`,
+*(근거 한 줄)* 이번 점사는 ${p}와의 인연에서 ‘어디서 숨이 막히고, 어디서 숨통이 트이는지’를 본다. 틀·끌림·완충—이름은 나중에, 흐름이 먼저야.`,
   };
 }
 
@@ -392,7 +392,7 @@ ${birthLabel(form)} ${form.gender} — 만세력 원국 **${chart.summaryLine}**
 월주 **${chart.pillars.month.korean}** — 바깥에서 보이는 나·환경의 결.
 ${hourBit}. ${chart.hourUnknown ? "시각을 알면 시주까지 더 정확해져요." : "시주는 내면·‘진짜 속’과 연결된다."}
 
-### 3-4. 기질을 장면으로
+### 3-4. 기질을 쉽게
 *(근거 한 줄)* 원국 십성 감각은 년 ${chart.tenGods.year.stem}/${chart.tenGods.year.branch} · 월 ${chart.tenGods.month.stem}/${chart.tenGods.month.branch} · 일 일간/${chart.tenGods.day.branch}${chart.tenGods.hour ? ` · 시 ${chart.tenGods.hour.stem}/${chart.tenGods.hour.branch}` : ""} — 외우지 마. “깊게 남고, 참다가 지친다”만 기억해.
 
 연애 함정: ‘끝까지 이해해주면 돌아올 것’ 믿음이 ${p}처럼 지쳐 떠난 상대에게 **압박**으로 읽힐 수 있다.
@@ -428,7 +428,7 @@ ${voice.strategyNudge}
 
 패턴을 바꿀 때 기억할 한 줄: **설득보다 안정**. 같은 스크립트의 3단계(과열)를 반복하면 이야기는 같은 결말로 복제돼. 헤어진 지 ${monthsLabel(form)} · “${breakupLine(form)}” 메모를 기준으로, 지금은 감정을 더 쓰는 구간이 아니라 기력을 회수하는 구간으로 읽는 편이 맞다.
 
-「또 같은 장면이 반복되면 어떡하지.」—그 두려움이 정상이야. 그래서 다음 장부터, 장면을 바꾸는 선택을 구체로 줄게.`,
+「또 같은 장면이 반복되면 어떡하지.」—그 두려움이 정상이야. 그래서 이어서, 흐름을 바꾸는 선택을 구체로 줄게.`,
   };
 }
 
@@ -652,7 +652,7 @@ function pitfallsSection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
     title: "주의할 함정",
     body: `${voice.pitfallsLead}
 
-함정은 목록이 아니라 **밤에 발이 가는 장면**이야.
+함정은 목록이 아니라 **밤에 발이 가는 습관**이야.
 
 1. **해석 중독**: ${p}의 모든 행동을 “좋아한다/아니다”로만 읽기. 침묵을 끝으로 단정하지 마.
 2. **자존감 거래**: 외모 관리는 OK, 복수심 전시는 NO.
@@ -663,7 +663,7 @@ function pitfallsSection(form: SajuBirthForm, voice: VoicePack): SajuReportSecti
 7. **착각**: “더 잘해주면 된다”가 아니다. 지금은 **덜 매달리는 안정**이 중심이다.
 8. **고민(${concernLine(form)})을 매일 검색으로 해결하려 하기**: 검색은 불안을 키운다. 리포트는 지도일 뿐, 발은 네 것이다.
 
-「함정인 줄 알면서도 손이 가.」—그 손이 가는 순간이 이야기의 위기야. 위기에서 선택을 바꾸면, 결말이 바뀌어.
+「함정인 줄 알면서도 손이 가.」—그 손이 가는 순간이 점사의 위기야. 위기에서 선택을 바꾸면, 흐름이 바뀌어.
 
 ${voice.strategyNudge}`,
   };
@@ -680,7 +680,7 @@ function closingSection(form: SajuBirthForm, voice: VoicePack): SajuReportSectio
 
 ${voice.closingBody}
 
-다음에 네가 할 선택: 오늘 밤, 확인 대신 정돈. 그게 다음 장의 첫 문장이야.
+다음에 네가 할 선택: 오늘 밤, 확인 대신 정돈. 그게 다음 선택의 첫 문장이야.
 
 ${voice.signOff}`,
   };
@@ -711,7 +711,7 @@ function partnerHeartExtra(form: SajuBirthForm, voice: VoicePack, chart: SajuCha
 
 ${voice.heartTempLead(p)}
 
-장면으로 말할게. 예전에 너희가 7~8도로 타오르던 대화창—그 불을 지금 다시 켜면 ${p}는 온기가 아니라 **청구서**를 읽어. 느낌이 왔어. 지금은 **2~3도의 옅은 온기**만. 손끝으로 스치듯, 숙제 없이.
+쉽게 말할게. 예전에 너희가 7~8도로 타오르던 대화창—그 불을 지금 다시 켜면 ${p}는 온기가 아니라 **청구서**를 읽어. 느낌이 왔어. 지금은 **2~3도의 옅은 온기**만. 손끝으로 스치듯, 숙제 없이.
 
 ${pairBit}
 
@@ -731,7 +731,7 @@ ${pairBit}
 
 ${voice.name}: ${voice.strategyNudge}
 
-…그리고 온도를 낮춘 다음에도, 함정은 남아 있어. 다음 장에서 짚을게.`,
+…온도를 낮춘 다음에도, 함정은 남아 있어. 이어서 짚을게.`,
     },
   ];
 }
@@ -745,7 +745,7 @@ function breakupDecisionExtra(form: SajuBirthForm, voice: VoicePack): SajuReport
       title: "남겨둘 이유 / 놓을 이유",
       body: `팩트 테이블을 열어볼게. 감성 에세이 말고.
 
-장면 하나: 너는 ${p} 대화창 앞에서 “붙여야 하나, 놓아야 하나”를 백 번 굴린다. 차유리는 그 굴림을 로맨스로 포장하지 않아. **자존이 버티는 구조**로 읽어.
+팩트: 너는 ${p} 대화창 앞에서 “붙여야 하나, 놓아야 하나”를 백 번 굴린다. 차유리는 그 굴림을 로맨스로 포장하지 않아. **자존이 버티는 구조**로 읽어.
 
 ### 남겨둘 이유가 되는 조건
 - ${p}와의 관계가 **서로를 성장**시켰던 구간이 분명하다.
@@ -772,14 +772,14 @@ function breakupDecisionExtra(form: SajuBirthForm, voice: VoicePack): SajuReport
 
 ${voice.keepLeaveClose}
 
-…결정이 뭐가 됐든, 다음 장—자존 루틴이 없으면 같은 밤이 복제돼.`,
+…결정이 뭐가 됐든—자존 루틴이 없으면 같은 밤이 복제돼. 이어서 루틴을 짚을게.`,
     },
     {
       id: "self-routine",
       title: "자존 회복 루틴",
       body: `이별 결정이든 재시도든, 먼저 필요한 건 **네 기력**이야. 팩트.
 
-장면: 자정, SNS, ${p} 검색. 그 루프를 ‘미션 실패’로 자책하지 마. **대체 루틴**을 심어.
+자정, SNS, ${p} 검색. 그 루프를 ‘미션 실패’로 자책하지 마. **대체 루틴**을 심어.
 
 - 수면·식사·가벼운 운동을 ‘미션’이 아니라 ‘최소 생존’으로
 - SNS 야간 차단 1~2시간
@@ -792,7 +792,7 @@ ${voice.keepLeaveClose}
 ${voice.selfRoutineClose}
 ${voice.strategyNudge}
 
-다음에 네가 할 선택: 오늘 밤, 검색 대신 수면. 그게 웹소설의 다음 페이지야.`,
+다음에 네가 할 선택: 오늘 밤, 검색 대신 수면. 그게 점사 상담의 다음 선택이야.`,
     },
   ];
 }
@@ -804,11 +804,11 @@ function strategyProductExtra(form: SajuBirthForm, voice: VoicePack): SajuReport
     {
       id: "dont-now",
       title: "지금 하면 안 되는 것",
-      body: `헐, 이 장부터는 빨간불이야.
+      body: `헐, 여기서부터는 빨간불이야.
 
 ${voice.dontNowLead} 헤어진 지 ${monthsLabel(form)}, “${breakupLine(form)}” 상태라면 더더욱. 일단 네 마음부터—그 마음 이상한 거 아니야. 다만 **행동만** 조심하자.
 
-### 금지에 가까운 행동 (지금 페이지에서 넘기지 마)
+### 금지에 가까운 행동 (지금은 넘기지 마)
 - 자정 장문 / 술김 통화
 - “우리 다시” 직구
 - 읽씹 추궁, 연속 카톡
@@ -825,7 +825,7 @@ ${voice.dontNowLead} 헤어진 지 ${monthsLabel(form)}, “${breakupLine(form)}
 - ${p}를 떠올릴 때 ‘보낼 문장’을 메모장에만 적고 닫기
 - 친구에게 “오늘 내가 참은 추궁” 자랑하기 (진짜로)
 
-같이 가자. 금지 목록을 지키면, 다음 장—타임라인·연락 가이드가 의미가 생겨.
+같이 가자. 금지 목록을 지키면, 타임라인·연락 가이드가 의미가 생겨.
 
 ${voice.name}: ${voice.strategyNudge}`,
     },
