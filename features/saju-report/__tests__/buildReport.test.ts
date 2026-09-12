@@ -104,6 +104,39 @@ describe("character voice distinctness", () => {
   });
 });
 
+
+describe("everyday Korean counseling (no jargon slogans)", () => {
+  const products = ["reunion-luck", "partner-heart", "breakup-decision", "reunion-strategy"] as const;
+
+  it("drops brand slogans and uses plain decisive Korean", () => {
+    for (const id of products) {
+      const report = buildTemplateReport(id, form);
+      const joined = [report.oneLiner, ...report.sections.map((s) => s.body)].join("\n");
+      expect(joined).not.toMatch(/보관함/);
+      expect(joined).not.toMatch(/창은 1\s*~\s*3개월이다/);
+      expect(joined).not.toMatch(/자존 구조부터 세워/);
+      expect(joined).not.toMatch(/선 그어/);
+      expect(joined).not.toMatch(/단정해/);
+      expect(joined).not.toMatch(/위 방향이다|위 방향이야|위 방향이에요/);
+    }
+  });
+
+  it("covers speak natural decisive timing and remaining-heart in character voice", () => {
+    const baek = buildTemplateReport("reunion-luck", form);
+    const seo = buildTemplateReport("partner-heart", form);
+    const cha = buildTemplateReport("breakup-decision", form);
+    const baekCover = baek.sections.find((s) => s.id === "cover")!.body;
+    const seoCover = seo.sections.find((s) => s.id === "cover")!.body;
+    const chaCover = cha.sections.find((s) => s.id === "cover")!.body;
+    expect(baekCover).toMatch(/다가가지 마|한두 달|다시 연락하려면/);
+    expect(baek.oneLiner).toMatch(/지금은 아니다/);
+    expect(seo.oneLiner).toMatch(/지운 건 아냐|손대긴 무서운/);
+    expect(seoCover).toMatch(/느낌이 왔어/);
+    expect(cha.oneLiner).toMatch(/괜찮은 상태|자존감부터/);
+    expect(chaCover).toMatch(/더 퍼주지 마|아껴도 돼|팩트/);
+  });
+});
+
 describe("partner chart in reunion origin-compare", () => {
   it("full partner YMD shows both pillars and day masters", () => {
     const full = {

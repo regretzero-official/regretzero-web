@@ -76,7 +76,7 @@ export type DemoReview = {
   stars: number;
   /** Product / character tags */
   tags: string[];
-  /** Saju-element chips e.g. 木 · 대운 · 보관함 */
+  /** Saju-element chips e.g. 木 · 대운 · 남은 마음 */
   elementChips: string[];
   /** Display date e.g. 2026.08.14 */
   dateLabel: string;

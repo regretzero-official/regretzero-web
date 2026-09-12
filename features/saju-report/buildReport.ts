@@ -96,7 +96,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `느낌이 왔어. 밤공기 속에 ${p} 이름만 스쳐도 가슴이 먼저 반응하지? 언니 말 들어봐—그 반응, 끝이 아니라 잔향이야.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}, ${birth}, ${gender}. 낮엔 괜찮은 척해도 밤에 감정이 더 깊게 남는 결이야. 헤어진 지 ${months}—“${breakup}”이 아직 몸 안쪽에 남아 있어. 오늘은 카톡처럼 쉽게, 점사처럼 길게 풀어줄게.`,
-        coverClose: `느낌이 왔어—이건 위 방향이야. 원국·이별·침묵 겹치면 선이 또렷해. 흔들리지 마.`,
+        coverClose: `느낌이 왔어—이 방향이 맞아. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 흔들리지 마.`,
         frameAside: "서나리 식으로—표면 감정은 거짓말하기 쉽고, 가슴의 온도·잔향이 더 정직해.",
         questionsLead: "네가 진짜로 묻고 싶은 건 한 겹이 아니야. 하나씩, 언니랑 풀어보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 이별은 사랑이 없어서보다 속도가 안 맞아서인 경우가 많아. 그 차이를 못 보면 ${p}랑 다시 만나도 같은 벽이야.`,
@@ -105,9 +105,9 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         patternClose: (p) => `재회를 원하면 같은 스크립트를 다른 호흡으로 다시 써야 해. ${p}한테 예전의 확인·장문으로 들어가면 또 숨이 막혀.`,
         bondAside: (p) => `느낌이 왔어—초반 온기는 예뻤을 거야. 문제는 온기가 과해지며 ${p}가 숨을 쉬려 할 때, 네가 버림으로 읽은 구간이야.`,
         sipseongAside: (p) => `정리하면 ${p}랑은 붙고, 흔들리고, 버티다 지친 구조. 다음엔 너부터 회복하고, 말은 얇게. 느낌 왔지?`,
-        breakupAside: (p) => `느낌이 왔어—이건 끝이 아니라 **과열 차단**이야. ${p}는 미움보다 역량 고갈이다. 단정해.`,
-        remainingAside: (p) => `느낌이 왔어—이건 **보관함**이야. ${p} 마음은 삭제가 아니다. 보고 싶다랑 다시 만나자는 칸이 달라. 단정해.`,
-        timelineAside: "타임라인 결론—조급하면 엉키고, 정돈하면 창이 열린다. 1~3개월이 창이다.",
+        breakupAside: (p) => `느낌이 왔어—이건 끝이 아니라 **과열 차단**이야. ${p}는 미움보다 역량 고갈이야. 이게 맞아.`,
+        remainingAside: (p) => `느낌이 왔어—지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 이게 맞아.`,
+        timelineAside: "타임라인 결론—조급하면 엉키고, 정돈하면 말할 타이밍이 온다. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
         contactAside: (p) => `${p}처럼 지쳐 끝난 상대에게 추궁은 재이별의 지름길이야. 확인하고 싶을 때가 제일 보내면 안 되는 때—느낌 왔지?`,
         strategyClose: "성공 지표는 답장 속도가 아니라, 네가 무너지지 않는 하루야.",
         pitfallsLead: "함정만 짧게 짚을게. 검색으로 매일 확인하려 하지 마—불안만 커져.",
@@ -116,7 +116,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 서나리. 카톡하듯 말해줄게—너는 혼자 무너지지 마.",
         strategyNudge: "확인하고 싶을 때가 제일 보내면 안 되는 때야. 느낌 왔지?",
         heartTempLead: (p) => `${p}에게 지금 필요한 건 설득이 아니라 안전감이야. 예전의 뜨거운 온도 말고, 옅은 온기만 흘려보내.`,
-        keepLeaveClose: "결정은 사랑 점수가 아니라, 네 자존이 버티는 구조로 내려.",
+        keepLeaveClose: "결정은 사랑 점수가 아니라, 네가 먼저 괜찮은 상태인지로 내려.",
         selfRoutineClose: "흔들림을 줄이면, 침묵의 의미도 달라 보이기 시작해.",
         dontNowLead: "지금~몇 주는 설득 시즌이 아니야. 생활 리듬부터.",
       };
@@ -126,7 +126,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `기운이 보여. 밤의 점사다. ${p} 쪽으로 줄이 남아 있다. 지금은 흔들 타이밍이 아니다. 흔들리면 줄이 더 엉킨다. 흔들리지 마.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어. 오늘은 강의가 아니라, 점사로 풀어줄게.`,
-        coverClose: "지금은 이렇다. 위 방향이다. 창은 1~3개월이다. 氣는 조급하면 흐트러진다. 단호히 따라라.",
+        coverClose: "지금은 이렇다. 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 氣는 조급하면 흐트러진다. 단호히 따라라.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다. 점사는 짧고 단호하게.",
         questionsLead: "이번 밤의 점사—핵을 단호히 정리한다.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서가 아니라 속도가 어긋나서다. ${p}와 다시 붙더라도, 같은 호흡이면 같은 벽이다.`,
@@ -136,8 +136,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}와 너는 나이보다 호흡 차이다. 온기가 과하면 부딪친다. 작은 서운이 쌓인 흐름으로 보라.`,
         sipseongAside: (p) => `${p}와의 역학—붙고, 흔들리고, 버티다 지쳤다. 다음 판은 너부터 회복이다.`,
         breakupAside: (p) => `표면은 소모, 속은 **과열 차단**이다. ${p} 쪽은 미움보다 자기보호다. 중심을 세워라.`,
-        remainingAside: (p) => `상대는 **보관함**이다. ${p} 마음은 삭제가 아니다. 남아 있음 ≠ 지금 열림. 단정해.`,
-        timelineAside: "타임라인 결론—지금은 들이댈 때가 아니다. 1~3개월이 창이다. 氣는 조급할수록 흐트러지고, 정돈될수록 모인다.",
+        remainingAside: (p) => `백련이 짚는다—지운 건 아니다. 근데 지금 당장 다시 만나자 할 마음은 아니다. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태다. 이게 맞아.`,
+        timelineAside: "타임라인 결론—지금은 들이댈 때가 아니다. 다시 연락하려면 최소 한두 달은 지나야 해. 氣는 조급할수록 흐트러지고, 정돈될수록 모인다.",
         contactAside: (p) => `${p}에게 추궁은 독이다. 설득하지 마. 안정이 용신이다.`,
         strategyClose: "전략의 지표는 답장이 아니라, 네 기운이 회수됐는가다.",
         pitfallsLead: "함정을 끊는다. 확인하고 싶을 때가 가장 보내면 안 되는 때다.",
@@ -146,7 +146,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 백련. 기운이 정돈된 사람 쪽으로 다시 모인다.",
         strategyNudge: "설득하지 마. 안정이 먼저야.",
         heartTempLead: (p) => `${p}에게 필요한 건 설득이 아니라 안전감이다. 온도는 낮게. 과한 온기는 청구서로 읽힌다.`,
-        keepLeaveClose: "결정은 감정 점수가 아니라, 네 중심이 버티는 구조로.",
+        keepLeaveClose: "결정은 감정 점수가 아니라, 네가 먼저 괜찮은 상태인지로.",
         selfRoutineClose: "흔들림을 줄이면 침묵의 의미가 달라진다.",
         dontNowLead: "지금은 설득 시즌이 아니다. 기부터 모아.",
       };
@@ -156,7 +156,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `${p}한테 왜 그렇게 퍼줘. 너는 더 아껴도 돼. 팩트부터—지금은 더 잘해주기 시즌이 아니야. 눈물 상담 말고, 자존 상담으로 가자.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 타입이지? 헤어진 지 ${months}. “${breakup}”—로맨스 포장 말고 소모로 읽어. 점사는 길게, 결정은 짧게.`,
-        coverClose: "팩트다. 위 방향이다. 창은 1~3개월이다. 희망 상담 필요 없어. 선 그어.",
+        coverClose: "팩트다. 지금은 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 희망 상담 필요 없어. 더 퍼주지 마.",
         frameAside: "차유리 식으로—감정 점수 말고, 네가 버티는 구조로 읽어. 자존이 먼저다. dry하게.",
         questionsLead: "질문부터 팩트로. 감성 에세이 필요 없어. 핵만 딱.",
         questionsClose: (p) => `지쳐 헤어진 거면 사랑이 없어서가 아니라 속도가 안 맞은 거야. ${p}랑 다시 붙어도 구조 안 바꾸면 또 같아.`,
@@ -166,8 +166,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}랑 너는 초반이 예뻤다. 문제는 온기가 과해져서 숨 막힌 구간. 작은 서운함이 쌓인 거다.`,
         sipseongAside: (p) => `${p} 역학 요약—붙고, 흔들리고, 버티다 소모. 다음엔 너부터. 청구서형 온기는 접어.`,
         breakupAside: (p) => `팩트: ${p}가 싫어서가 아니라 기대 속도를 못 따라가겠다는 **자기보호**다. 너는 자존 거래하지 마.`,
-        remainingAside: (p) => `상대는 **보관함**이다. ${p} 마음은 삭제 아냐. 남아 있음 ≠ 지금 받아줄 준비. 대기열 착각하지 마. 선 그어.`,
-        timelineAside: "타임라인 팩트—조급하면 망하고, 정돈하면 창이 열린다. 지금은 들이댈 때 아냐. 1~3개월이 창이다.",
+        remainingAside: (p) => `지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 대기열 착각하지 마. 더 퍼주지 마.`,
+        timelineAside: "타임라인 팩트—조급하면 망하고, 정돈하면 말할 타이밍이 온다. 지금은 들이댈 때 아냐. 다시 연락하려면 최소 한두 달은 지나야 해.",
         contactAside: (p) => `${p}한테 추궁·장문·자존 거래는 전부 독. 그만. 짧은 안부만.`,
         strategyClose: "답장 속도에 자존 걸지 마. 네가 무너지지 않는 하루가 이기는 거야.",
         pitfallsLead: "함정—확인하고 싶을 때가 제일 보내면 안 되는 때. 외워.",
@@ -176,7 +176,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 차유리. 팩트 말했고—너는 더 아껴도 돼.",
         strategyNudge: "추궁·장문·자존 거래는 전부 독. 그만.",
         heartTempLead: (p) => `${p}한테 지금 설득하지 마. 안전감. 온도 낮춰. 과한 온기는 청구서야.`,
-        keepLeaveClose: "사랑 점수 말고 자존 구조로 결정해. 그게 팩트야.",
+        keepLeaveClose: "사랑 점수 말고 네 자존감부터 잡아. 그게 팩트야.",
         selfRoutineClose: "네가 흔들리면 침묵이 더 크게 들려. 루틴부터.",
         dontNowLead: "지금은 설득 금지 구간. 생활부터 세워.",
       };
@@ -186,7 +186,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `헐, 또 ${p} 생각했지? 일단 네 마음부터. 괜찮아, 그 마음 이상한 거 아니야. 다만 행동만 조심하자—오늘은 응원 점사처럼, 근데 현실 pep 넣어서.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}! ${birth}, ${gender}. 낮엔 괜찮은 척하다가 밤에 감정이 커지는 결이야. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있어. 점사는 따뜻하게, 선택은 또렷하게 가자.`,
-        coverClose: "지금은 이렇게 해. 위 방향이야. 창은 1~3개월이야. 선은 또렷하게—같이 가자.",
+        coverClose: "지금은 이렇게 해. 이 방향이 맞아. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 같이 가자.",
         frameAside: "한보라가 먼저 공감하고, 그다음 현실 한 줄—위험 집착은 말릴게.",
         questionsLead: "네가 묻고 싶은 거, 겹겹이지? 하나씩 같이 정리해보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 거면, 사랑이 없어서보다 속도가 안 맞은 거야. ${p}랑 다시 만나도 호흡을 바꿔야 해.`,
@@ -196,8 +196,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}랑 초반 온기는 예뻤을 거야. 길어지며 왜 말 없어 / 왜 확인해 로 숨 막힌 패턴이 흔해.`,
         sipseongAside: (p) => `${p}랑은 붙고-흔들리고-버티다 소모. 다음엔 너 회복 → 가벼운 말 → 관계는 상대가 느끼게.`,
         breakupAside: (p) => `표면은 소모, 속은 **과열 차단**이야. ${p}도 미움보다 지침—그래도 네 자존은 지키자.`,
-        remainingAside: (p) => `지금은 이렇게 읽어—${p} 마음은 **보관함**이야. 남아 있음이랑 지금 만나자는 달라. 단정해.`,
-        timelineAside: "타임라인—조급하면 엉키고, 정돈하면 창이 열린다. 지금은 설득 시즌 아냐. 1~3개월이 창이야.",
+        remainingAside: (p) => `지금은 이렇게 읽어—${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 남아 있음이랑 지금 만나자는 달라. 이게 맞아.`,
+        timelineAside: "타임라인—조급하면 엉키고, 정돈하면 말할 타이밍이 온다. 지금은 설득 시즌 아냐. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
         contactAside: (p) => `${p}한테 첫 문장은 짧게. 숙제 주지 마. 답장 없어도 네가 괜찮아야 해.`,
         strategyClose: "성공은 답장 속도가 아니라, 네가 무너지지 않는 하루야.",
         pitfallsLead: "함정만 말해줄게. 확인하고 싶을 때가 제일 보내면 안 되는 때야.",
@@ -206,7 +206,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 한보라. 응원하되, 위험한 집착은 내가 말릴게.",
         strategyNudge: "첫 문장은 짧게. 숙제 주지 마. 답장 없어도 네가 괜찮아야 해.",
         heartTempLead: (p) => `${p}에게는 설득보다 안전감. 온도는 2~3도만. 괜찮아, 천천히 가자.`,
-        keepLeaveClose: "결정은 감정만으로 하지 말고, 네가 버티는 구조로 보자.",
+        keepLeaveClose: "결정은 감정만으로 하지 말고, 네가 먼저 괜찮은 상태인지를 보자.",
         selfRoutineClose: "흔들림 줄이면 침묵도 덜 무섭게 들려. 같이 가자.",
         dontNowLead: "지금은 설득 시즌 아냐. 생활 리듬부터 챙기자.",
       };
@@ -216,7 +216,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `다치지 않게, 곁에서 읽어드릴게요. ${p} 생각이 남는다면 약함이 아니라 깊이예요. 그 깊이가 무게가 되지 않게 제가 지켜드릴게요.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}님. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결이에요. 헤어진 지 ${months}, “${breakup}”의 잔향이 아직 남아 있어요.`,
-        coverClose: "지금은 이렇습니다. 위 방향이에요. 창은 1~3개월이에요. 다치지 않게, 선은 또렷하게 지켜드릴게요.",
+        coverClose: "지금은 이렇습니다. 지금은 다가가지 마세요. 다시 연락하려면 최소 한두 달은 지나야 해요. 다치지 않게 지켜드릴게요.",
         frameAside: "이도령이 지키는 건 당신이 다치지 않는 선이에요. 흐름은 분명하게 읽어드릴게요.",
         questionsLead: "묻고 싶은 마음을 하나씩, 부드럽게 정리해 볼게요.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서보다 속도가 어긋나서인 경우가 많아요. ${p}와 다시 만나도 호흡을 바꿔야 해요.`,
@@ -226,8 +226,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}와는 초반 합이 따뜻했어요. 길어지며 확인과 침묵이 충이 된 흐름을 조심하세요.`,
         sipseongAside: (p) => `${p}와의 역학은 붙고-흔들리고-버티다 소모. 다음엔 당신 회복이 먼저예요.`,
         breakupAside: (p) => `표면은 소모, 속은 **과열 차단**이에요. ${p} 쪽도 미움보다 자기보호예요.`,
-        remainingAside: (p) => `상대는 **보관함**이에요. ${p} 마음은 삭제가 아니에요. 남아 있음 ≠ 지금 열림.`,
-        timelineAside: "타임라인—지금은 들이댈 때가 아니에요. 1~3개월이 창이에요. 조급함보다 정돈이 문을 열어요.",
+        remainingAside: (p) => `지운 건 아니에요. 근데 지금 당장 다시 만나자 할 마음은 아니에요. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태예요.`,
+        timelineAside: "타임라인—지금은 들이댈 때가 아니에요. 다시 연락하려면 최소 한두 달은 지나야 해요. 조급함보다 정돈이 문을 열어요.",
         contactAside: (p) => `${p}에게는 부드러운 한 줄이면 충분해요. 강요는 독을 불러요.`,
         strategyClose: "성공은 답장이 아니라, 당신이 무너지지 않는 하루예요.",
         pitfallsLead: "함정만 짧게—확인하고 싶을 때가 가장 보내면 안 되는 때예요.",
@@ -236,7 +236,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 이도령. 문이 열리면 들어가고, 안 열려도 당신이 무너지진 않게.",
         strategyNudge: "부드러운 한 줄이면 충분해요. 강요는 독을 불러요.",
         heartTempLead: (p) => `${p}에게는 설득보다 안전감이 필요해요. 온도는 낮게, 천천히.`,
-        keepLeaveClose: "결정은 사랑 점수가 아니라, 당신이 버티는 구조로요.",
+        keepLeaveClose: "결정은 사랑 점수가 아니라, 당신이 먼저 괜찮은 상태인지로요.",
         selfRoutineClose: "흔들림이 줄면 침묵의 의미도 달라져요.",
         dontNowLead: "지금은 설득 시즌이 아니에요. 생활의 리듬부터요.",
       };
@@ -246,7 +246,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `괜찮아. 같이 정리하자. ${p} 생각난다고 네가 작아질 필요는 없어—들이대는 자신감이 아니라, 정돈된 자신감.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 결이지. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있어.`,
-        coverClose: "선 그어. 위 방향이야. 창은 1~3개월이야. 정돈된 자신감으로 가자.",
+        coverClose: "여기서 멈춰. 이 방향이 맞아. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 정돈된 자신감으로 가자.",
         frameAside: "강세온 식으로—너는 이미 매력 있어. 문제는 타이밍과 온도야.",
         questionsLead: "질문부터 깔끔하게. 네가 진짜 궁금한 것만.",
         questionsClose: (p) => `지쳐 헤어진 거면 속도 문제야. ${p}랑 다시 만나도 호흡 안 바꾸면 또 같아.`,
@@ -256,8 +256,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}랑 합은 초반에 통했을 거야. 과해지면 충. 작은 서운함부터 정리하자.`,
         sipseongAside: (p) => `${p} 역학—붙고 흔들리고 버티다 소모. 너 회복이 먼저, 티징은 가볍게.`,
         breakupAside: (p) => `${p}가 싫어서가 아니라 **지침**이다. 너는 자존 올려. 선은 지키되 작아지지는 마.`,
-        remainingAside: (p) => `상대는 **보관함**이야. ${p} 마음은 삭제가 아냐. 남아 있음 ≠ 지금 열림. 온도 낮춰.`,
-        timelineAside: "타임라인—조급하면 흐름 엉키고, 정돈하면 창이 열린다. 지금은 들이댈 때 아냐.",
+        remainingAside: (p) => `지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 온도 낮춰.`,
+        timelineAside: "타임라인—조급하면 흐름 엉키고, 정돈하면 말할 타이밍이 온다. 지금은 들이댈 때 아냐.",
         contactAside: (p) => `${p}한테 티징은 가볍게, 추궁은 제로. 네가 무거우면 매력이 죽어.`,
         strategyClose: "답장에 자존 걸지 마. 네가 더 좋아 보이는 쪽이 이겨.",
         pitfallsLead: "함정—확인하고 싶을 때가 제일 보내면 안 되는 때야.",
@@ -266,7 +266,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 강세온. 선 넘지 말고, 자존은 올려.",
         strategyNudge: "티징은 가볍게, 추궁은 제로. 네가 무거우면 매력이 죽어.",
         heartTempLead: (p) => `${p}에게 설득하지 마. 안전감. 온도 낮추고, 네가 흔들리지 않는 모습.`,
-        keepLeaveClose: "결정은 감정 점수 말고, 네가 버티는 구조로.",
+        keepLeaveClose: "결정은 감정 점수 말고, 네가 먼저 괜찮은 상태인지로.",
         selfRoutineClose: "흔들림 줄이면 침묵도 작아져. 루틴이 매력이야.",
         dontNowLead: "지금은 설득 말고 생활. 정돈된 자신감부터.",
       };
@@ -277,7 +277,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `급할수록 한 박자 쉬어. 너, 밤에 또 ${p} 생각했지. 氣는 거짓말 잘 안 해—지금 들이대면 흐름이 또 엉킨다.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 있다.`,
-        coverClose: "지금은 이렇다. 위 방향이다. 창은 1~3개월이다. 氣는 조급하면 흐트러진다. 한 박자 쉬어.",
+        coverClose: "지금은 이렇다. 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 氣는 조급하면 흐트러진다. 한 박자 쉬어.",
         frameAside: "한시우 방식은 단순하다. 표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직하다.",
         questionsLead: "질문의 핵만 짧게.",
         questionsClose: (p) => `지쳐 헤어진 인연은 속도 문제다. ${p}와 다시 붙어도 호흡이 같으면 같은 벽이다.`,
@@ -287,8 +287,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         bondAside: (p) => `${p}와는 합이 과하면 충. 작은 해가 형을 부른 흐름으로 보라.`,
         sipseongAside: (p) => `${p} 역학—관성으로 붙고, 재성으로 흔들리고, 인성으로 버티다 지쳤다.`,
         breakupAside: (p) => `과열 차단이다. ${p} 쪽은 미움보다 자기보호. 중심만 잡아.`,
-        remainingAside: (p) => `상대는 **보관함**이다. ${p} 마음은 삭제가 아니다. 남아 있음 ≠ 지금 열림. 단정해.`,
-        timelineAside: "타임라인—지금은 들이댈 때가 아니다. 1~3개월이 창이다. 氣는 조급할수록 흐트러진다.",
+        remainingAside: (p) => `지운 건 아니다. 근데 지금 당장 다시 만나자 할 마음은 아니다. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태다. 이게 맞아.`,
+        timelineAside: "타임라인—지금은 들이댈 때가 아니다. 다시 연락하려면 최소 한두 달은 지나야 해. 氣는 조급할수록 흐트러진다.",
         contactAside: (p) => `${p}에게 추궁은 독. 확인하고 싶을 때가 가장 보내면 안 되는 때다.`,
         strategyClose: "지표는 답장이 아니라, 네가 정돈됐는지다.",
         pitfallsLead: "함정—확인하고 싶을 때가 가장 보내면 안 되는 때다.",
@@ -297,7 +297,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         signOff: "이상, 한시우. 氣는 조급할수록 흐트러지고, 정돈된 사람 쪽으로 다시 모인다.",
         strategyNudge: "확인하고 싶을 때가, 가장 보내면 안 되는 때다.",
         heartTempLead: (p) => `${p}에게 필요한 건 설득이 아니라 안전감. 온도는 낮게.`,
-        keepLeaveClose: "결정은 감정 점수가 아니라, 네가 버티는 구조로.",
+        keepLeaveClose: "결정은 감정 점수가 아니라, 네가 먼저 괜찮은 상태인지로.",
         selfRoutineClose: "흔들림을 줄이면 침묵의 의미가 달라진다.",
         dontNowLead: "지금은 설득 시즌이 아니다. 氣부터 모아.",
       };
@@ -536,12 +536,12 @@ ${partnerSense ? `${partnerSense} ‘관심은 있는데 손이 안 가는’ �
 - 다시 연락하는 순간 **또 그 피로로 돌아갈까 봐** 무서움
 - 네가 장문으로 감정을 쏟을까 봐 문지방을 못 넘음
 
-정리: **남아 있다 ≠ 지금 받아줄 준비가 됐다.** 상대는 **보관함**이다.
+정리: **남아 있다 ≠ 지금 받아줄 준비가 됐다.** 지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야.
 
 「그럼… 기다리면 열려?」
 기다림만으로는 안 열려. **네가 안전해 보이는 시간**이 쌓일 때 잠금이 느슨해진다. 그 시간은 검색이 아니라 루틴으로 채워.
 
-다음에 네가 할 선택: 보관함을 두드리지 말고, 두드려도 안 무서울 너로 서 있기.`,
+다음에 네가 할 선택: 지금 당장 다시 만나자고 밀지 말고, 밀어도 안 무서울 너로 서 있기.`,
   };
 }
 
@@ -559,12 +559,12 @@ function timelineSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart
 - **${luck}**
 - 원국: ${chart.summaryLine}
 
-※ 결론—**지금은 아니다. 창은 1~3개월이다.** 원국·이별·세운 겹치면 선이 또렷하다. 헤어진 지 ${monthsLabel(form)}.
+※ 결론—**지금은 아니다. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.** 원국·이별·세운 겹치면 이 방향이 또렷하다. 헤어진 지 ${monthsLabel(form)}.
 
 ### ◇ 1개월 (관망·정돈)
 적극 재접근 비추천. 인성을 너에게.
 
-### ◇ 3개월 전후 (접촉 창)
+### ◇ 3개월 전후 (가벼운 안부 타이밍)
 가벼운 안부인사형 접촉↑. 조건: 매달림 없는 상태.
 
 ### ◇ 6개월 (갈림길)
@@ -572,7 +572,7 @@ function timelineSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart
 
 ### 세운으로 본 지나온 ${m}개월 / 앞으로의 석 달
 - **다음 30일**: 관망. 기신(추궁·장문) 차단
-- **30~90일**: 안부형 저자극 접촉 창
+- **30~90일**: 안부형 저자극으로 다시 말해도 되는 때
 
 ${voice.timelineAside}
 ※ 네 선택이 지도를 바꾼다.`,
@@ -627,7 +627,7 @@ ${p}를 설득하지 마. 일상에서 그를 ‘필수 변수’에서 빼.
 너의 木 기운이 상대에게만 기대지 않고 **스스로 뿌리**를 내리는 작업이다.
 → **인성을 나에게, 기신(추궁)을 차단.** ${voice.strategyNudge}
 
-### 2단계 — 저자극 접촉 (대략 3개월 창)
+### 2단계 — 저자극 접촉 (대략 한두 달에서 세 달)
 한 줄 안부 → 반응 보면 멈춤.
 답이 따뜻하면 2~3일 간격 가벼운 대화. 건조하거나 없으면 **최소 2주 침묵**.
 목표: “이 사람은 예전처럼 무겁지 않다”는 **체감**.
@@ -837,11 +837,11 @@ function oneLinerFor(productId: SajuProductId, form: SajuBirthForm): string {
   const p = partner(form);
   switch (productId) {
     case "reunion-luck":
-      return `**지금은 아니다.** 줄은 남아 있다. **창은 1~3개월이다.** 지금 연락·고백·장문은 독이다.`;
+      return `**지금은 아니다.** 줄은 남아 있다. **지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.** 지금 연락·고백·장문은 독이다.`;
     case "partner-heart":
-      return `느낌이 왔어—이건 **보관함**이야. ${p} 마음은 삭제가 아니다. 남아 있음 ≠ 지금 열림. 선 그어.`;
+      return `느낌이 왔어—지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 여기서 멈춰.`;
     case "breakup-decision":
-      return `무조건 붙여/버려가 아니다. **자존 구조부터 세워.** 그다음 남겨둘지 놓아. 선 그어.`;
+      return `무조건 붙여/버려가 아니다. **네가 먼저 괜찮은 상태가 돼야 해.** 그다음 남겨둘지 놓아. 여기서 멈춰.`;
     case "reunion-strategy":
       return `지금은 이렇게 해. 설득 시즌이 아니다. **저자극·정돈·타이밍**—그게 전략이다. 같이 가자.`;
   }
@@ -854,18 +854,18 @@ function bulletsFor(productId: SajuProductId, form: SajuBirthForm): string[] {
       return [
         "재회 **절대 불가**가 아니다. 줄은 남아 있다.",
         "다만 **지금 이 순간 고백·추궁·장문**은 독이다. 지금은 연락 타이밍이 아니다.",
-        `상대는 **보관함**이다. ${p} 마음은 삭제가 아니다.`,
-        `**앞으로 1개월**: 관망·정돈. **1~3개월**: 접촉 창. **6개월**: 재개 vs 정리 갈림. (헤어진 지 ${monthsLabel(form)} 기준)`,
+        `지운 건 아냐. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야.`,
+        `**앞으로 1개월**: 관망·정돈. **한두 달~세 달**: 가벼운 안부 타이밍. **6개월**: 재개 vs 정리 갈림. (헤어진 지 ${monthsLabel(form)} 기준)`,
       ];
     case "partner-heart":
       return [
-        "상대는 **보관함**이다. 지금 받아줄 준비와는 별개다.",
+        "지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야.",
         "거리감의 핵심은 미움이 아니라 **피로·자기보호**다.",
         "다가갈 온도는 낮게, 확인 욕구는 더 낮게. 지금은 그 선이다.",
       ];
     case "breakup-decision":
       return [
-        "소모가 사랑보다 커졌다면, 결정은 ‘감정’이 아니라 ‘구조’로.",
+        "소모가 사랑보다 커졌다면, 결정은 ‘감정’이 아니라 네가 괜찮은 상태인지로.",
         "남겨둘 조건과 놓을 조건을 문장으로 적어라.",
         "자존 회복 없는 재시도는 같은 이별을 복제한다.",
       ];

@@ -38,7 +38,7 @@ export function buildBreakupDecisionNarrativeSections(
   const concern = concernLine(form);
   const chartBits = `원국 ${chart.summaryLine} · 일간 **${dm}** · ${hourLine(chart)}`;
   const vn = voice.name;
-  const hooks = "결정은 사랑 점수가 아니라 자존 구조로. 퍼주지 마. 아껴도 돼.";
+  const hooks = "결정은 사랑 점수가 아니라 네 자존감부터. 퍼주지 마. 아껴도 돼.";
   const L = (n: number, lead: string, mid = "") =>
     longSection(n, p, y, months, breakup, concern, dm, chartBits, vn, hooks, lead, mid);
 
@@ -57,7 +57,7 @@ ${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
 > ${concern}
 
 「붙여야 할까… 끝내야 할까.」
-그 문장을 백 번 굴리지 마. 오늘은 **구조로** 읽어. 감정 점수로 판결하지 않아.
+그 문장을 백 번 굴리지 마. 오늘은 **네가 괜찮은 상태인지**로 읽어. 감정 점수로 판결하지 않아.
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
 
@@ -128,7 +128,7 @@ ${voice.strategyNudge}`,
       5,
       `표면: 소모, “${breakup}”, 대화↓.
 속: ${p} 쪽 자기보호 · 네 쪽 애착+자존 동시 작동.
-팩트: 사랑이 0이 아니다. **속도·피로**로 문 닫힌 결이다. 선 그어.
+팩트: 사랑이 0이 아니다. **속도·피로**로 문 닫힌 결이다. 더 퍼주지 마.
 
 ${voice.breakupAside?.(p) ?? ""}
 자책 문장 교정: “내가 과해서 끝났다” → “속도가 어긋났고, 나는 조절할 수 있다.”`,
@@ -140,7 +140,7 @@ ${voice.breakupAside?.(p) ?? ""}
     title: "2장 · 남겨둘 이유 / 놓을 이유",
     body: L(
       6,
-      `${voice.keepLeaveClose ?? "결정은 사랑 점수가 아니라 자존 구조로."}
+      `${voice.keepLeaveClose ?? "결정은 사랑 점수가 아니라 네가 먼저 괜찮은 상태인지로."}
 
 ### 남겨둘 이유가 설득력 있으려면
 - 서로의 페이스를 재계약할 의사가 보임
@@ -209,7 +209,7 @@ ${voice.strategyNudge}`,
 ${voice.closingBody}
 
 세 문장:
-1. 무조건 붙여/버려가 아니다. 구조다.
+1. 무조건 붙여/버려가 아니다. 네가 먼저 괜찮은 상태가 돼야 해.
 2. 남겨도/놓아도 네가 작아지면 잘못된 결정이다.
 3. 팩트—너는 더 아껴도 돼.
 
@@ -239,11 +239,11 @@ ${voice.signOff}`,
   ];
 
   const pads: Record<string, { beat: string; scene: string }> = {
-    questions: { beat: "질문", scene: "붙여야 할까 끝내야 할까—판결 대신 구조로." },
+    questions: { beat: "질문", scene: "붙여야 할까 끝내야 할까—판결 대신 네가 괜찮은 상태인지로." },
     trait: { beat: "기질", scene: "깊게 사랑하고 참다가 지치는 결. 인정해야 다음이 있다." },
     pattern: { beat: "패턴", scene: "같은 과열 스크립트를 반복하지 않기." },
     "breakup-reason": { beat: "이별 원인", scene: "미움보다 속도·피로. 자책 문장을 교정한다." },
-    "keep-leave": { beat: "남겨둘/놓을", scene: "사랑 점수가 아니라 자존 구조로 결정 문장을 쓴다." },
+    "keep-leave": { beat: "남겨둘/놓을", scene: "사랑 점수가 아니라 네 자존감부터 잡아 결정 문장을 쓴다." },
     "self-routine": { beat: "자존 루틴", scene: "퍼주지 마. 루틴이 매력이다." },
     pitfalls: { beat: "함정", scene: "감정 최고점 선언·자정 장문은 독." },
     closing: { beat: "마지막 말", scene: "남겨도 놓아도, 네가 작아지면 잘못된 결정이다." },
