@@ -113,7 +113,7 @@ ${voice.traitClose?.(p) ?? ""}`,
     title: "연애 패턴 · 잔향의 스크립트",
     body: L(
       4,
-      `진입→몰입→과열→차단→잔향. 전략의 적은 3단계(과열) 반복.
+      `진입→몰입→달아오름→차단→잔향. 전략의 적은 3단계(달아오름) 반복.
 같은 방식으로 ${p}에게 가면 또 지친다. 재회는 설득보다 안정.
 
 ${voice.patternClose?.(p) ?? ""}
@@ -264,7 +264,7 @@ ${voice.signOff}`,
   const pads: Record<string, { beat: string; scene: string }> = {
     questions: { beat: "질문", scene: "지금 연락해도 될까—달력이 아니라 상태에 묻는다." },
     trait: { beat: "기질", scene: "깊게 남는 결. 전략은 그 결을 추궁으로 쓰지 않는 것." },
-    pattern: { beat: "패턴", scene: "과열 스크립트를 다른 호흡으로." },
+    pattern: { beat: "패턴", scene: "달아올랐다 지치던 패턴을 다른 호흡으로." },
     "dont-now": { beat: "금지", scene: "빨간불. 자정 장문·직구·추궁은 넘기지 마." },
     timeline: { beat: "타임라인", scene: "한 달·세 달·여섯 달은 눈금. 상태는 네가 표시한다." },
     contact: { beat: "멘트", scene: "전송 버튼 앞. 멘트보다 네 상태." },

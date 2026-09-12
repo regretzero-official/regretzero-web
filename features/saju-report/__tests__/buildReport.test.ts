@@ -118,6 +118,15 @@ describe("everyday Korean counseling (no jargon slogans)", () => {
       expect(joined).not.toMatch(/선 그어/);
       expect(joined).not.toMatch(/단정해/);
       expect(joined).not.toMatch(/위 방향이다|위 방향이야|위 방향이에요/);
+      expect(joined).not.toMatch(/줄은 남아/);
+      expect(joined).not.toMatch(/이 선이다|그 선이다/);
+      expect(joined).not.toMatch(/사랑이 0/);
+      expect(joined).not.toMatch(/문 닫힌 결/);
+      expect(joined).not.toMatch(/과열 스크립트/);
+      expect(joined).not.toMatch(/저열|고열/);
+      expect(joined).not.toMatch(/청구서/);
+      expect(joined).not.toMatch(/칸이 달라/);
+      expect(joined).not.toMatch(/해 결이다|문 닫힌 결이다/);
     }
   });
 

@@ -38,7 +38,7 @@ export function buildPartnerHeartNarrativeSections(
   const concern = concernLine(form);
   const chartBits = `원국 ${chart.summaryLine} · 일간 **${dm}** · ${hourLine(chart)}`;
   const vn = voice.name;
-  const hooks = "속마음은 저열로 읽고, 온기는 2~3도만. 지금 당장 다시 만나자고 밀지 마.";
+  const hooks = "속마음은 살짝 그리움으로 읽고, 온기는 2~3도만. 지금 당장 다시 만나자고 밀지 마.";
   const L = (n: number, lead: string, mid = "") =>
     longSection(n, p, y, months, breakup, concern, dm, chartBits, vn, hooks, lead, mid);
 
@@ -121,7 +121,7 @@ ${voice.traitClose?.(p) ?? ""}`,
 
 1. **진입** — 상대의 빈자리·무심함이 끌림
 2. **몰입** — 네가 감정·배려·계획을 많이 씀
-3. **과열** — 확인·장문↑, 상대는 숨
+3. **달아오름** — 확인·장문↑, 상대는 숨
 4. **차단** — “쉬자” / 이별
 5. **잔향** — 지금 ${months}은 4→5단계 경계
 
@@ -177,7 +177,7 @@ ${voice.breakupAside?.(p) ?? ""}
       5,
       `${voice.remainingAside?.(p) ?? ""}
 **지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야.**
-${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 남아 있음 ≠ 지금 열어줄 준비. 지금은 이 선이다.
+${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 남아 있음 ≠ 지금 열어줄 준비. 지금은 여기까지야.
 
 ### 남아 있다는 쪽의 신호
 - SNS·대화창을 가끔 열지만 먼저 못 씀
@@ -203,12 +203,12 @@ ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 남아 있음 �
       4,
       `${voice.heartTempLead?.(p) ?? `${p}에게 지금 필요한 건 설득이 아니라 안전감.`}
 
-**흘려보낼 온기는 2~3도면 충분해.** 길게 설명할수록 청구서가 돼.
+**흘려보낼 온기는 2~3도면 충분해.** 길게 설명할수록 부담이 돼.
 “문득 생각나서. 잘 지내?” — 이게 상한선에 가까운 온도야.
 
 ### 온도 실수
-- 자정 장문 = 고열 폭탄
-- “나 아직 너만” = 책임 청구서
+- 자정 장문 = 확인 강요
+- “나 아직 너만” = 책임 떠넘기기
 - 연속 톡 = 문 닫는 초인종
 
 ### 온도 연습
@@ -268,8 +268,8 @@ ${voice.strategyNudge}`,
 ${voice.closingBody}
 
 네가 가져갈 세 문장:
-1. 자리는 남아 있다. 문은 아직이다. 지금은 그 선이다.
-2. 속마음은 저열로 읽고, 온기는 얇게.
+1. 마음은 아직 남아 있어. 문은 아직 닫혀 있어. 지금은 더 밀지 마.
+2. 속마음은 살짝 그리움으로 읽고, 온기는 얇게.
 3. 답장 속도보다, 네가 무너지지 않는 하루.
 
 *(근거 한 줄)* 원국 ${chart.summaryLine} · 일간 ${dm} · ${yearSense(chart)} — 참고용이에요. 절대 결과가 아니에요.
@@ -302,11 +302,11 @@ ${voice.signOff}`,
   const pads: Record<string, { beat: string; scene: string }> = {
     questions: { beat: "질문 정리", scene: `질문의 핵만 남긴다. ${p} 속마음, 거리감, 온도. 여기서 멈춰.` },
     trait: { beat: "일간 기질", scene: "원국을 보면—시험 점수가 아니라, 깊게 남는 결을 읽는 점사다." },
-    pattern: { beat: "잔향 스크립트", scene: "같은 스크립트의 3단계(과열) 앞에서, 다른 숨을 쉬는 상담이 시작된다." },
+    pattern: { beat: "잔향 스크립트", scene: "같은 스크립트의 3단계(달아오름) 앞에서, 다른 숨을 쉬는 상담이 시작된다." },
     bond: { beat: "인연의 결", scene: "온기와 숨 막힘 사이. 정은 있는데 마음이 상하기 쉬운 그 결." },
     "breakup-reason": { beat: "이별 원인", scene: "‘잠깐 쉬자’가 남긴 잔향. 미움보다 속도·피로로 읽어." },
     remaining: { beat: "남은 속마음", scene: "지운 건 아냐. 문은 아직 닫혀 있다. 그래도 마음엔 남아 있다. 이게 맞아." },
-    "heart-temp": { beat: "다가갈 온도", scene: "온기는 2~3도. 고열은 일기장에만. 상담 결론이다." },
+    "heart-temp": { beat: "다가갈 온도", scene: "온기는 2~3도. 확인 강요는 일기장에만. 상담 결론이다." },
     contact: { beat: "연락 가이드", scene: "멘트보다 네 상태. 전송 전 30초만 물어." },
     pitfalls: { beat: "함정", scene: "확인하고 싶을 때가 제일 보내면 안 되는 때다." },
     closing: { beat: "마지막 말", scene: "속마음은 지도로, 하루는 네가 산다. 그게 점사의 본편이야." },
