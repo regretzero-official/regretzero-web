@@ -511,12 +511,20 @@ ${voice.breakupAside(p)}
 
 function remainingHeartSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection {
   const p = partner(form);
+  const pc = chart.partnerChart;
+  const partnerSense =
+    pc?.detailLevel === "full" && pc.dayMaster && pc.dayMasterElement
+      ? `상대 원국 ${pc.summaryLine} · 일간 **${dayMasterLabel(pc.dayMaster, pc.dayMasterElement)}**을 겹치면,`
+      : chart.partnerYearPillar
+        ? `상대 연주 **${chart.partnerYearPillar.korean}** 결을 겹치면,`
+        : "";
   return {
     id: "remaining",
     title: "상대 속마음에 내가 남아있는지",
     body: `${voice.remainingAside(p)}
 헤어진 지 ${monthsLabel(form)}, 메모상 “${breakupLine(form)}”라면—삭제의 공망보다 **손대기 무서운 공망**에 가깝다.
 네 공망: **${chart.voidBranches.join("·") || "없음"}**.
+${partnerSense ? `${partnerSense} ‘관심은 있는데 손이 안 가는’ 구간으로 읽히는 편이 자연스럽다.` : ""}
 
 ### 남아 있다는 쪽의 신호
 - SNS·대화창을 가끔 열지만 먼저 쓰지는 못함
@@ -662,14 +670,22 @@ function noticeSection(characterName: string, productTitle: string): SajuReportS
   };
 }
 
-function partnerHeartExtra(form: SajuBirthForm, voice: VoicePack): SajuReportSection[] {
+function partnerHeartExtra(form: SajuBirthForm, voice: VoicePack, chart: SajuChart): SajuReportSection[] {
   const p = partner(form);
+  const pc = chart.partnerChart;
+  const pairBit =
+    pc?.detailLevel === "full" && pc.dayMaster
+      ? `네 일간 **${dayMasterLabel(chart.dayMaster, chart.dayMasterElement)}** ↔ ${p} 일간 **${dayMasterLabel(pc.dayMaster, pc.dayMasterElement ?? "")}** 페어를 기준으로 온도를 낮게 잡아.`
+      : chart.partnerYearPillar
+        ? `${p} 연주 **${chart.partnerYearPillar.korean}** 결을 존중하되, 온도는 낮게.`
+        : "";
   return [
     {
       id: "heart-temp",
       title: "상대에게 다가갈 온도",
       body: `${voice.heartTempLead(p)}
 온도를 숫자로 비유하면—예전의 7~8도를 다시 켜지 말고, **2~3도의 옅은 온기**만 흘려보내라.
+${pairBit}
 답장이 없어도 네가 무너지지 않는 모습이, 아이러니하게 ${p}의 문을 덜 무섭게 만든다.
 
 헤어진 지 ${monthsLabel(form)} · “${breakupLine(form)}” 메모를 기준으로 하면, 지금 과한 온기는 청구서로 읽히기 쉽다.
@@ -827,7 +843,7 @@ function sectionsForProduct(
       bondSection(form, voice),
       breakupReasonSection(form, voice),
       remainingHeartSection(form, voice, chart),
-      ...partnerHeartExtra(form, voice),
+      ...partnerHeartExtra(form, voice, chart),
       contactGuideSection(form, voice),
       pitfallsSection(form, voice),
       closingSection(form, voice),
@@ -913,6 +929,10 @@ export function emptyBirthForm(): SajuBirthForm {
     birthPlace: "",
     partnerName: "",
     partnerBirthYear: "",
+    partnerBirthMonth: "",
+    partnerBirthDay: "",
+    partnerBirthTime: "",
+    partnerGender: "",
     monthsApart: "3",
     breakupNote: "",
     concern: "",

@@ -8,6 +8,7 @@ import {
   hubDeepLink,
   type SajuLandingSlug,
 } from "@/features/saju-report/product-landings";
+import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
 import { getSajuProduct } from "@/features/saju-report/products";
 
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
@@ -28,6 +29,9 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
 
   const character = getSajuCharacter(product.characterId);
   const startHref = hubDeepLink(product.id);
+  const freeCount = landing.previewUnlockedCount;
+  const totalSections = getCanonicalSectionCount(product.id);
+  const freeScopeLine = `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${totalSections}장)`;
   const reviews = SAJU_DEMO_REVIEWS.filter((r) =>
     r.tags.some((t) => t === landing.reviewTag || t === product.characterName),
   );
@@ -88,6 +92,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
                   >
                     {landing.ctaLabel} →
                   </Link>
+                  <p className="mt-2 text-[11px] leading-5 text-[#B8AEB4]/90">{freeScopeLine}</p>
                 </div>
               </div>
             </div>
@@ -263,6 +268,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
         </main>
 
         <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
+          <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">{freeScopeLine}</p>
           <Link
             href={startHref}
             className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold"

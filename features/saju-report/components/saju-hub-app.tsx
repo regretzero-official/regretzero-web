@@ -10,6 +10,7 @@ import { formatChartChip } from "@/features/saju-report/manseryeok/formatChart";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
 import { saveSajuReading } from "@/features/saju-report/my-readings";
 import { getLandingByProductId } from "@/features/saju-report/product-landings";
+import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
 import { SAJU_PRODUCTS, SAJU_REPORT_PRICE, getSajuProduct } from "@/features/saju-report/products";
 import type {
   SajuBirthForm,
@@ -315,6 +316,24 @@ function HubLanding({
   );
 }
 
+
+function FieldReqBadge({ required }: { required: boolean }) {
+  return required ? (
+    <span className="ml-1 rounded-full bg-[#E8336D]/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[#FF7A99]">
+      필수
+    </span>
+  ) : (
+    <span className="ml-1 rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#6E666C]">
+      선택
+    </span>
+  );
+}
+
+function freePreviewScopeLine(product: SajuProduct, freeCount = 1) {
+  const total = getCanonicalSectionCount(product.id);
+  return `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${total}장)`;
+}
+
 function BirthFormView({
   product,
   form,
@@ -332,10 +351,11 @@ function BirthFormView({
 }) {
   const patch = (partial: Partial<SajuBirthForm>) => setForm({ ...form, ...partial });
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
+  const scopeLine = freePreviewScopeLine(product, 1);
 
   return (
     <div className={SAJU_BOTTOM_NAV_PAD}>
-      <div className="px-5 pt-4">
+      <div className="saju-header sticky top-12 z-30 border-b border-white/5 px-5 pb-3 pt-3">
         <button
           type="button"
           onClick={onBack}
@@ -343,28 +363,36 @@ function BirthFormView({
         >
           ← 상품으로
         </button>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-3 flex items-center gap-3">
           {character ? (
-            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/15">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/15">
               <Image
                 alt={character.name}
                 className="object-cover object-top"
                 fill
-                sizes="56px"
+                sizes="48px"
                 src={character.portraitSrc}
               />
             </div>
           ) : null}
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF7A99]">
-              {product.characterName}
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]">
+              <span>{product.characterName}</span>
+              {character?.roleLabel ? (
+                <span className="rounded-full border border-[#FF7A99]/35 bg-[#E8336D]/15 px-1.5 py-0.5 tracking-[0.08em] text-[#FF7A99]">
+                  {character.roleLabel}
+                </span>
+              ) : null}
             </div>
-            <h1 className="text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
+            <h1 className="truncate text-lg font-bold tracking-[-0.04em] text-[#F8F4F6]">
               {product.title} 신청
             </h1>
           </div>
         </div>
-        <p className="mt-2 text-sm leading-6 text-[#9A9098]">
+      </div>
+
+      <div className="px-5 pt-3">
+        <p className="text-sm leading-6 text-[#9A9098]">
           출생·고민을 적을수록 리포트가 구체해집니다. 저장되지 않는 데모 입력입니다.
         </p>
       </div>
@@ -377,7 +405,10 @@ function BirthFormView({
         }}
       >
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">호칭 (선택)</span>
+          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+            호칭
+            <FieldReqBadge required={false} />
+          </span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             value={form.displayName}
@@ -387,7 +418,11 @@ function BirthFormView({
         </label>
 
         <div>
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">성별</span>
+          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+            성별
+            <FieldReqBadge required={false} />
+            <span className="ml-1 font-normal text-[#6E666C]">· 대운 참고</span>
+          </span>
           <div className="flex gap-2">
             {(["여성", "남성", "기타"] as const).map((g) => (
               <button
@@ -406,51 +441,75 @@ function BirthFormView({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {(
-            [
-              ["birthYear", "출생 연도", "1995"],
-              ["birthMonth", "출생 월", "3"],
-              ["birthDay", "출생 일", "14"],
-            ] as const
-          ).map(([key, label, ph]) => (
-            <label key={key} className="block">
-              <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">{label}</span>
-              <input
-                className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
-                inputMode="numeric"
-                value={form[key]}
-                onChange={(e) => patch({ [key]: e.target.value })}
-                placeholder={ph}
-              />
-            </label>
-          ))}
+        <div>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-[#9A9098]">내 출생</span>
+            <span className="rounded-full border border-[#F0A05A]/40 bg-[#F0A05A]/12 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#F0A05A]">
+              지금은 양력만 · 음력은 준비 중
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                ["birthYear", "출생 연도", "1992"],
+                ["birthMonth", "출생 월", "1–12"],
+                ["birthDay", "출생 일", "1–31"],
+              ] as const
+            ).map(([key, label, ph]) => (
+              <label key={key} className="block">
+                <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+                  {label}
+                  <FieldReqBadge required />
+                </span>
+                <input
+                  className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
+                  inputMode="numeric"
+                  value={form[key]}
+                  onChange={(e) => patch({ [key]: e.target.value })}
+                  placeholder={ph}
+                  required
+                />
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 시간 <span className="font-normal text-[#6E666C]">(선택)</span></span>
+            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+              출생 시간
+              <FieldReqBadge required={false} />
+            </span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthTime}
               onChange={(e) => patch({ birthTime: e.target.value })}
-              placeholder="밤 10시"
+              placeholder="14:30 또는 오후 2시 / 모름"
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 지역 <span className="font-normal text-[#6E666C]">(선택 · 비우면 서울로 읽기)</span></span>
+            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+              출생 지역
+              <FieldReqBadge required={false} />
+            </span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthPlace}
               onChange={(e) => patch({ birthPlace: e.target.value })}
-              placeholder="서울"
+              placeholder="비우면 서울"
             />
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-[16px] border border-white/8 bg-white/[0.03] p-3 space-y-3">
+          <p className="text-[11px] leading-5 text-[#6E666C]">
+            상대 정보는 전부 선택이에요. 연도만 있어도 연주 비교가 되고, 월·일(+시간)까지 있으면 「두 사람의 사주 원국 비교」가 더 깊어져요.
+          </p>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름</span>
+            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+              상대 이름
+              <FieldReqBadge required={false} />
+            </span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.partnerName}
@@ -458,31 +517,88 @@ function BirthFormView({
               placeholder="예: 민재"
             />
           </label>
+          <div>
+            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+              상대 성별
+              <FieldReqBadge required={false} />
+              <span className="ml-1 font-normal text-[#6E666C]">· 대운 준비용</span>
+            </span>
+            <div className="flex gap-2">
+              {(["여성", "남성", "기타"] as const).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() =>
+                    patch({ partnerGender: form.partnerGender === g ? "" : g })
+                  }
+                  className={`min-h-10 flex-1 rounded-full text-xs font-semibold transition ${
+                    form.partnerGender === g
+                      ? "bg-[#E8336D] text-white"
+                      : "border border-white/10 bg-white/5 text-[#B8AEB4]"
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                ["partnerBirthYear", "상대 연도", "1993"],
+                ["partnerBirthMonth", "상대 월", "1–12"],
+                ["partnerBirthDay", "상대 일", "1–31"],
+              ] as const
+            ).map(([key, label, ph]) => (
+              <label key={key} className="block">
+                <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+                  {label}
+                  <FieldReqBadge required={false} />
+                </span>
+                <input
+                  className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
+                  inputMode="numeric"
+                  value={form[key]}
+                  onChange={(e) => patch({ [key]: e.target.value })}
+                  placeholder={ph}
+                />
+              </label>
+            ))}
+          </div>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생 연도 <span className="font-normal text-[#6E666C]">(선택)</span></span>
+            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+              상대 출생 시간
+              <FieldReqBadge required={false} />
+            </span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              inputMode="numeric"
-              value={form.partnerBirthYear}
-              onChange={(e) => patch({ partnerBirthYear: e.target.value })}
-              placeholder="1993"
+              value={form.partnerBirthTime}
+              onChange={(e) => patch({ partnerBirthTime: e.target.value })}
+              placeholder="14:30 또는 오후 2시 / 모름"
             />
           </label>
         </div>
 
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">헤어진 지 (개월)</span>
+          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+            헤어진 지 (개월)
+            <FieldReqBadge required />
+          </span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             inputMode="numeric"
             value={form.monthsApart}
             onChange={(e) => patch({ monthsApart: e.target.value })}
-            placeholder="3"
+            placeholder="예: 3"
+            required
           />
         </label>
 
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">이별 상황</span>
+          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+            이별 상황
+            <FieldReqBadge required={false} />
+          </span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             value={form.breakupNote}
@@ -492,26 +608,34 @@ function BirthFormView({
         </label>
 
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">지금 가장 궁금한 것</span>
+          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
+            지금 가장 궁금한 것
+            <FieldReqBadge required />
+          </span>
           <textarea
             className="saju-input min-h-28 w-full resize-none rounded-[14px] px-4 py-3 text-sm"
             value={form.concern}
             onChange={(e) => patch({ concern: e.target.value })}
             placeholder="재회할 수 있을까요? 지금 연락해도 될까요?"
+            required
           />
         </label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
-        >
-          {loading ? "미리보기 생성 중…" : "무료 미리보기 보기"}
-        </button>
+        <div className="space-y-2 pt-1">
+          <p className="text-center text-[11px] leading-5 text-[#9A9098]">{scopeLine}</p>
+          <button
+            type="submit"
+            disabled={loading}
+            className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
+          >
+            {loading ? "미리보기 생성 중…" : "무료 미리보기 보기"}
+          </button>
+        </div>
       </form>
     </div>
   );
 }
+
 
 function PreviewView({
   product,

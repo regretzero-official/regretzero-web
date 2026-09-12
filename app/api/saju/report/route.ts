@@ -27,6 +27,11 @@ function parseForm(raw: unknown): SajuBirthForm | null {
   const genderRaw = asString(f.gender, 20);
   const gender =
     genderRaw === "남성" || genderRaw === "기타" || genderRaw === "여성" ? genderRaw : "여성";
+  const partnerGenderRaw = asString(f.partnerGender, 20);
+  const partnerGender =
+    partnerGenderRaw === "남성" || partnerGenderRaw === "기타" || partnerGenderRaw === "여성"
+      ? partnerGenderRaw
+      : "";
 
   return {
     displayName: asString(f.displayName, 40),
@@ -38,6 +43,10 @@ function parseForm(raw: unknown): SajuBirthForm | null {
     birthPlace: asString(f.birthPlace, 40),
     partnerName: asString(f.partnerName, 40),
     partnerBirthYear: asString(f.partnerBirthYear, 8),
+    partnerBirthMonth: asString(f.partnerBirthMonth, 4),
+    partnerBirthDay: asString(f.partnerBirthDay, 4),
+    partnerBirthTime: asString(f.partnerBirthTime, 40),
+    partnerGender,
     monthsApart: asString(f.monthsApart, 8),
     breakupNote: asString(f.breakupNote, 200),
     concern: asString(f.concern, 400),

@@ -1,6 +1,18 @@
-export { computeChart, parseBirthTime, dayMasterLabel } from "./computeChart";
-export { formatChartChip, formatChartMarkdown, formatChartPlain } from "./formatChart";
+export {
+  computeChart,
+  computePartnerChart,
+  computeFourPillarsFromBirth,
+  parseBirthTime,
+  dayMasterLabel,
+} from "./computeChart";
+export {
+  formatChartChip,
+  formatChartMarkdown,
+  formatChartPlain,
+  formatPartnerChartMarkdown,
+} from "./formatChart";
 export type {
+  PartnerChart,
   SajuChart,
   SajuLuckInfoView,
   SajuLuckPillarView,

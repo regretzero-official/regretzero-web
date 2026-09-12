@@ -9,7 +9,15 @@ function formSummary(form: SajuBirthForm) {
   return [
     `내담자: ${form.displayName || "(익명)"} · ${form.gender}`,
     `출생: ${form.birthYear || "?"}년 ${form.birthMonth || "?"}월 ${form.birthDay || "?"}일 ${form.birthTime || "(시간 미상)"} · ${form.birthPlace || "(지역 미상)"}`,
-    `상대: ${form.partnerName || "(이름 미상)"}${form.partnerBirthYear ? ` · ${form.partnerBirthYear}년생` : ""}`,
+    (() => {
+      const name = form.partnerName || "(이름 미상)";
+      if (!form.partnerBirthYear) return `상대: ${name}`;
+      const ymd =
+        form.partnerBirthMonth && form.partnerBirthDay
+          ? `${form.partnerBirthYear}년 ${form.partnerBirthMonth}월 ${form.partnerBirthDay}일 ${form.partnerBirthTime || "(시간 미상)"}`
+          : `${form.partnerBirthYear}년생(월일 미상)`;
+      return `상대: ${name} · ${ymd}`;
+    })(),
     `이별: 약 ${form.monthsApart || "?"}개월 전 · ${form.breakupNote || "사정 미상"}`,
     `고민: ${form.concern || "재회/속마음/연락 타이밍"}`,
   ].join("\n");

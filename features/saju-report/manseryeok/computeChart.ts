@@ -7,8 +7,9 @@ import {
 } from "manseryeok";
 
 import type { SajuBirthForm } from "../types";
-import { formatChartMarkdown } from "./formatChart";
+import { formatChartMarkdown, formatPartnerChartMarkdown } from "./formatChart";
 import type {
+  PartnerChart,
   SajuChart,
   SajuLuckInfoView,
   SajuPillarView,
@@ -163,20 +164,47 @@ export function dayMasterLabel(stem: string, element: string): string {
   return `${stem}${element}`;
 }
 
+/** Shared birth Y/M/D(+time) → four-pillars core (no partner / formattedKorean). */
+export type BirthYmdInput = {
+  year: number;
+  month: number;
+  day: number;
+  birthTime: string;
+  gender?: SajuBirthForm["gender"];
+};
+
+export type CoreFourPillars = {
+  solar: { year: number; month: number; day: number };
+  hourUnknown: boolean;
+  birthClock: { hour: number; minute: number } | null;
+  pillars: {
+    year: SajuPillarView;
+    month: SajuPillarView;
+    day: SajuPillarView;
+    hour: SajuPillarView | null;
+  };
+  dayMaster: string;
+  dayMasterElement: string;
+  dayMasterYinYang: string;
+  elements: SajuChart["elements"];
+  tenGods: SajuTenGodsSummary;
+  voidBranches: string[];
+  luckPillars?: SajuLuckInfoView;
+  summaryLine: string;
+};
+
 /**
- * Compute app chart from birth form.
+ * Reusable manseryeok calculateFourPillars wrapper.
  * Solar calendar, dayBoundary midnight, no trueSolarTime (MVP).
  * When hour unknown: library uses midday ONLY internally; hour pillar is null.
  */
-export function computeChart(form: SajuBirthForm): SajuChart {
-  const year = parseIntLoose(form.birthYear, 1995);
-  const month = Math.min(12, Math.max(1, parseIntLoose(form.birthMonth, 3)));
-  const day = Math.min(31, Math.max(1, parseIntLoose(form.birthDay, 14)));
-  const parsedTime = parseBirthTime(form.birthTime);
+export function computeFourPillarsFromBirth(input: BirthYmdInput): CoreFourPillars {
+  const { year, month, day } = input;
+  const parsedTime = parseBirthTime(input.birthTime);
   const hourUnknown = parsedTime.kind === "unknown";
   const hour = hourUnknown ? 12 : parsedTime.hour;
   const minute = hourUnknown ? 0 : parsedTime.minute;
-  const gender = mapGender(form.gender);
+  const gender = input.gender ? mapGender(input.gender) : undefined;
 
   const detail = calculateFourPillars({
     year,
@@ -195,20 +223,11 @@ export function computeChart(form: SajuBirthForm): SajuChart {
     ? null
     : pillarView(detail.hour, detail.hourString, detail.hourHanja, detail.hourElement);
 
-  const currentYear = new Date().getFullYear();
-  const currentYearPillar = yearPillarOnly(currentYear);
-
-  let partnerYearPillar: SajuPillarView | undefined;
-  const py = parseIntLoose(form.partnerBirthYear, NaN);
-  if (Number.isFinite(py) && py >= 1800 && py <= 2300) {
-    partnerYearPillar = yearPillarOnly(py);
-  }
-
   const summaryLine = hourP
     ? `${yearP.korean}/${monthP.korean}/${dayP.korean}/${hourP.korean}`
     : `${yearP.korean}/${monthP.korean}/${dayP.korean}/시주미상`;
 
-  const chart: SajuChart = {
+  return {
     solar: { year, month, day },
     hourUnknown,
     birthClock: hourUnknown ? null : { hour, minute },
@@ -227,9 +246,118 @@ export function computeChart(form: SajuBirthForm): SajuChart {
     tenGods: tenGodsFrom(detail, hourUnknown),
     voidBranches: [...detail.voidBranches],
     luckPillars: toLuck(detail),
+    summaryLine,
+  };
+}
+
+function partnerYearOnly(year: number): PartnerChart {
+  const yearP = yearPillarOnly(year);
+  const chart: PartnerChart = {
+    detailLevel: "year-only",
+    solar: { year },
+    hourUnknown: true,
+    birthClock: null,
+    pillars: { year: yearP, month: null, day: null, hour: null },
+    summaryLine: yearP.korean,
+    formattedKorean: "",
+  };
+  chart.formattedKorean = formatPartnerChartMarkdown(chart);
+  return chart;
+}
+
+function partnerFromCore(core: CoreFourPillars): PartnerChart {
+  const chart: PartnerChart = {
+    detailLevel: "full",
+    solar: { ...core.solar },
+    hourUnknown: core.hourUnknown,
+    birthClock: core.birthClock,
+    pillars: {
+      year: core.pillars.year,
+      month: core.pillars.month,
+      day: core.pillars.day,
+      hour: core.pillars.hour,
+    },
+    dayMaster: core.dayMaster,
+    dayMasterElement: core.dayMasterElement,
+    dayMasterYinYang: core.dayMasterYinYang,
+    summaryLine: core.summaryLine,
+    formattedKorean: "",
+  };
+  chart.formattedKorean = formatPartnerChartMarkdown(chart);
+  return chart;
+}
+
+/** Build partner chart from form fields — undefined if no usable partner year. */
+export function computePartnerChart(form: SajuBirthForm): PartnerChart | undefined {
+  const py = parseIntLoose(form.partnerBirthYear, NaN);
+  if (!Number.isFinite(py) || py < 1800 || py > 2300) return undefined;
+
+  const pmRaw = String(form.partnerBirthMonth ?? "").trim();
+  const pdRaw = String(form.partnerBirthDay ?? "").trim();
+  const pm = parseIntLoose(pmRaw, NaN);
+  const pd = parseIntLoose(pdRaw, NaN);
+  const hasYmd =
+    pmRaw.length > 0 &&
+    pdRaw.length > 0 &&
+    Number.isFinite(pm) &&
+    Number.isFinite(pd) &&
+    pm >= 1 &&
+    pm <= 12 &&
+    pd >= 1 &&
+    pd <= 31;
+
+  if (!hasYmd) return partnerYearOnly(py);
+
+  const core = computeFourPillarsFromBirth({
+    year: py,
+    month: Math.min(12, Math.max(1, pm)),
+    day: Math.min(31, Math.max(1, pd)),
+    birthTime: form.partnerBirthTime ?? "",
+    gender: form.partnerGender || undefined,
+  });
+  return partnerFromCore(core);
+}
+
+/**
+ * Compute app chart from birth form.
+ * Solar calendar, dayBoundary midnight, no trueSolarTime (MVP).
+ * When hour unknown: library uses midday ONLY internally; hour pillar is null.
+ */
+export function computeChart(form: SajuBirthForm): SajuChart {
+  const year = parseIntLoose(form.birthYear, 1995);
+  const month = Math.min(12, Math.max(1, parseIntLoose(form.birthMonth, 3)));
+  const day = Math.min(31, Math.max(1, parseIntLoose(form.birthDay, 14)));
+
+  const core = computeFourPillarsFromBirth({
+    year,
+    month,
+    day,
+    birthTime: form.birthTime,
+    gender: form.gender,
+  });
+
+  const currentYear = new Date().getFullYear();
+  const currentYearPillar = yearPillarOnly(currentYear);
+
+  const partnerChart = computePartnerChart(form);
+  const partnerYearPillar = partnerChart?.pillars.year;
+
+  const chart: SajuChart = {
+    solar: core.solar,
+    hourUnknown: core.hourUnknown,
+    birthClock: core.birthClock,
+    pillars: core.pillars,
+    dayMaster: core.dayMaster,
+    dayMasterElement: core.dayMasterElement,
+    dayMasterYinYang: core.dayMasterYinYang,
+    elements: core.elements,
+    tenGods: core.tenGods,
+    voidBranches: core.voidBranches,
+    luckPillars: core.luckPillars,
     currentYearPillar,
     partnerYearPillar,
-    summaryLine,
+    partnerChart,
+    summaryLine: core.summaryLine,
     formattedKorean: "",
   };
 
