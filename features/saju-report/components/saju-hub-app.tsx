@@ -317,18 +317,6 @@ function HubLanding({
 }
 
 
-function FieldReqBadge({ required }: { required: boolean }) {
-  return required ? (
-    <span className="ml-1 rounded-full bg-[#E8336D]/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[#FF7A99]">
-      필수
-    </span>
-  ) : (
-    <span className="ml-1 rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#6E666C]">
-      선택
-    </span>
-  );
-}
-
 function freePreviewScopeLine(product: SajuProduct, freeCount = 1) {
   const total = getCanonicalSectionCount(product.id);
   return `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${total}장)`;
@@ -405,24 +393,17 @@ function BirthFormView({
         }}
       >
         <label className="block">
-          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-            호칭
-            <FieldReqBadge required={false} />
-          </span>
+          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">호칭</span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             value={form.displayName}
             onChange={(e) => patch({ displayName: e.target.value })}
-            placeholder="예: 수진"
+            placeholder="수진"
           />
         </label>
 
         <div>
-          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-            성별
-            <FieldReqBadge required={false} />
-            <span className="ml-1 font-normal text-[#6E666C]">· 대운 참고</span>
-          </span>
+          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">성별</span>
           <div className="flex gap-2">
             {(["여성", "남성", "기타"] as const).map((g) => (
               <button
@@ -442,25 +423,17 @@ function BirthFormView({
         </div>
 
         <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[#9A9098]">내 출생</span>
-            <span className="rounded-full border border-[#F0A05A]/40 bg-[#F0A05A]/12 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#F0A05A]">
-              입력은 양력 기준이에요
-            </span>
-          </div>
+          <p className="mb-2 text-xs font-semibold text-[#9A9098]">내 출생 · 양력</p>
           <div className="grid grid-cols-3 gap-2">
             {(
               [
-                ["birthYear", "출생 연도", "1992"],
-                ["birthMonth", "출생 월", "1–12"],
-                ["birthDay", "출생 일", "1–31"],
+                ["birthYear", "연도", "1992"],
+                ["birthMonth", "월", "3"],
+                ["birthDay", "일", "14"],
               ] as const
             ).map(([key, label, ph]) => (
               <label key={key} className="block">
-                <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-                  {label}
-                  <FieldReqBadge required />
-                </span>
+                <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">{label}</span>
                 <input
                   className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
                   inputMode="numeric"
@@ -476,53 +449,38 @@ function BirthFormView({
 
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
-            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-              출생 시간
-              <FieldReqBadge required={false} />
-            </span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 시간</span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthTime}
               onChange={(e) => patch({ birthTime: e.target.value })}
-              placeholder="14:30 또는 오후 2시 / 모름"
+              placeholder="14:30"
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-              출생 지역
-              <FieldReqBadge required={false} />
-            </span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 지역</span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.birthPlace}
               onChange={(e) => patch({ birthPlace: e.target.value })}
-              placeholder="비우면 서울"
+              placeholder="서울"
             />
           </label>
         </div>
 
-        <div className="rounded-[16px] border border-white/8 bg-white/[0.03] p-3 space-y-3">
-          <p className="text-[11px] leading-5 text-[#6E666C]">
-            상대 정보는 전부 선택이에요. 연도만 있어도 연주 비교가 되고, 월·일(+시간)까지 있으면 「두 사람의 사주 원국 비교」가 더 깊어져요.
-          </p>
+        <div className="space-y-3">
+          <p className="text-xs font-semibold text-[#9A9098]">상대 출생</p>
           <label className="block">
-            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-              상대 이름
-              <FieldReqBadge required={false} />
-            </span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름</span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.partnerName}
               onChange={(e) => patch({ partnerName: e.target.value })}
-              placeholder="예: 민재"
+              placeholder="민재"
             />
           </label>
           <div>
-            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-              상대 성별
-              <FieldReqBadge required={false} />
-              <span className="ml-1 font-normal text-[#6E666C]">· 대운 준비용</span>
-            </span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 성별</span>
             <div className="flex gap-2">
               {(["여성", "남성", "기타"] as const).map((g) => (
                 <button
@@ -545,16 +503,13 @@ function BirthFormView({
           <div className="grid grid-cols-3 gap-2">
             {(
               [
-                ["partnerBirthYear", "상대 연도", "1993"],
-                ["partnerBirthMonth", "상대 월", "1–12"],
-                ["partnerBirthDay", "상대 일", "1–31"],
+                ["partnerBirthYear", "연도", "1993"],
+                ["partnerBirthMonth", "월", "7"],
+                ["partnerBirthDay", "일", "21"],
               ] as const
             ).map(([key, label, ph]) => (
               <label key={key} className="block">
-                <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-                  {label}
-                  <FieldReqBadge required={false} />
-                </span>
+                <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">{label}</span>
                 <input
                   className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
                   inputMode="numeric"
@@ -566,39 +521,30 @@ function BirthFormView({
             ))}
           </div>
           <label className="block">
-            <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-              상대 출생 시간
-              <FieldReqBadge required={false} />
-            </span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생 시간</span>
             <input
               className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
               value={form.partnerBirthTime}
               onChange={(e) => patch({ partnerBirthTime: e.target.value })}
-              placeholder="14:30 또는 오후 2시 / 모름"
+              placeholder="15:00"
             />
           </label>
         </div>
 
         <label className="block">
-          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-            헤어진 지 (개월)
-            <FieldReqBadge required />
-          </span>
+          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">헤어진 지 (개월)</span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             inputMode="numeric"
             value={form.monthsApart}
             onChange={(e) => patch({ monthsApart: e.target.value })}
-            placeholder="예: 3"
+            placeholder="3"
             required
           />
         </label>
 
         <label className="block">
-          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-            이별 상황
-            <FieldReqBadge required={false} />
-          </span>
+          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">이별 상황</span>
           <input
             className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
             value={form.breakupNote}
@@ -608,15 +554,12 @@ function BirthFormView({
         </label>
 
         <label className="block">
-          <span className="mb-1.5 flex flex-wrap items-center text-xs font-semibold text-[#9A9098]">
-            지금 가장 궁금한 것
-            <FieldReqBadge required />
-          </span>
+          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">지금 가장 궁금한 것</span>
           <textarea
             className="saju-input min-h-28 w-full resize-none rounded-[14px] px-4 py-3 text-sm"
             value={form.concern}
             onChange={(e) => patch({ concern: e.target.value })}
-            placeholder="재회할 수 있을까요? 지금 연락해도 될까요?"
+            placeholder="그 사람, 아직 나에게 마음이 남아 있을까?"
             required
           />
         </label>
