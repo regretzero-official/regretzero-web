@@ -47,7 +47,7 @@ export function SajuTrustStrip() {
 
 /** Hub trust — visual chips only (no essay) */
 export function SajuCredibilitySection() {
-  const chips = ["만세력 원국", "캐릭터 상담", "오락·위로"];
+  const chips = ["만세력 원국", "캐릭터 상담", "참고용"];
   return (
     <section className="px-5" aria-label="해석 기준">
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -61,7 +61,7 @@ export function SajuCredibilitySection() {
         ))}
       </div>
       <p className="mt-2.5 text-center text-[11px] leading-4 text-[#6E666C]">
-        Regretzero 명리 라인 · 확정 예언 아님
+        Regretzero 명리 라인 · 참고용이에요
       </p>
     </section>
   );
@@ -99,7 +99,7 @@ export function SajuBusinessFooter() {
         </Link>
       </div>
       <p className="mt-2.5 text-[11px] text-[#6E666C]">
-        원국은 만세력으로 계산하고, 해석·조언은 오락·위로용입니다. 확정 예언·점술·의료·법률을 대체하지 않습니다.
+        원국은 만세력으로 계산해요. 해석은 참고용이에요. 절대 결과가 아니에요.
       </p>
     </footer>
   );

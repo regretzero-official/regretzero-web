@@ -283,7 +283,7 @@ function HubLanding({
           href="/saju/chat"
           className="mt-4 flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#FF7A99] transition hover:bg-white/8"
         >
-          캐릭터와 대화(베타) →
+          캐릭터와 대화 →
         </Link>
       </section>
 
@@ -305,7 +305,7 @@ function HubLanding({
             FAQ
           </Link>
           <Link href="/saju/chat" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
-            캐릭터와 대화(베타)
+            캐릭터와 대화
           </Link>
           <Link href="/" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
             홈
@@ -385,7 +385,7 @@ function BirthFormView({
               ) : null}
             </div>
             <h1 className="truncate text-lg font-bold tracking-[-0.04em] text-[#F8F4F6]">
-              {product.title} 신청
+              {product.title} 입력하기
             </h1>
           </div>
         </div>
@@ -445,7 +445,7 @@ function BirthFormView({
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold text-[#9A9098]">내 출생</span>
             <span className="rounded-full border border-[#F0A05A]/40 bg-[#F0A05A]/12 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#F0A05A]">
-              지금은 양력만 · 음력은 준비 중
+              입력은 양력 기준이에요
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -690,7 +690,7 @@ function PreviewView({
                 무료 미리보기
               </div>
               <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#9A9098]">
-                오락·비예언
+                참고용
               </span>
             </div>
             <h1 className="mt-1 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
@@ -701,7 +701,7 @@ function PreviewView({
             </div>
             <WonGukChip report={report} />
             <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
-              원국은 만세력 · 해석은 오락·위로 (확정 예언 아님)
+              원국은 만세력 · 해석은 참고용이에요
             </p>
           </div>
         </div>
@@ -808,7 +808,7 @@ function ReportView({
           <ReportMarkdown body={report.oneLiner} />
         </div>
         <WonGukChip report={report} />
-        <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 오락·위로</p>
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 참고용이에요</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"

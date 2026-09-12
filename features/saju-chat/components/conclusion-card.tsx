@@ -72,8 +72,7 @@ export function ConclusionCard({
       </div>
 
       <p className="mt-4 rounded-[16px] border border-white/10 bg-[#09090B] px-4 py-3 text-xs leading-5 text-[#9A9098]">
-        본 결과는 오락용 AI 캐릭터 대화입니다. 실제 사주·예언·심리 진단이 아니며, 인생·연애의 중요 결정은 본인의
-        판단과 전문가 상담을 우선하세요.
+        참고용이에요. 절대 결과가 아니에요. 중요한 결정은 본인 판단과, 필요할 땐 전문가 상담을 우선해 주세요.
       </p>
 
       <div className="mt-auto grid gap-2 pt-6">

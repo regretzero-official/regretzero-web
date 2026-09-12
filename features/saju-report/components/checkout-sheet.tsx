@@ -162,7 +162,7 @@ export function CheckoutSheet({
                   </ul>
                 </div>
                 <p className="rounded-[14px] border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] leading-5 text-[#9A9098]">
-                  <strong className="text-[#D8D0D4]">오락·비예언</strong> · 재미·위로용이며 확정 예언·전문 상담을 대신하지 않아요.
+                  <strong className="text-[#D8D0D4]">참고용이에요.</strong> 절대 결과가 아니에요.
                 </p>
                 <p className="text-[11px] leading-5 text-[#9A9098]">
                   확인하면 이 기기 localStorage에 잠금이 풀리고,{" "}

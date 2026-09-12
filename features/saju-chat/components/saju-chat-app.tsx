@@ -339,7 +339,7 @@ export function SajuChatApp() {
               ← 사주 리포트
             </Link>
             <span className="saju-pill rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.14em]">
-              대화 베타
+              캐릭터 대화
             </span>
           </header>
 
@@ -386,7 +386,7 @@ export function SajuChatApp() {
 
             <div className="mt-auto space-y-3 px-5 pt-5">
               <p className="text-center text-[10px] leading-4 text-[#6B6570]">
-                엔터테인먼트용 · 실제 예언이 아닙니다
+                참고용이에요. 절대 결과가 아니에요.
               </p>
               <button
                 className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full px-5 text-base font-semibold transition active:scale-[0.99]"
@@ -596,7 +596,7 @@ export function SajuChatApp() {
             </button>
           </form>
           <p className="mt-2.5 text-center text-[10px] leading-4 text-[#6B6570]">
-            오락용 AI 채팅 · 실제 예언이 아닙니다
+            참고용이에요. 절대 결과가 아니에요.
           </p>
         </div>
       </MobileShell>
