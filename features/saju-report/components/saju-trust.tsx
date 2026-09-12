@@ -157,7 +157,7 @@ export function LockedSectionsPaywall({
 }) {
   const total = sections.length;
   const lockedCount = Math.max(0, total - previewUnlockedCount);
-  const progressLabel = `미리보기 ${previewUnlockedCount}/${total}`;
+  const progressLabel = `무료 ${previewUnlockedCount}장 · 나머지 잠금`;
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -167,7 +167,7 @@ export function LockedSectionsPaywall({
         </div>
       </div>
       <p className="mt-1.5 text-[11px] leading-5 text-[#9A9098]">
-        지금 {previewUnlockedCount}개만 열려 있고, 나머지 {lockedCount}개가 잠겨 있어요. 잠금 해제 시 {total}개 섹션 · 긴 해석을 받습니다.
+        무료 {previewUnlockedCount}장만 열려 있고, 나머지 {lockedCount}장이 잠겨 있어요. 잠금 해제 시 {total}장 전체 · 긴 해석을 받아요.
       </p>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
         <div

@@ -2,7 +2,7 @@ import type { SajuLandingSlug } from "./product-landings";
 
 export type SajuEntryContent = {
   slug: SajuLandingSlug;
-  /** Character voice lines — 2–3 short lines */
+  /** Character voice lines — 2–3 short 점사 openers */
   lines: string[];
   concernChips: string[];
   meetLabel: string;
@@ -22,22 +22,22 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
       "연락이 올지 궁금해요",
       "타이밍이 헷갈려요",
     ],
-    meetLabel: "만나기",
+    meetLabel: "점사 만나기",
     skipLabel: "건너뛰기",
   },
   heart: {
     slug: "heart",
     lines: [
-      "그 사람 때문에 또 잠 못 잤지?",
-      "나는 느낌이 왔어. 오늘은 속마음부터 풀어보자.",
-      "언니 말 들어봐—그 잔향, 끝이 아닐 수도 있어.",
+      "느낌이 왔어. 그 사람 때문에 또 잠 못 잤지?",
+      "오늘은 속마음부터 풀어보자.",
+      "그 잔향, 끝이 아닐 수도 있어—언니 말 들어봐.",
     ],
     concernChips: [
       "읽씹·잠수가 답답해요",
       "거리감이 애매해요",
       "남은 마음이 궁금해요",
     ],
-    meetLabel: "시작하기",
+    meetLabel: "점사 시작하기",
     skipLabel: "건너뛰기",
   },
   breakup: {
@@ -52,7 +52,7 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
       "자존감이 닳았어요",
       "같은 패턴이 반복돼요",
     ],
-    meetLabel: "시작하기",
+    meetLabel: "점사 시작하기",
     skipLabel: "건너뛰기",
   },
   strategy: {
@@ -67,7 +67,7 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
       "첫 문장이 막혀요",
       "더 멀어질까 두려워요",
     ],
-    meetLabel: "만나기",
+    meetLabel: "점사 만나기",
     skipLabel: "건너뛰기",
   },
 };

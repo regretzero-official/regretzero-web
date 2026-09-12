@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
@@ -14,7 +14,6 @@ import {
   getLandingByProductId,
   hubDeepLink,
 } from "@/features/saju-report/product-landings";
-import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
 import {
   CHARACTER_PRIMARY_PRODUCT,
   SAJU_PRODUCTS,
@@ -36,11 +35,13 @@ import {
 } from "@/features/saju-report/unlock";
 
 import { CheckoutSheet } from "./checkout-sheet";
-import { CounselorSwitcher } from "./counselor-switcher";
 import { ReportMarkdown } from "./report-markdown";
+import { SajuBirthFormView } from "./saju-birth-form";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
+import { SajuLoadingTheater } from "./saju-loading-theater";
 import {
   DemoReviewCard,
+  LockIcon,
   LockedSectionsPaywall,
   SajuBusinessFooter,
   SajuCredibilitySection,
@@ -344,280 +345,6 @@ function HubLanding({
 }
 
 
-function freePreviewScopeLine(product: SajuProduct, freeCount = 1) {
-  const total = getCanonicalSectionCount(product.id);
-  return `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${total}장)`;
-}
-
-function BirthFormView({
-  product,
-  characterId,
-  onCharacterChange,
-  form,
-  setForm,
-  onBack,
-  onSubmit,
-  loading,
-}: {
-  product: SajuProduct;
-  characterId: SajuCharacterId;
-  onCharacterChange: (id: SajuCharacterId) => void;
-  form: SajuBirthForm;
-  setForm: (next: SajuBirthForm) => void;
-  onBack: () => void;
-  onSubmit: () => void;
-  loading: boolean;
-}) {
-  const patch = (partial: Partial<SajuBirthForm>) => setForm({ ...form, ...partial });
-  const counselors = getProductCounselors(product);
-  const character = SAJU_CHARACTERS.find((c) => c.id === characterId);
-  const scopeLine = freePreviewScopeLine(product, 1);
-
-  return (
-    <div className={SAJU_BOTTOM_NAV_PAD}>
-      <div className="saju-header sticky top-12 z-30 border-b border-white/5 px-5 pb-3 pt-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm font-semibold text-[#9A9098] hover:text-[#FF7A99]"
-        >
-          ← 상품으로
-        </button>
-        <div className="mt-3 flex items-center gap-3">
-          {character ? (
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/15">
-              <Image
-                alt={character.name}
-                className="object-cover object-top"
-                fill
-                sizes="48px"
-                src={character.portraitSrc}
-              />
-            </div>
-          ) : null}
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]">
-              <span>{character?.name ?? product.characterName}</span>
-              {character?.roleLabel ? (
-                <span className="rounded-full border border-[#FF7A99]/35 bg-[#E8336D]/15 px-1.5 py-0.5 tracking-[0.08em] text-[#FF7A99]">
-                  {character.roleLabel}
-                </span>
-              ) : null}
-            </div>
-            <h1 className="truncate text-lg font-bold tracking-[-0.04em] text-[#F8F4F6]">
-              {product.title} 입력하기
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-5 pt-3 space-y-3">
-        <CounselorSwitcher
-          counselors={counselors}
-          selectedId={characterId}
-          size="sm"
-          onSelect={(id) => onCharacterChange(id as SajuCharacterId)}
-        />
-        <p className="text-sm leading-6 text-[#9A9098]">
-          생년월일과 지금 상황을 자세히 적을수록, 해석이 더 구체해져요. 결과는 공개되지 않으며, 잠금 해제 후 이 기기 「내 사주」에 남길 수 있어요.
-        </p>
-      </div>
-
-      <form
-        className="mt-5 space-y-4 px-5 pb-8"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit();
-        }}
-      >
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">호칭</span>
-          <input
-            className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-            value={form.displayName}
-            onChange={(e) => patch({ displayName: e.target.value })}
-            placeholder="수진"
-          />
-        </label>
-
-        <div>
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">성별</span>
-          <div className="flex gap-2">
-            {(["여성", "남성", "기타"] as const).map((g) => (
-              <button
-                key={g}
-                type="button"
-                onClick={() => patch({ gender: g })}
-                className={`min-h-11 flex-1 rounded-full text-sm font-semibold transition ${
-                  form.gender === g
-                    ? "bg-[#E8336D] text-white"
-                    : "border border-white/10 bg-white/5 text-[#B8AEB4]"
-                }`}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-xs font-semibold text-[#9A9098]">내 출생 · 양력</p>
-          <div className="grid grid-cols-3 gap-2">
-            {(
-              [
-                ["birthYear", "연도", "1992"],
-                ["birthMonth", "월", "3"],
-                ["birthDay", "일", "14"],
-              ] as const
-            ).map(([key, label, ph]) => (
-              <label key={key} className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">{label}</span>
-                <input
-                  className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
-                  inputMode="numeric"
-                  value={form[key]}
-                  onChange={(e) => patch({ [key]: e.target.value })}
-                  placeholder={ph}
-                  required
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 시간</span>
-            <input
-              className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              value={form.birthTime}
-              onChange={(e) => patch({ birthTime: e.target.value })}
-              placeholder="14:30"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">출생 지역</span>
-            <input
-              className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              value={form.birthPlace}
-              onChange={(e) => patch({ birthPlace: e.target.value })}
-              placeholder="서울"
-            />
-          </label>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-xs font-semibold text-[#9A9098]">상대 출생</p>
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름</span>
-            <input
-              className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              value={form.partnerName}
-              onChange={(e) => patch({ partnerName: e.target.value })}
-              placeholder="민재"
-            />
-          </label>
-          <div>
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 성별</span>
-            <div className="flex gap-2">
-              {(["여성", "남성", "기타"] as const).map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() =>
-                    patch({ partnerGender: form.partnerGender === g ? "" : g })
-                  }
-                  className={`min-h-10 flex-1 rounded-full text-xs font-semibold transition ${
-                    form.partnerGender === g
-                      ? "bg-[#E8336D] text-white"
-                      : "border border-white/10 bg-white/5 text-[#B8AEB4]"
-                  }`}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {(
-              [
-                ["partnerBirthYear", "연도", "1993"],
-                ["partnerBirthMonth", "월", "7"],
-                ["partnerBirthDay", "일", "21"],
-              ] as const
-            ).map(([key, label, ph]) => (
-              <label key={key} className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">{label}</span>
-                <input
-                  className="saju-input min-h-12 w-full rounded-[14px] px-3 text-sm"
-                  inputMode="numeric"
-                  value={form[key]}
-                  onChange={(e) => patch({ [key]: e.target.value })}
-                  placeholder={ph}
-                />
-              </label>
-            ))}
-          </div>
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 출생 시간</span>
-            <input
-              className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-              value={form.partnerBirthTime}
-              onChange={(e) => patch({ partnerBirthTime: e.target.value })}
-              placeholder="15:00"
-            />
-          </label>
-        </div>
-
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">헤어진 지 (개월)</span>
-          <input
-            className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-            inputMode="numeric"
-            value={form.monthsApart}
-            onChange={(e) => patch({ monthsApart: e.target.value })}
-            placeholder="3"
-            required
-          />
-        </label>
-
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">이별 상황</span>
-          <input
-            className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-            value={form.breakupNote}
-            onChange={(e) => patch({ breakupNote: e.target.value })}
-            placeholder="서로 지쳐 헤어진 느낌"
-          />
-        </label>
-
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">지금 가장 궁금한 것</span>
-          <textarea
-            className="saju-input min-h-28 w-full resize-none rounded-[14px] px-4 py-3 text-sm"
-            value={form.concern}
-            onChange={(e) => patch({ concern: e.target.value })}
-            placeholder="그 사람, 아직 나에게 마음이 남아 있을까?"
-            required
-          />
-        </label>
-
-        <div className="space-y-2 pt-1">
-          <p className="text-center text-[11px] leading-5 text-[#9A9098]">{scopeLine}</p>
-          <button
-            type="submit"
-            disabled={loading}
-            className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
-          >
-            {loading ? "미리보기 생성 중…" : "무료 미리보기 보기"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-
 function PreviewView({
   product,
   report,
@@ -640,9 +367,11 @@ function PreviewView({
   const character = SAJU_CHARACTERS.find((c) => c.id === report.characterId);
   const clear = report.previewSections[0];
   const blurred = report.previewSections[1] ?? report.sections[1];
+  const total = report.sections.length;
+  const priceLabel = `₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`;
 
   return (
-    <div className={SAJU_BOTTOM_NAV_PAD}>
+    <div className={`${SAJU_BOTTOM_NAV_PAD} pb-[calc(env(safe-area-inset-bottom)+148px)]`}>
       <div className="px-5 pt-4">
         <button
           type="button"
@@ -667,18 +396,23 @@ function PreviewView({
           </div>
           <div className="bg-[#12151C] px-4 pb-4 pt-1">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF7A99]">
-                무료 미리보기
+              <div className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-[#FF7A99]">
+                무료 1장 · 나머지 잠금
               </div>
               <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#9A9098]">
                 참고용
               </span>
             </div>
-            <h1 className="mt-1 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
+            <h1 className="mt-2 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
               {report.title}
             </h1>
-            <div className="mt-2 text-sm leading-6 text-[#D8D0D4]">
-              <ReportMarkdown body={report.oneLiner} />
+            <div className="mt-2 rounded-[14px] border border-[#E8336D]/25 bg-[#E8336D]/10 px-3 py-2.5 text-sm leading-6 text-[#FF7A99]">
+              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]/80">
+                미리보기에서 한줄 결론
+              </div>
+              <div className="mt-1 text-[#F4F0F2]">
+                <ReportMarkdown body={report.oneLiner} />
+              </div>
             </div>
             <WonGukChip report={report} />
             <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
@@ -691,7 +425,12 @@ function PreviewView({
       <div className="mt-5 space-y-4 px-5">
         {clear ? (
           <article className="saju-card rounded-[20px] px-4 py-4">
-            <h2 className="text-base font-bold text-[#F4F0F2]">{clear.title}</h2>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <h2 className="text-base font-bold text-[#F4F0F2]">{clear.title}</h2>
+              <span className="shrink-0 rounded-full border border-[#E8336D]/35 bg-[#E8336D]/12 px-2 py-0.5 text-[10px] font-bold text-[#FF7A99]">
+                무료 공개
+              </span>
+            </div>
             <div className="mt-3">
               <ReportMarkdown body={clear.body.slice(0, 900) + (clear.body.length > 900 ? "…" : "")} />
             </div>
@@ -705,7 +444,8 @@ function PreviewView({
               <ReportMarkdown body={blurred.body.slice(0, 700)} />
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent via-[#09090B]/75 to-[#09090B]">
-              <div className="rounded-full border border-white/15 bg-[#12151C]/95 px-4 py-2 text-sm font-semibold text-[#FF7A99]">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#12151C]/95 px-4 py-2 text-sm font-semibold text-[#FF7A99]">
+                <LockIcon />
                 이어서 잠금 · 전체 리포트
               </div>
             </div>
@@ -719,20 +459,24 @@ function PreviewView({
           />
           <p className="mt-3 text-xs leading-5 text-[#9A9098]">
             잠금 해제 시{" "}
-            <strong className="text-[#D8D0D4]">{report.sections.length}개 섹션 · 긴 해석</strong>
+            <strong className="text-[#D8D0D4]">{total}개 섹션 · 긴 해석</strong>
             과 내 사주 저장
           </p>
-          <button
-            type="button"
-            disabled={unlocking}
-            onClick={onOpenCheckout}
-            className="saju-cta mt-4 flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
-          >
-            {unlocking
-              ? "리포트 생성 중…"
-              : `전체 리포트 잠금 해제 · ₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`}
-          </button>
         </div>
+      </div>
+
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
+        <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">
+          무료 1장 · 나머지 {Math.max(0, total - 1)}장 잠금 · 데모 결제
+        </p>
+        <button
+          type="button"
+          disabled={unlocking}
+          onClick={onOpenCheckout}
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-[0_12px_40px_rgba(232,51,109,0.35)] disabled:opacity-50"
+        >
+          {unlocking ? "리포트 생성 중…" : `전체 잠금 해제 · ${priceLabel}`}
+        </button>
       </div>
 
       {checkoutOpen ? (
@@ -855,6 +599,9 @@ export function SajuHubApp({
   const [preview, setPreview] = useState<SajuReportPayload | null>(null);
   const [report, setReport] = useState<SajuReportPayload | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showLoadingTheater, setShowLoadingTheater] = useState(false);
+  const [loadingReady, setLoadingReady] = useState(false);
+  const pendingPreviewRef = useRef<SajuReportPayload | null>(null);
   const [unlocking, setUnlocking] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -920,19 +667,35 @@ export function SajuHubApp({
 
   const handlePreview = useCallback(async () => {
     setLoading(true);
+    setShowLoadingTheater(true);
+    setLoadingReady(false);
+    pendingPreviewRef.current = null;
     setError(null);
     try {
       const next = await fetchReport(true);
       if (!next) throw new Error("empty");
-      setPreview(next);
-      setStep("preview");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      pendingPreviewRef.current = next;
+      setLoadingReady(true);
     } catch {
-      setError("미리보기를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
-    } finally {
+      pendingPreviewRef.current = null;
+      setShowLoadingTheater(false);
+      setLoadingReady(false);
       setLoading(false);
+      setError("미리보기를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
     }
   }, [fetchReport]);
+
+  const finishLoadingTheater = useCallback(() => {
+    const next = pendingPreviewRef.current;
+    if (!next) return;
+    pendingPreviewRef.current = null;
+    setPreview(next);
+    setShowLoadingTheater(false);
+    setLoadingReady(false);
+    setLoading(false);
+    setStep("preview");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleUnlock = useCallback(async () => {
     if (!productId) return;
@@ -982,7 +745,7 @@ export function SajuHubApp({
           ) : null}
 
           {step === "form" && product && resolvedCharacterId ? (
-            <BirthFormView
+            <SajuBirthFormView
               product={product}
               characterId={resolvedCharacterId}
               onCharacterChange={setCharacterId}
@@ -1016,6 +779,14 @@ export function SajuHubApp({
         </main>
 
         <SajuBottomNav />
+        {showLoadingTheater && resolvedCharacterId ? (
+          <SajuLoadingTheater
+            characterId={resolvedCharacterId}
+            accent={product?.accent}
+            ready={loadingReady}
+            onComplete={finishLoadingTheater}
+          />
+        ) : null}
       </div>
     </div>
   );
