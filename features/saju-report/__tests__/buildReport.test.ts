@@ -43,8 +43,11 @@ describe("buildTemplateReport depth", () => {
     expect(report.sections.length).toBe(15);
     expect(joined).toMatch(/근거 한 줄/);
     expect(joined).toMatch(/기운이 보여/);
-    expect(joined).toMatch(/밤의 점사|밤이다|기억의 장면|대화창/);
+    expect(joined).toMatch(/밤의 점사|점사로|대화창|흐름상/);
     expect(joined).toMatch(/다음에 네가 할 선택/);
+    expect(joined).toMatch(/점사로 한 번 더|점사처럼|점사할게/);
+    expect(joined).not.toMatch(/웹소설처럼/);
+    expect(joined).not.toMatch(/방 안이 고요하다/);
     expect(joined).not.toMatch(/십성으로 보면/);
     expect(joined).not.toMatch(/호흡 누적/);
     expect(joined).not.toMatch(/용신 감각/);
@@ -52,12 +55,12 @@ describe("buildTemplateReport depth", () => {
     expect(joined).not.toMatch(/- 년: .+\/- 월: .+\/- 일:/s);
   });
 
-  it("other products stay substantial with character voice", () => {
-    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(5500);
+  it("other products are Foxbunny-length 점사 counseling with character voice", () => {
+    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("partner-heart", form).characterName).toBe("서나리");
-    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(5500);
+    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("breakup-decision", form).characterName).toBe("차유리");
-    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(5500);
+    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("reunion-strategy", form).characterName).toBe("한보라");
     const seo = buildTemplateReport("partner-heart", form).sections.map((s) => s.body).join("\n");
     const cha = buildTemplateReport("breakup-decision", form).sections.map((s) => s.body).join("\n");
@@ -65,7 +68,15 @@ describe("buildTemplateReport depth", () => {
     expect(seo).toMatch(/느낌이 왔어|잔향|언니/);
     expect(cha).toMatch(/팩트|아껴도 돼|퍼줘/);
     expect(bora).toMatch(/헐|네 마음부터/);
-    expect(seo).toMatch(/다음에 네가 할 선택|읽는 장면|장면/);
+    expect(seo).toMatch(/다음에 네가 할 선택/);
+    expect(cha).toMatch(/다음에 네가 할 선택/);
+    expect(bora).toMatch(/다음에 네가 할 선택/);
+    expect(seo).toMatch(/근거 한 줄/);
+    expect(cha).toMatch(/근거 한 줄/);
+    expect(bora).toMatch(/근거 한 줄/);
+    expect(seo).toMatch(/만세력|원국/);
+    expect(seo).not.toMatch(/십성으로 보면/);
+    expect(seo).not.toMatch(/### 용신·희신·기신/);
   });
 });
 
@@ -90,6 +101,67 @@ describe("character voice distinctness", () => {
     expect(seoOpen).toMatch(/느낌이 왔어|언니/);
     expect(boraOpen).toMatch(/헐|네 마음부터/);
     expect(seoOpen.slice(0, 280)).not.toEqual(boraOpen.slice(0, 280));
+  });
+});
+
+
+describe("everyday Korean counseling (no jargon slogans)", () => {
+  const products = ["reunion-luck", "partner-heart", "breakup-decision", "reunion-strategy"] as const;
+
+  it("drops brand slogans and uses plain decisive Korean", () => {
+    for (const id of products) {
+      const report = buildTemplateReport(id, form);
+      const joined = [report.oneLiner, ...report.sections.map((s) => s.body)].join("\n");
+      expect(joined).not.toMatch(/보관함/);
+      expect(joined).not.toMatch(/창은 1\s*~\s*3개월이다/);
+      expect(joined).not.toMatch(/자존 구조부터 세워/);
+      expect(joined).not.toMatch(/선 그어/);
+      expect(joined).not.toMatch(/단정해/);
+      expect(joined).not.toMatch(/위 방향이다|위 방향이야|위 방향이에요/);
+      expect(joined).not.toMatch(/줄은 남아/);
+      expect(joined).not.toMatch(/이 선이다|그 선이다/);
+      expect(joined).not.toMatch(/사랑이 0/);
+      expect(joined).not.toMatch(/문 닫힌 결/);
+      expect(joined).not.toMatch(/과열 스크립트/);
+      expect(joined).not.toMatch(/저열|고열/);
+      expect(joined).not.toMatch(/청구서/);
+      expect(joined).not.toMatch(/칸이 달라/);
+      expect(joined).not.toMatch(/해 결이다|문 닫힌 결이다/);
+      expect(joined).not.toMatch(/지금은 아니다/);
+      expect(joined).not.toMatch(/문은 아직이야|문은 아직 닫혀/);
+      expect(joined).not.toMatch(/독이다/);
+      expect(joined).not.toMatch(/저자극/);
+      expect(joined).not.toMatch(/설득 시즌/);
+      expect(joined).not.toMatch(/부담 없는 안부·일상 먼저·타이밍/);
+      expect(joined).not.toMatch(/기부터 모아|氣부터 모아/);
+      expect(joined).not.toMatch(/대기열/);
+      expect(joined).not.toMatch(/타임라인 결론|※ 결론—/);
+      expect(joined).not.toMatch(/氣는 조급하면 흐트러/);
+      expect(joined).not.toMatch(/이 방향이 맞아/);
+      expect(joined).not.toMatch(/달아오름/);
+      expect(joined).not.toMatch(/남아 있음 ≠/);
+      expect(joined).not.toMatch(/백련이 짚는다/);
+      expect(joined).not.toMatch(/구조 안 바꾸면/);
+    }
+  });
+
+  it("covers speak natural decisive timing and remaining-heart in character voice", () => {
+    const baek = buildTemplateReport("reunion-luck", form);
+    const seo = buildTemplateReport("partner-heart", form);
+    const cha = buildTemplateReport("breakup-decision", form);
+    const baekCover = baek.sections.find((s) => s.id === "cover")!.body;
+    const seoCover = seo.sections.find((s) => s.id === "cover")!.body;
+    const chaCover = cha.sections.find((s) => s.id === "cover")!.body;
+    expect(baekCover).toMatch(/다가가지 마|한두 달|다시 연락하려면/);
+    expect(baek.oneLiner).toMatch(/지금은 연락할 때가 아니야/);
+    expect(seo.oneLiner).toMatch(/지운 건 아냐|손대긴 무서운/);
+    expect(seoCover).toMatch(/느낌이 왔어/);
+    expect(cha.oneLiner).toMatch(/괜찮은 상태|자존감부터/);
+    expect(chaCover).toMatch(/더 퍼주지 마|아껴도 돼|팩트/);
+    const boraStrategy = buildTemplateReport("reunion-strategy", form, "han-bora");
+    expect(boraStrategy.oneLiner).toMatch(/지금은 설득하지 마/);
+    expect(boraStrategy.oneLiner).toMatch(/가벼운 안부|네 생활부터/);
+    expect(boraStrategy.oneLiner).not.toMatch(/설득 시즌|부담 없는 안부·일상 먼저·타이밍/);
   });
 });
 

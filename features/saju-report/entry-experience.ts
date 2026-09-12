@@ -13,9 +13,9 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
   reunion: {
     slug: "reunion",
     lines: [
-      "기운이 보여. 아직 그쪽으로 줄이 남아 있어.",
+      "기운이 보여. 아직 그쪽 인연이 완전히 끊긴 건 아니야.",
       "다만 지금 흔들면 더 엉킨다.",
-      "오늘은 흔들리지 않게, 단호히 짚어줄게.",
+      "오늘은 흔들리지 않게, 분명히 짚어줄게.",
     ],
     concernChips: [
       "아직 미련이 남았어요",
