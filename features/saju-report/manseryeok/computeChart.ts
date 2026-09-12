@@ -313,6 +313,7 @@ export function computePartnerChart(form: SajuBirthForm): PartnerChart | undefin
     month: Math.min(12, Math.max(1, pm)),
     day: Math.min(31, Math.max(1, pd)),
     birthTime: form.partnerBirthTime ?? "",
+    gender: form.partnerGender || undefined,
   });
   return partnerFromCore(core);
 }

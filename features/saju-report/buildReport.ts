@@ -932,6 +932,7 @@ export function emptyBirthForm(): SajuBirthForm {
     partnerBirthMonth: "",
     partnerBirthDay: "",
     partnerBirthTime: "",
+    partnerGender: "",
     monthsApart: "3",
     breakupNote: "",
     concern: "",
