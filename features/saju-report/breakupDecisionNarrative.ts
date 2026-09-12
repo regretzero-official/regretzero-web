@@ -99,7 +99,7 @@ ${voice.questionsClose?.(p) ?? ""}
       `${voice.traitLead ?? "기질은 원국 숫자로 짧게."}
 ${birthLabel(form)} — **${chart.summaryLine}**. 일간 **${dm}**.
 
-깊게 사랑하고, 참다가, 한꺼번에 지치는 결. ${p} 이별도 그 패턴일 가능성이 커. 인정해야 다음이 있어.
+깊게 사랑하고, 참다가, 한꺼번에 지치는 결. ${p} 이별도 그 패턴이다. 인정해야 다음이 있어.
 
 년 ${chart.pillars.year.korean} · 월 ${chart.pillars.month.korean} · 일 ${chart.pillars.day.korean} · ${hourLine(chart)}
 
@@ -156,7 +156,7 @@ ${voice.breakupAside?.(p) ?? ""}
 남겨둔다면: “나는 ○○가 보일 때만 남긴다.”
 놓는다면: “나는 ○○를 위해 놓는다.” (상대 탓이 아니라 네 자존 문장)
 
-고민(${concern})을 한 줄로 줄여. 줄이지 못하면 아직 결정 타이밍이 아니야—**루틴 타이밍**이야.`,
+고민(${concern})을 한 줄로 줄여. 줄이지 못하면 지금은 결정 타이밍이 아니다—**루틴 타이밍**이다.`,
     ),
   };
 
