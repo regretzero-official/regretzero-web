@@ -65,6 +65,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
             heroSub={landing.heroSub}
             ctaLabel={landing.ctaLabel}
             freeScopeLine={freeScopeLine}
+            stickyHint={landing.stickyHint}
             footerExtra={
               <>
                 <p className="mt-3 text-center text-[11px] text-[#6E666C]">
