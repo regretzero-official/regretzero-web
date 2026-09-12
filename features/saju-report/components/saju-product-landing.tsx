@@ -6,7 +6,10 @@ import {
   getLandingBySlug,
   type SajuLandingSlug,
 } from "@/features/saju-report/product-landings";
-import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
+import {
+  getCanonicalSectionCount,
+  getCanonicalSections,
+} from "@/features/saju-report/canonical-sections";
 import { getProductCounselors, getSajuProduct } from "@/features/saju-report/products";
 
 import { LandingCounselorChrome } from "./landing-counselor-hero";
@@ -27,9 +30,9 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
   }
 
   const counselors = getProductCounselors(product);
-  const freeCount = landing.previewUnlockedCount;
   const totalSections = getCanonicalSectionCount(product.id);
-  const freeScopeLine = `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${totalSections}장)`;
+  const sectionTitles = getCanonicalSections(product.id);
+  const freeScopeLine = `무료 1장 · 나머지 잠금(${product.shortTitle} ${totalSections}장)`;
   const reviews = SAJU_DEMO_REVIEWS.filter((r) =>
     r.tags.some((t) => t === landing.reviewTag || t === product.characterName),
   );
@@ -118,49 +121,60 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
               </ul>
             </section>
 
-            {/* 3. Preview outline with locks */}
+            {/* 3. Full section outline with locks (canonical titles) */}
             <section className="px-5">
               <div className="flex flex-wrap items-end justify-between gap-2">
                 <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-                  미리보기 구성
+                  점사 {totalSections}장 구성
                 </h2>
                 <span className="rounded-full border border-[#E8336D]/40 bg-[#E8336D]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#FF7A99]">
-                  미리보기 {landing.previewUnlockedCount}/{product.sections.length}
+                  무료 1장 · 나머지 잠금
                 </span>
               </div>
-              <p className="mt-1 text-xs leading-5 text-[#9A9098]">
-                일부는 무료로 열리고, 나머지는 잠금 아이콘으로 표시돼요.
+              <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3.5 py-3">
+                <div className="text-[11px] font-bold tracking-[0.06em] text-[#FF7A99]">
+                  무료 미리보기
+                </div>
+                <p className="mt-1 text-sm leading-6 text-[#F4F0F2]">
+                  미리보기에서 <strong className="text-[#FF7A99]">한줄 결론</strong>과 첫 장을 먼저 열어요.
+                  나머지는 잠금 — 가능성·타이밍을 차분히 짚는 점사예요.
+                </p>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-[#9A9098]">
+                번호는 실제 리포트 목차와 같아요. 잠금은 유료 해제 후 열려요.
               </p>
               <ol className="mt-4 space-y-2">
-                {product.sections.map((title, index) => {
+                {sectionTitles.map((title, index) => {
                   const locked = index >= landing.previewUnlockedCount;
                   return (
                     <li
-                      key={title}
+                      key={`${index}-${title}`}
                       className={`flex items-center justify-between gap-3 rounded-[16px] border px-3.5 py-3 text-sm ${
                         locked
                           ? "border-white/8 bg-[#09090B] text-[#6E666C]"
                           : "border-[#E8336D]/25 bg-[#E8336D]/10 text-[#F4F0F2]"
                       }`}
                     >
-                      <span className="flex items-center gap-2.5">
+                      <span className="flex min-w-0 items-center gap-2.5">
                         <span
-                          className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${
+                          className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
                             locked ? "bg-white/5 text-[#9A9098]" : "bg-[#E8336D] text-white"
                           }`}
                         >
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <span className={locked ? "blur-[0.3px]" : "font-semibold"}>{title}</span>
+                        <span className={`min-w-0 leading-5 ${locked ? "" : "font-semibold"}`}>
+                          {title}
+                        </span>
                       </span>
                       {locked ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
                           <LockIcon />
                           잠금
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold tracking-wide text-[#FF7A99]">
-                          미리보기
+                        <span className="shrink-0 text-[10px] font-bold tracking-wide text-[#FF7A99]">
+                          무료
                         </span>
                       )}
                     </li>
@@ -170,7 +184,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
 
               {landing.curiosity.length > 0 ? (
                 <div className="mt-5 saju-card rounded-[20px] px-4 py-4">
-                  <div className="text-sm font-semibold text-[#F4F0F2]">이런 게 궁금하다면</div>
+                  <div className="text-sm font-semibold text-[#F4F0F2]">이런 가능성이 궁금하다면</div>
                   <ul className="mt-2 space-y-1.5 text-sm leading-6 text-[#B8AEB4]">
                     {landing.curiosity.map((q) => (
                       <li key={q}>· {q}</li>

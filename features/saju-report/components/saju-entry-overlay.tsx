@@ -128,7 +128,7 @@ export function SajuEntryOverlay({
           </div>
 
           <p className="mt-5 text-[11px] font-semibold tracking-wide text-[#9A9098]">
-            지금 마음에 가까운 걸 골라보세요
+            지금 마음에 가까운 걸 골라보세요 · 건너뛰어도 돼요
           </p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             {entry.concernChips.map((chip) => {
@@ -157,11 +157,10 @@ export function SajuEntryOverlay({
 
           <button
             type="button"
-            disabled={!selected}
             onClick={finish}
-            className="saju-cta mt-5 flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+            className="saju-cta mt-5 flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
           >
-            {entry.meetLabel}
+            {selected ? entry.meetLabel : `${entry.meetLabel} · 바로`}
           </button>
         </div>
       </div>
