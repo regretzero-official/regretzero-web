@@ -61,7 +61,7 @@ ${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
 
-**흐름상 결론만 먼저.**
+**결론만 먼저.**
 
 ${oneLiner}
 
@@ -128,7 +128,7 @@ ${voice.strategyNudge}`,
       5,
       `표면: 소모, “${breakup}”, 대화↓.
 속: ${p} 쪽 자기보호 · 네 쪽 애착+자존 동시 작동.
-팩트: 사랑이 0이라서가 아니라 **속도·피로**로 문 닫힌 결에 가깝다.
+팩트: 사랑이 0이 아니다. **속도·피로**로 문 닫힌 결이다. 선 그어.
 
 ${voice.breakupAside?.(p) ?? ""}
 자책 문장 교정: “내가 과해서 끝났다” → “속도가 어긋났고, 나는 조절할 수 있다.”`,

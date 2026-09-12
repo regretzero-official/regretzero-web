@@ -66,7 +66,7 @@ ${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
 
-**흐름상 결론만 먼저.**
+**결론만 먼저.**
 
 ${oneLiner}
 
@@ -154,10 +154,10 @@ ${voice.strategyNudge}`,
 - **${luck}**
 - 원국: ${chart.summaryLine}
 
-※ 흐름상 결론—**지금은 들이댈 때가 아니다. 1~3개월이 창이다.** ${months} 기준.
+※ 결론—**지금은 아니다. 창은 1~3개월이다.** ${months} 기준. 선 그어.
 
 ### ◇ 1개월 — 관망·정돈
-적극 재접근 금지에 가깝다. 에너지를 너에게.
+적극 재접근 금지다. 에너지는 너에게. 지금은 이렇게 해.
 
 ### ◇ 3개월 전후 — 접촉 창
 가벼운 안부. 조건: 매달림 없는 너. **이 구간이 창이다.**

@@ -59,7 +59,7 @@ ${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
 
 **원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
 
-**흐름상 결론만 먼저.**
+**결론만 먼저.**
 
 ${oneLiner}
 
@@ -176,7 +176,7 @@ ${voice.breakupAside?.(p) ?? ""}
     body: L(
       5,
       `${voice.remainingAside?.(p) ?? ""}
-**${p} 마음은 삭제가 아니라 ‘보관함’ 쪽이다.**
+**상대는 보관함이다. ${p} 마음은 삭제가 아니다.**
 남아 있음 ≠ 지금 열어줄 준비. 지금은 그 선이다.
 
 ### 남아 있다는 쪽의 신호
@@ -300,12 +300,12 @@ ${voice.signOff}`,
   ];
 
   const pads: Record<string, { beat: string; scene: string }> = {
-    questions: { beat: "질문 정리", scene: `흐름상 질문의 핵만 남긴다. ${p} 속마음, 거리감, 온도.` },
+    questions: { beat: "질문 정리", scene: `질문의 핵만 남긴다. ${p} 속마음, 거리감, 온도. 선 그어.` },
     trait: { beat: "일간 기질", scene: "원국을 보면—시험 점수가 아니라, 깊게 남는 결을 읽는 점사다." },
     pattern: { beat: "잔향 스크립트", scene: "같은 스크립트의 3단계(과열) 앞에서, 다른 숨을 쉬는 상담이 시작된다." },
     bond: { beat: "인연의 결", scene: "온기와 숨 막힘 사이. 정은 있는데 마음이 상하기 쉬운 그 결." },
     "breakup-reason": { beat: "이별 원인", scene: "‘잠깐 쉬자’가 남긴 잔향. 미움보다 속도·피로로 읽어." },
-    remaining: { beat: "남은 속마음", scene: "보관함—열려 있진 않다. 그래도 비어 있진 않다. 흐름상 그쪽이다." },
+    remaining: { beat: "남은 속마음", scene: "상대는 보관함이다. 열려 있진 않다. 그래도 비어 있진 않다. 단정해." },
     "heart-temp": { beat: "다가갈 온도", scene: "온기는 2~3도. 고열은 일기장에만. 상담 결론이다." },
     contact: { beat: "연락 가이드", scene: "멘트보다 네 상태. 전송 전 30초만 물어." },
     pitfalls: { beat: "함정", scene: "확인하고 싶을 때가 제일 보내면 안 되는 때다." },
