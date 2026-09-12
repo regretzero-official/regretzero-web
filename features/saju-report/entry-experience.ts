@@ -34,9 +34,9 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
   reunion: {
     slug: "reunion",
     lines: [
-      "기운이 보여. 아직 그쪽 인연이 완전히 끊긴 건 아니야.",
-      "다만 지금 흔들면 더 엉킨다.",
-      "오늘은 흔들리지 않게, 분명히 짚어줄게.",
+      "잠깐. 기운이 보여—아직 그쪽 인연이 완전히 끊긴 건 아니야.",
+      "다만 지금 흔들면 더 엉킨다. 성급한 연락은 독이야.",
+      "오늘은 흔들리지 않게, 타이밍부터 분명히 짚어줄게.",
     ],
     concernChips: [
       "아직 미련이 남았어요",
@@ -58,8 +58,8 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
     slug: "heart",
     lines: [
       "느낌이 왔어. 그 사람 때문에 또 잠 못 잤지?",
-      "오늘은 속마음부터 풀어보자.",
-      "그 잔향, 끝이 아닐 수도 있어—언니 말 들어봐.",
+      "읽씹·거리감—그 잔향, 끝이 아닐 수도 있어.",
+      "오늘은 추측 말고 속마음부터 풀어줄게. 언니 말 들어봐.",
     ],
     concernChips: [
       "읽씹·잠수가 답답해요",
@@ -80,9 +80,9 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
   breakup: {
     slug: "breakup",
     lines: [
-      "또 그 사람 때문에 머리 복잡하지.",
-      "팩트부터 말할게. 지금은 더 잘해주기 시즌 아냐.",
-      "너는 더 아껴도 돼.",
+      "또 그 사람 때문에 머리 복잡하지. 멈춰.",
+      "팩트부터 말할게. 지금은 더 잘해주기 시즌이 아니야.",
+      "자존을 깎아가며 붙잡지 마. 너는 더 아껴도 돼.",
     ],
     concernChips: [
       "붙잡을지 말지 모르겠어요",
@@ -103,9 +103,9 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
   strategy: {
     slug: "strategy",
     lines: [
-      "헐, 첫 톡 때문에 또 망설였지?",
-      "괜찮아. 일단 네 마음부터.",
-      "해도 되는 말부터 같이 골라보자.",
+      "헐, 첫 톡 때문에 또 손가락만 떠봤지?",
+      "괜찮아. 일단 네 마음부터—초조한 문장은 보내지 마.",
+      "해도 되는 말·하면 안 되는 말부터 같이 골라보자.",
     ],
     concernChips: [
       "지금 연락해도 될까요",

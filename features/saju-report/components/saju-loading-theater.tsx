@@ -11,6 +11,7 @@ import {
   LOADING_STAGE_MS,
   SAJU_LOADING_STAGES,
 } from "@/features/saju-report/loading-theater";
+import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
 
 type SajuLoadingTheaterProps = {
   characterId: SajuCharacterId;
@@ -34,7 +35,8 @@ export function SajuLoadingTheater({
   const [stageIndex, setStageIndex] = useState(0);
   const [skipped, setSkipped] = useState(false);
   const [hintSkip, setHintSkip] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
+  const theaterActive = !skipped;
+  const { soundOn, needsGesture, toggleSound, mute } = useTheaterAmbient(theaterActive);
 
   useEffect(() => {
     const hint = window.setTimeout(() => setHintSkip(true), LOADING_SKIP_HINT_MS);
@@ -92,23 +94,36 @@ export function SajuLoadingTheater({
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_100%)]" />
 
         <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSoundOn((v) => !v)}
-            className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
-            aria-pressed={soundOn}
-          >
-            사운드 {soundOn ? "켜짐" : "꺼짐"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSkipped(true)}
-            className={`rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition hover:bg-black/60 ${
-              hintSkip ? "text-white" : "text-white/70"
-            }`}
-          >
-            건너뛰기
-          </button>
+          <div className="flex flex-col items-end gap-1.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void toggleSound()}
+                className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
+                aria-pressed={soundOn}
+                title={needsGesture ? "사운드를 들으려면 터치하세요" : undefined}
+              >
+                사운드 {soundOn ? "켜짐" : "꺼짐"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  mute();
+                  setSkipped(true);
+                }}
+                className={`rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition hover:bg-black/60 ${
+                  hintSkip ? "text-white" : "text-white/70"
+                }`}
+              >
+                건너뛰기
+              </button>
+            </div>
+            {!soundOn ? (
+              <p className="max-w-[220px] rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-right text-[10px] font-semibold leading-snug text-white/65 backdrop-blur">
+                사운드를 들으려면 터치하세요
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-12">

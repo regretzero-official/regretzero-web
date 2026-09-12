@@ -18,6 +18,7 @@ import {
 import type { SajuLandingSlug } from "@/features/saju-report/product-landings";
 import { getLandingBySlug } from "@/features/saju-report/product-landings";
 import { getSajuProduct } from "@/features/saju-report/products";
+import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -71,12 +72,13 @@ export function SajuEntryOverlay({
   const reducedMotion = usePrefersReducedMotion();
   const [selected, setSelected] = useState<string | null>(null);
   const [beat, setBeat] = useState<SajuEntryBeatId>("shrine");
-  const [soundOn, setSoundOn] = useState(false);
+  const { soundOn, needsGesture, toggleSound, mute } = useTheaterAmbient(true);
 
   const finish = useCallback(() => {
+    mute();
     markSajuEntrySeen(slug);
     onDismiss();
-  }, [onDismiss, slug]);
+  }, [mute, onDismiss, slug]);
 
   const advance = useCallback(() => {
     const next = getNextEntryBeat(beat);
@@ -120,22 +122,29 @@ export function SajuEntryOverlay({
           <BeatDots beat={beat} />
         </div>
 
-        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSoundOn((v) => !v)}
-            className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
-            aria-pressed={soundOn}
-          >
-            {soundOn ? entry.soundOnLabel : entry.soundEnableLabel}
-          </button>
-          <button
-            type="button"
-            onClick={finish}
-            className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/80 backdrop-blur transition hover:bg-black/60"
-          >
-            {entry.skipLabel}
-          </button>
+        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void toggleSound()}
+              className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
+              aria-pressed={soundOn}
+            >
+              {soundOn ? entry.soundOnLabel : entry.soundEnableLabel}
+            </button>
+            <button
+              type="button"
+              onClick={finish}
+              className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/80 backdrop-blur transition hover:bg-black/60"
+            >
+              {entry.skipLabel}
+            </button>
+          </div>
+          {!soundOn ? (
+            <p className="max-w-[220px] rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-right text-[10px] font-semibold leading-snug text-white/65 backdrop-blur">
+              사운드를 들으려면 터치하세요
+            </p>
+          ) : null}
         </div>
 
         <div

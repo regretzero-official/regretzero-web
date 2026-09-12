@@ -543,7 +543,7 @@ function PreviewView({
 
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
         <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">
-          무료 1장 · 나머지 {Math.max(0, total - 1)}장 잠금 · 데모 결제
+          지금 미리보기 가능 · 무료 1장 · 나머지 잠금 · 데모 결제
         </p>
         <button
           type="button"
