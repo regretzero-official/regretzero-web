@@ -8,6 +8,7 @@ import type { SajuProductId } from "../types";
 const form = {
   ...emptyBirthForm(),
   displayName: "수진",
+  gender: "여성" as const,
   birthYear: "1995",
   birthMonth: "3",
   birthDay: "14",

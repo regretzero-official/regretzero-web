@@ -17,6 +17,8 @@ type LandingCounselorChromeProps = {
   heroSub: string;
   ctaLabel: string;
   freeScopeLine: string;
+  /** Honest social-proof style hint (no fake counts) */
+  stickyHint?: string;
   children: ReactNode;
   footerExtra?: ReactNode;
 };
@@ -28,6 +30,7 @@ export function LandingCounselorChrome({
   heroSub,
   ctaLabel,
   freeScopeLine,
+  stickyHint,
   children,
   footerExtra,
 }: LandingCounselorChromeProps) {
@@ -95,10 +98,13 @@ export function LandingCounselorChrome({
       <div className="space-y-10" data-narrator={narratorName}>{children}</div>
 
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
+        <p className="mb-1 text-center text-[10px] font-semibold leading-4 text-[#FF7A99]/90">
+          {stickyHint ?? "지금 미리보기 가능"}
+        </p>
         <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">{freeScopeLine}</p>
         <Link
           href={startHref}
-          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-[0_12px_40px_rgba(232,51,109,0.35)]"
         >
           {ctaLabel}
         </Link>
