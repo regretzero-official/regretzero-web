@@ -393,7 +393,7 @@ function BirthFormView({
 
       <div className="px-5 pt-3">
         <p className="text-sm leading-6 text-[#9A9098]">
-          출생·고민을 적을수록 리포트가 구체해집니다. 저장되지 않는 데모 입력입니다.
+          생년월일과 지금 상황을 자세히 적을수록, 해석이 더 구체해져요. 결과는 공개되지 않으며, 잠금 해제 후 이 기기 「내 사주」에 남길 수 있어요.
         </p>
       </div>
 

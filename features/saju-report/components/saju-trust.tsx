@@ -86,7 +86,7 @@ export function SajuBusinessFooter() {
           개인정보 안내
         </Link>
         <Link href="/saju/faq#refund" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
-          환불(데모)
+          환불 안내
         </Link>
         <Link href="/saju/faq#terms" className="underline-offset-2 hover:text-[#FF7A99] hover:underline">
           약관 안내

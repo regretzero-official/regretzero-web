@@ -29,7 +29,7 @@ function TestPayBadge() {
       className="rounded-[14px] border border-[#F0A05A]/45 bg-[#F0A05A]/15 px-3 py-2.5 text-center text-[12px] font-bold tracking-[-0.01em] text-[#F0A05A]"
       role="status"
     >
-      테스트 결제 · 실제 청구 없음
+      지금은 실제 청구 없이 전체 결과를 열어볼 수 있어요
     </div>
   );
 }
@@ -116,7 +116,7 @@ export function CheckoutSheet({
             {step === 2 ? (
               <div className="space-y-3">
                 <p className="text-sm leading-6 text-[#9A9098]">
-                  결제 수단을 골라 주세요. (UI만 · 실제 결제사 연동 전)
+                  결제 수단을 골라 주세요. 지금은 실제 청구 없이 진행돼요.
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {PAY_METHODS.map((m) => {

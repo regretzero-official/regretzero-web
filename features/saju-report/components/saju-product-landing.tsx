@@ -130,7 +130,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
               이런 걸 받아요
             </h2>
             <p className="mt-1 text-xs text-[#9A9098]">
-              {product.characterName}이 풀어주는 긴 리포트 · {product.priceLabel} 데모
+              {product.characterName}이 풀어주는 긴 리포트 · {product.priceLabel}
             </p>
             <ul className="mt-3 space-y-2">
               {landing.deliverables.map((item) => (
