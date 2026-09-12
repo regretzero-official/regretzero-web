@@ -28,7 +28,7 @@ describe("buildTemplateReport depth", () => {
     const report = buildTemplateReport("reunion-luck", form);
     const len = bodyLen("reunion-luck");
     expect(report.sections.length).toBeGreaterThanOrEqual(12);
-    expect(len).toBeGreaterThanOrEqual(6000);
+    expect(len).toBeGreaterThanOrEqual(35000);
     expect(report.characterName).toBe("백련");
     expect(report.sections.some((s) => s.id === "notice")).toBe(true);
     expect(report.sections.some((s) => /한줄결론|한 줄 결론/.test(s.title))).toBe(true);
@@ -41,6 +41,11 @@ describe("buildTemplateReport depth", () => {
     expect(report.chart?.summaryLine).toBeTruthy();
     expect(report.sections.some((s) => s.id === "origin-compare")).toBe(true);
     expect(report.sections.length).toBe(15);
+    expect(joined).toMatch(/근거 한 줄/);
+    expect(joined).toMatch(/기운이 보여/);
+    expect(joined).not.toMatch(/십성으로 보면/);
+    expect(joined).not.toMatch(/호흡 누적/);
+    expect(joined).not.toMatch(/용신 감각/);
   });
 
   it("other products stay substantial with character voice", () => {

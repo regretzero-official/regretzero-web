@@ -122,8 +122,8 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         id: characterId,
         name: characterName,
         openerAside: (p) => `기운이 보여. ${p} 쪽으로 아직 줄이 남아 있어. 다만 지금 흔들면 줄이 더 엉킨다. 흔들리지 마.`,
-        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 원국이다. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 몸 안에 있다.`,
-        coverClose: "확정 예언은 하지 않는다. 氣는 흐른다. 그래도 원국·이별·침묵의 결을 겹치면, 위 방향이 가장 설득력 있다.",
+        coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어.`,
+        coverClose: "확정 예언은 하지 않는다. 기운은 흐른다. 그래도 원국·이별·침묵의 결을 겹치면, 위 방향이 가장 설득력 있다.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다.",
         questionsLead: "이번 점사의 핵을 단호히 정리한다.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서가 아니라 속도가 어긋나서다. ${p}와 다시 붙더라도, 같은 호흡이면 같은 벽이다.`,
@@ -138,10 +138,10 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         contactAside: (p) => `${p}에게 추궁은 독이다. 설득하지 마. 안정이 용신이다.`,
         strategyClose: "전략의 지표는 답장이 아니라, 네 기운이 회수됐는가다.",
         pitfallsLead: "함정을 끊는다. 확인하고 싶을 때가 가장 보내면 안 되는 때다.",
-        closingHook: (p, months) => `${months}의 침묵은 삭제가 아닐 수 있다. ${p} 자리를 묻기 전에—네 중심부터 세워. 남겨둘 만한 너로.`,
-        closingBody: "진지함을 무게가 아니라 안정으로 바꿔라. 대운이 문을 열어도, 네가 흔들리면 문은 닫힌다. 기운이 정돈된 사람 쪽으로 다시 모인다.",
+        closingHook: (p, months) => `${months}의 침묵은 삭제가 아닐 수 있어. ${p} 자리를 묻기 전에—네 중심부터 세워. 남겨둘 만한 너로.`,
+        closingBody: "진지함을 무게가 아니라 안정으로 바꿔. 타이밍이 문을 열어도, 네가 흔들리면 문은 닫힌다. 기운이 정돈된 사람 쪽으로 다시 모인다.",
         signOff: "이상, 백련. 기운이 정돈된 사람 쪽으로 다시 모인다.",
-        strategyNudge: "설득하지 마. 안정이 용신이다.",
+        strategyNudge: "설득하지 마. 안정이 먼저야.",
         heartTempLead: (p) => `${p}에게 필요한 건 설득이 아니라 안전감이다. 온도는 낮게. 과한 온기는 청구서로 읽힌다.`,
         keepLeaveClose: "결정은 감정 점수가 아니라, 네 중심이 버티는 구조로.",
         selfRoutineClose: "흔들림을 줄이면 침묵의 의미가 달라진다.",
@@ -769,7 +769,7 @@ function oneLinerFor(productId: SajuProductId, form: SajuBirthForm): string {
   const p = partner(form);
   switch (productId) {
     case "reunion-luck":
-      return `그 사람, 아직 나를 생각할까? 기운상 **완전히 끝난 인연은 아니다.** 다만 **지금 당장 들이대면** 줄이 더 엉키고, **1~3개월 사이 거리 있는 재접근**이 붙을 여지가 더 크다.`;
+      return `그 사람, 아직 나를 생각할까? **완전히 끝난 인연은 아니야.** 다만 **지금 당장 들이대면** 줄이 더 엉키고, **1~3개월 사이 거리 있는 재접근**이 붙을 여지가 더 커.`;
     case "partner-heart":
       return `느낌이 왔어—${p} 마음에서 네가 **삭제됐다기보다 보관함**에 있을 가능성이 커. 다만 ‘남아 있음’과 ‘다시 열 준비’는 다른 층이야.`;
     case "breakup-decision":
@@ -784,9 +784,9 @@ function bulletsFor(productId: SajuProductId, form: SajuBirthForm): string[] {
   switch (productId) {
     case "reunion-luck":
       return [
-        "재회 **절대 불가** 쪽은 아니다.",
-        "다만 **지금 이 순간 고백·추궁·장문**은 독이 될 가능성이 높다.",
-        `${p} 마음속에 네가 **완전히 지워진 상태**로 보이지는 않는다.`,
+        "재회 **절대 불가** 쪽은 아니야.",
+        "다만 **지금 이 순간 고백·추궁·장문**은 독이 될 가능성이 높아.",
+        `${p} 마음속에 네가 **완전히 지워진 상태**로 보이지는 않아.`,
         `**앞으로 1개월**: 관망·정돈. **3개월 전후**: 접촉 창. **6개월**: 재개 vs 정리 갈림. (헤어진 지 ${monthsLabel(form)} 기준)`,
       ];
     case "partner-heart":

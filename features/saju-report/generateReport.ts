@@ -25,7 +25,7 @@ function formSummary(form: SajuBirthForm) {
 
 function productOutline(productId: SajuProductId): string {
   if (productId === "reunion-luck") {
-    return `필수 구조(제목 유지, 각 섹션 충분히 길게 · 전체 본문 약 6000~10000자):
+    return `필수 구조(제목 유지, 각 섹션을 Foxbunny급으로 길게 · 전체 본문 약 35000~45000자):
 1. 표지/한줄결론 — 「그 사람, 아직 나를 생각할까?」 훅 + 원국 요약 인용
 2. 1장 · 끌린 이유
 3. 두 사람의 사주 원국 비교 (양쪽 연주·일간 페어 필수)
@@ -40,7 +40,12 @@ function productOutline(productId: SajuProductId): string {
 12. 4장 · 달라져야 할 것
 13. 행동 플랜 · 연락 가이드
 14. 마지막 기회 · 선생님 마지막 말
-15. 안내(원국=만세력 계산, 해석=오락·위로 — 짧게 한 번만)`;
+15. 안내(원국=만세력 계산, 해석=오락·위로 — 짧게 한 번만)
+
+쉬운 톤 규칙(필수):
+- 각 섹션: 짧은 오프너 → **쉬운 결론(볼드)** → 긴 상담 서술(장면·상대 심리·하지 말 것/할 것) → *(근거 한 줄)* 사주 사실 1개 + 쉬운 번역 → 행동 한 줄
+- 십성 리스트/용신·희신·기신 나열/난해한 합충 비유 금지
+- 백련 보이스: 단호·돌봄·반말~세미포멀 (“기운이 보여.” “흔들리지 마.”)`;
   }
   const common = `필수 구조(번호/제목 유지, 각 섹션을 충분히 길게 · 전체 본문 약 6000~10000자 목표):
 1. 표지/한줄결론 — 고객 출생·상대·개월·고민·원국 인용
@@ -76,7 +81,8 @@ function systemPrompt(productId: SajuProductId): string {
 - 고객 디테일(출생·상대·개월·고민·이별 메모)을 적극 인용.
 - 의료/법률 주장 금지. 한국어만. 마크다운 헤딩(##) OK.
 - 사주 용어는 설득력 있게 쓰되, 본문 중간에 “프레임/엔터테인먼트”를 반복하지 말 것. 고지는 맨 끝 한 번만.
-- 분량: 본문 **6000자 이상 10000자 전후**. 각 섹션을 풍부하게.
+- 분량: reunion-luck은 본문 **35000자 이상 45000자 전후**(섹션당 매우 풍부). 다른 상품은 **6000자 이상 10000자 전후**.
+- reunion-luck 톤: 쉬운 일상어·연애 상담. 십성 나열·용신/희신/기신 스택·난해한 합충 비유 금지. 사주 사실은 섹션당 근거 한 줄로만, 반드시 쉬운 말로 번역.
 - 타사 상표·캐릭터명 금지.
 - 마지막에 짧은 재미·위로용 안내 섹션 필수.`;
 }
@@ -130,7 +136,7 @@ async function callOpenAICompatible(args: {
       body: JSON.stringify({
         model: args.model,
         temperature: 0.85,
-        max_tokens: 8192,
+        max_tokens: 16384,
         messages: [
           { role: "system", content: args.system },
           { role: "user", content: args.user },
@@ -157,7 +163,7 @@ export async function generateSajuReport(
   const system = systemPrompt(productId);
   const user = `다음 고객 정보로 **${product.title}** 긴 한국어 상담 리포트를 작성하라.
 제목/본문에 확정 예언처럼 쓰지 말 것. “프리미엄/MVP/프레임” 마케팅 톤 금지.
-분량 목표: **약 6000~10000자**. 섹션마다 ${product.characterName} 고유 보이스(이름만 교체 금지).
+분량 목표: reunion-luck은 **약 35000~45000자**, 그 외 **약 6000~10000자**. 섹션마다 ${product.characterName} 고유 보이스(이름만 교체 금지). reunion-luck은 쉬운 말·긴 상담 서술(장면·감정·타이밍·행동) 위주.
 고지(재미·위로용)는 맨 끝 섹션에만 짧게.
 
 고객 정보:
