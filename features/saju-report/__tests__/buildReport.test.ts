@@ -52,12 +52,12 @@ describe("buildTemplateReport depth", () => {
     expect(joined).not.toMatch(/- 년: .+\/- 월: .+\/- 일:/s);
   });
 
-  it("other products stay substantial with character voice", () => {
-    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(5500);
+  it("other products are Foxbunny-length web-novel with character voice", () => {
+    expect(bodyLen("partner-heart")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("partner-heart", form).characterName).toBe("서나리");
-    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(5500);
+    expect(bodyLen("breakup-decision")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("breakup-decision", form).characterName).toBe("차유리");
-    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(5500);
+    expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("reunion-strategy", form).characterName).toBe("한보라");
     const seo = buildTemplateReport("partner-heart", form).sections.map((s) => s.body).join("\n");
     const cha = buildTemplateReport("breakup-decision", form).sections.map((s) => s.body).join("\n");
@@ -65,7 +65,15 @@ describe("buildTemplateReport depth", () => {
     expect(seo).toMatch(/느낌이 왔어|잔향|언니/);
     expect(cha).toMatch(/팩트|아껴도 돼|퍼줘/);
     expect(bora).toMatch(/헐|네 마음부터/);
-    expect(seo).toMatch(/다음에 네가 할 선택|읽는 장면|장면/);
+    expect(seo).toMatch(/다음에 네가 할 선택/);
+    expect(cha).toMatch(/다음에 네가 할 선택/);
+    expect(bora).toMatch(/다음에 네가 할 선택/);
+    expect(seo).toMatch(/근거 한 줄/);
+    expect(cha).toMatch(/근거 한 줄/);
+    expect(bora).toMatch(/근거 한 줄/);
+    expect(seo).toMatch(/만세력|원국/);
+    expect(seo).not.toMatch(/십성으로 보면/);
+    expect(seo).not.toMatch(/### 용신·희신·기신/);
   });
 });
 

@@ -5,7 +5,10 @@ import { computeChart } from "./manseryeok/computeChart";
 import { dayMasterLabel } from "./manseryeok/computeChart";
 import type { SajuChart } from "./manseryeok/types";
 import { getSajuProduct } from "./products";
+import { buildBreakupDecisionNarrativeSections } from "./breakupDecisionNarrative";
+import { buildPartnerHeartNarrativeSections } from "./partnerHeartNarrative";
 import { buildReunionNarrativeSections } from "./reunionNarrative";
+import { buildReunionStrategyNarrativeSections } from "./reunionStrategyNarrative";
 import type {
   SajuBirthForm,
   SajuProductId,
@@ -882,60 +885,18 @@ function sectionsForProduct(
   productTitle: string,
   chart: SajuChart,
 ): SajuReportSection[] {
+  const one = oneLinerFor(productId, form);
+  const bullets = bulletsFor(productId, form);
   if (productId === "reunion-luck") {
-    return buildReunionNarrativeSections(
-      form,
-      voice,
-      chart,
-      productTitle,
-      oneLinerFor(productId, form),
-      bulletsFor(productId, form),
-    );
+    return buildReunionNarrativeSections(form, voice, chart, productTitle, one, bullets);
   }
-
-  const base: SajuReportSection[] = [
-    commonCover(form, voice, productTitle, oneLinerFor(productId, form), bulletsFor(productId, form)),
-    questionsSection(form, voice),
-    loveTraitSection(form, voice, chart),
-    lovePatternSection(form, voice),
-  ];
-
   if (productId === "partner-heart") {
-    return [
-      ...base,
-      bondSection(form, voice),
-      breakupReasonSection(form, voice),
-      remainingHeartSection(form, voice, chart),
-      ...partnerHeartExtra(form, voice, chart),
-      contactGuideSection(form, voice),
-      pitfallsSection(form, voice),
-      closingSection(form, voice),
-      noticeSection(voice.name, productTitle),
-    ];
+    return buildPartnerHeartNarrativeSections(form, voice, chart, productTitle, one, bullets);
   }
-
   if (productId === "breakup-decision") {
-    return [
-      ...base,
-      breakupReasonSection(form, voice),
-      ...breakupDecisionExtra(form, voice),
-      pitfallsSection(form, voice),
-      closingSection(form, voice),
-      noticeSection(voice.name, productTitle),
-    ];
+    return buildBreakupDecisionNarrativeSections(form, voice, chart, productTitle, one, bullets);
   }
-
-  // reunion-strategy
-  return [
-    ...base,
-    ...strategyProductExtra(form, voice),
-    timelineSection(form, voice, chart),
-    contactGuideSection(form, voice),
-    strategySection(form, voice),
-    pitfallsSection(form, voice),
-    closingSection(form, voice),
-    noticeSection(voice.name, productTitle),
-  ];
+  return buildReunionStrategyNarrativeSections(form, voice, chart, productTitle, one, bullets);
 }
 
 export function buildTemplateReport(
