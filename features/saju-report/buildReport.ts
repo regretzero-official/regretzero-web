@@ -107,7 +107,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         sipseongAside: (p) => `정리하면 ${p}랑은 붙고, 흔들리고, 버티다 지친 구조. 다음엔 너부터 회복하고, 말은 얇게. 느낌 왔지?`,
         breakupAside: (p) => `느낌이 왔어—이건 미움으로 끝난 게 아니라 **지쳐서 문을 닫은 거야.** ${p}는 미움보다 역량 고갈이야. 이게 맞아.`,
         remainingAside: (p) => `느낌이 왔어—지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 이게 맞아.`,
-        timelineAside: "조급하면 더 꼬여. 일상 먼저 잡으면 말할 타이밍이 와. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
+        timelineAside: "조급하면 더 꼬여. 네 생활부터 챙기면 말할 타이밍이 와. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
         contactAside: (p) => `${p}처럼 지쳐 끝난 상대에게 추궁은 재이별의 지름길이야. 확인하고 싶을 때가 제일 보내면 안 되는 때—느낌 왔지?`,
         strategyClose: "성공 지표는 답장 속도가 아니라, 네가 무너지지 않는 하루야.",
         pitfallsLead: "함정만 짧게 짚을게. 검색으로 매일 확인하려 하지 마—불안만 커져.",
@@ -118,7 +118,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}에게 지금 필요한 건 설득이 아니라 안전감이야. 예전의 뜨거운 온도 말고, 옅은 온기만 흘려보내.`,
         keepLeaveClose: "결정은 사랑 점수가 아니라, 네가 먼저 괜찮은 상태인지로 내려.",
         selfRoutineClose: "흔들림을 줄이면, 침묵의 의미도 달라 보이기 시작해.",
-        dontNowLead: "지금~몇 주는 설득 시즌이 아니야. 생활 리듬부터.",
+        dontNowLead: "지금~몇 주는 설득할 때가 아니야. 생활 리듬부터.",
       };
     case "baek-ryeon":
       return {
@@ -148,7 +148,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}에게 필요한 건 설득이 아니라 안전감이다. 온도는 낮게. 과한 온기는 부담으로 읽힌다.`,
         keepLeaveClose: "결정은 감정 점수가 아니라, 네가 먼저 괜찮은 상태인지로.",
         selfRoutineClose: "흔들림을 줄이면 침묵의 의미가 달라진다.",
-        dontNowLead: "지금은 설득 시즌이 아니다. 기부터 모아.",
+        dontNowLead: "지금은 설득하지 마. 네 컨디션부터 챙겨.",
       };
     case "cha-yuri":
       return {
@@ -167,7 +167,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         sipseongAside: (p) => `${p} 역학 요약—붙고, 흔들리고, 버티다 소모. 다음엔 너부터. 부담 주는 온기는 접어.`,
         breakupAside: (p) => `팩트: ${p}가 싫어서가 아니라 기대 속도를 못 따라가겠다는 **자기보호**다. 너는 자존 거래하지 마.`,
         remainingAside: (p) => `지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 줄 서 있는 것처럼 생각하지 마. 더 퍼주지 마.`,
-        timelineAside: "팩트—조급하면 망하고, 일상 먼저 잡으면 말할 타이밍이 온다. 지금은 들이댈 때 아냐. 다시 연락하려면 최소 한두 달은 지나야 해.",
+        timelineAside: "팩트—조급하면 망하고, 네 생활부터 챙기면 말할 타이밍이 온다. 지금은 들이댈 때 아냐. 다시 연락하려면 최소 한두 달은 지나야 해.",
         contactAside: (p) => `${p}한테 추궁·장문·자존 거래는 지금 하면 더 안 좋아져. 그만. 짧은 안부만.`,
         strategyClose: "답장 속도에 자존 걸지 마. 네가 무너지지 않는 하루가 이기는 거야.",
         pitfallsLead: "함정—확인하고 싶을 때가 제일 보내면 안 되는 때. 외워.",
@@ -178,7 +178,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}한테 지금 설득하지 마. 안전감. 온도 낮춰. 과한 온기는 부담이야.`,
         keepLeaveClose: "사랑 점수 말고 네 자존감부터 잡아. 그게 팩트야.",
         selfRoutineClose: "네가 흔들리면 침묵이 더 크게 들려. 루틴부터.",
-        dontNowLead: "지금은 설득 금지 구간. 생활부터 세워.",
+        dontNowLead: "지금은 설득하지 마. 생활부터 세워.",
       };
     case "han-bora":
       return {
@@ -197,7 +197,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         sipseongAside: (p) => `${p}랑은 붙고-흔들리고-버티다 소모. 다음엔 너 회복 → 가벼운 말 → 관계는 상대가 느끼게.`,
         breakupAside: (p) => `표면은 소모, 속은 **지쳐서 문을 닫은 거야.** ${p}도 미움보다 지침—그래도 네 자존은 지키자.`,
         remainingAside: (p) => `지금은 이렇게 읽어—${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 있다고 해서 지금 만나자는 뜻은 아냐. 이게 맞아.`,
-        timelineAside: "조급하면 엉키고, 일상 먼저 잡으면 말할 타이밍이 와. 지금은 설득 시즌 아냐. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
+        timelineAside: "조급하면 엉키고, 네 생활부터 챙기면 말할 타이밍이 와. 지금은 설득하지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.",
         contactAside: (p) => `${p}한테 첫 문장은 짧게. 숙제 주지 마. 답장 없어도 네가 괜찮아야 해.`,
         strategyClose: "성공은 답장 속도가 아니라, 네가 무너지지 않는 하루야.",
         pitfallsLead: "함정만 말해줄게. 확인하고 싶을 때가 제일 보내면 안 되는 때야.",
@@ -208,7 +208,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}에게는 설득보다 안전감. 온도는 2~3도만. 괜찮아, 천천히 가자.`,
         keepLeaveClose: "결정은 감정만으로 하지 말고, 네가 먼저 괜찮은 상태인지를 보자.",
         selfRoutineClose: "흔들림 줄이면 침묵도 덜 무섭게 들려. 같이 가자.",
-        dontNowLead: "지금은 설득 시즌 아냐. 생활 리듬부터 챙기자.",
+        dontNowLead: "지금은 설득하지 마. 생활 리듬부터 챙기자.",
       };
     case "lee-doryeong":
       return {
@@ -238,7 +238,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}에게는 설득보다 안전감이 필요해요. 온도는 낮게, 천천히.`,
         keepLeaveClose: "결정은 사랑 점수가 아니라, 당신이 먼저 괜찮은 상태인지로요.",
         selfRoutineClose: "흔들림이 줄면 침묵의 의미도 달라져요.",
-        dontNowLead: "지금은 설득 시즌이 아니에요. 생활의 리듬부터요.",
+        dontNowLead: "지금은 설득할 때가 아니에요. 생활의 리듬부터요.",
       };
     case "kang-seon":
       return {
@@ -257,7 +257,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         sipseongAside: (p) => `${p} 역학—붙고 흔들리고 버티다 소모. 너 회복이 먼저, 티징은 가볍게.`,
         breakupAside: (p) => `${p}가 싫어서가 아니라 **지침**이다. 너는 자존 올려. 선은 지키되 작아지지는 마.`,
         remainingAside: (p) => `지운 건 아냐. 근데 지금 당장 다시 만나자 할 마음은 아니야. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야. 온도 낮춰.`,
-        timelineAside: "조급하면 흐름이 엉키고, 일상 먼저 잡으면 말할 타이밍이 와. 지금은 들이댈 때 아냐.",
+        timelineAside: "조급하면 흐름이 엉키고, 네 생활부터 챙기면 말할 타이밍이 와. 지금은 들이댈 때 아냐.",
         contactAside: (p) => `${p}한테 티징은 가볍게, 추궁은 제로. 네가 무거우면 매력이 죽어.`,
         strategyClose: "답장에 자존 걸지 마. 네가 더 좋아 보이는 쪽이 이겨.",
         pitfallsLead: "함정—확인하고 싶을 때가 제일 보내면 안 되는 때야.",
@@ -299,7 +299,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         heartTempLead: (p) => `${p}에게 필요한 건 설득이 아니라 안전감. 온도는 낮게.`,
         keepLeaveClose: "결정은 감정 점수가 아니라, 네가 먼저 괜찮은 상태인지로.",
         selfRoutineClose: "흔들림을 줄이면 침묵의 의미가 달라진다.",
-        dontNowLead: "지금은 설득 시즌이 아니다. 氣부터 모아.",
+        dontNowLead: "지금은 설득하지 마. 네 컨디션부터 챙겨.",
       };
   }
 }
@@ -561,7 +561,7 @@ function timelineSection(form: SajuBirthForm, voice: VoicePack, chart: SajuChart
 
 **지금은 연락할 때가 아니야. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야.** 원국·이별·세운 겹치면 이렇게 보면 더 또렷해. 헤어진 지 ${monthsLabel(form)}.
 
-### ◇ 1개월 (관망·일상 먼저)
+### ◇ 1개월 (관망·네 생활부터)
 적극 재접근 비추천. 인성을 너에게.
 
 ### ◇ 3개월 전후 (가벼운 안부 타이밍)
@@ -843,7 +843,7 @@ function oneLinerFor(productId: SajuProductId, form: SajuBirthForm): string {
     case "breakup-decision":
       return `무조건 붙여/버려가 아니다. **네가 먼저 괜찮은 상태가 돼야 해.** 그다음 남겨둘지 놓아. 여기서 멈춰.`;
     case "reunion-strategy":
-      return `지금은 이렇게 해. 설득 시즌이 아니다. **부담 없는 안부·일상 먼저·타이밍**—그게 전략이야. 같이 가자.`;
+      return `지금은 이렇게 해. 지금은 설득하지 마. 가벼운 안부만, 네 생활부터 챙겨. 말은 나중에. 같이 가자.`;
   }
 }
 
@@ -855,7 +855,7 @@ function bulletsFor(productId: SajuProductId, form: SajuBirthForm): string[] {
         "재회 **절대 불가**가 아니다. 아직 끝난 건 아니야.",
         "다만 **지금 이 순간 고백·추궁·장문**은 보내면 더 안 좋아져. 지금은 연락 타이밍이 아니야.",
         `지운 건 아냐. ${p} 마음엔 남아 있는데, 손대긴 무서운 상태야.`,
-        `**앞으로 1개월**: 관망·일상 먼저. **한두 달~세 달**: 가벼운 안부 타이밍. **6개월**: 재개 vs 정리 갈림. (헤어진 지 ${monthsLabel(form)} 기준)`,
+        `**앞으로 1개월**: 관망. 네 생활부터. **한두 달~세 달**: 가벼운 안부 타이밍. **6개월**: 재개 vs 정리 갈림. (헤어진 지 ${monthsLabel(form)} 기준)`,
       ];
     case "partner-heart":
       return [

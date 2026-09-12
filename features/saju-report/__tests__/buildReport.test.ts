@@ -131,6 +131,9 @@ describe("everyday Korean counseling (no jargon slogans)", () => {
       expect(joined).not.toMatch(/문은 아직이야|문은 아직 닫혀/);
       expect(joined).not.toMatch(/독이다/);
       expect(joined).not.toMatch(/저자극/);
+      expect(joined).not.toMatch(/설득 시즌/);
+      expect(joined).not.toMatch(/부담 없는 안부·일상 먼저·타이밍/);
+      expect(joined).not.toMatch(/기부터 모아|氣부터 모아/);
       expect(joined).not.toMatch(/대기열/);
       expect(joined).not.toMatch(/타임라인 결론|※ 결론—/);
       expect(joined).not.toMatch(/氣는 조급하면 흐트러/);
@@ -155,6 +158,10 @@ describe("everyday Korean counseling (no jargon slogans)", () => {
     expect(seoCover).toMatch(/느낌이 왔어/);
     expect(cha.oneLiner).toMatch(/괜찮은 상태|자존감부터/);
     expect(chaCover).toMatch(/더 퍼주지 마|아껴도 돼|팩트/);
+    const boraStrategy = buildTemplateReport("reunion-strategy", form, "han-bora");
+    expect(boraStrategy.oneLiner).toMatch(/지금은 설득하지 마/);
+    expect(boraStrategy.oneLiner).toMatch(/가벼운 안부|네 생활부터/);
+    expect(boraStrategy.oneLiner).not.toMatch(/설득 시즌|부담 없는 안부·일상 먼저·타이밍/);
   });
 });
 

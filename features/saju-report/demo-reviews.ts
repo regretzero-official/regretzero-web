@@ -43,7 +43,7 @@ export const SAJU_DEMO_REVIEWS: DemoReview[] = [
     maskedName: "y***o",
     stars: 5,
     tags: ["재회운", "백련"],
-    elementChips: ["대운", "세운", "일상 먼저"],
+    elementChips: ["대운", "세운", "생활부터"],
     dateLabel: "2026.06.18",
     body: "타임라인에서 한 달은 관망·한두 달에서 세 달쯤 다시 말해도 된다고 해서 조급함이 줄었어요. ‘완전히 끝’이 아니라 ‘방식만 바꾸라’는 말에 숨이 트인 느낌.",
   },
