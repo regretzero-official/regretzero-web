@@ -89,14 +89,14 @@ export function PaywallSheet({ character, preview, onClose, onUnlock }: PaywallS
 
           <div className="px-5 pb-5">
             <div className="rounded-[16px] border border-white/10 bg-[#09090B] px-4 py-3 text-xs leading-5 text-[#9A9098]">
-              엔터테인먼트용 · 실제 예언이 아닙니다
+              참고용이에요. 절대 결과가 아니에요.
             </div>
             <button
               className="saju-cta mt-4 flex min-h-14 w-full items-center justify-center rounded-full px-5 text-base font-semibold transition active:scale-[0.99]"
               onClick={onUnlock}
               type="button"
             >
-              데모로 잠금 해제 (₩4,900)
+              잠금 해제하기 (₩4,900)
             </button>
             <button
               className="mt-2 flex min-h-11 w-full items-center justify-center rounded-full text-sm font-semibold text-[#9A9098] transition hover:bg-white/5"

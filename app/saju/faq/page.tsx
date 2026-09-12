@@ -9,7 +9,7 @@ import { SAJU_PRODUCT_LANDINGS } from "@/features/saju-report/product-landings";
 export const metadata: Metadata = {
   title: "사주 FAQ · 자주 묻는 말",
   description:
-    "밤의 사주 서비스 안내. 엔터테인먼트 목적, 무료 미리보기와 데모 잠금, 개인정보·환불(데모) 안내.",
+    "밤의 사주 서비스 안내. 무료 미리보기와 잠금 해제, 개인정보·환불 안내. 참고용이에요.",
   robots: { index: false, follow: false },
 };
 
@@ -41,7 +41,7 @@ export default function SajuFaqPage() {
               궁금한 점부터
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#9A9098]">
-              서비스 성격·미리보기·데모 결제·개인정보·환불을 짧게 정리했어요.
+              서비스 성격·미리보기·결제·개인정보·환불을 짧게 정리했어요.
             </p>
           </section>
 
@@ -81,9 +81,9 @@ export default function SajuFaqPage() {
           </section>
 
           <section className="saju-card-elevated rounded-[22px] px-4 py-4 text-xs leading-5 text-[#9A9098]">
-            원국은 만세력으로 계산하고, 해석·조언은 오락·위로용 엔터테인먼트입니다. 확정
-            예언·의료·법률을 대체하지 않으며, 원치 않는 연락·스토킹을 권장하지 않습니다. 현재 잠금 해제는{" "}
-            <strong className="text-[#D8D0D4]">데모</strong>이며 실제 결제가 이루어지지 않습니다.
+            원국은 만세력으로 계산하고, 해석은 참고용이에요. 절대 결과가 아니에요. 원치 않는
+            연락은 권하지 않아요. 지금은{" "}
+            <strong className="text-[#D8D0D4]">실제 청구 없이</strong> 전체 결과를 열어볼 수 있어요.
           </section>
 
           <section>

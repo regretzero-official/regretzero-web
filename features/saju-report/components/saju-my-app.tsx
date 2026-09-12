@@ -55,7 +55,7 @@ function ReportReader({
         <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
           <ReportMarkdown body={report.oneLiner} />
         </div>
-        <p className="mt-2 text-center text-[11px] text-[#6E666C]">오락·비예언 · 재미·위로용 콘텐츠입니다.</p>
+        <p className="mt-2 text-center text-[11px] text-[#6E666C]">참고용이에요. 절대 결과가 아니에요.</p>
         <nav
           aria-label="리포트 목차"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"
