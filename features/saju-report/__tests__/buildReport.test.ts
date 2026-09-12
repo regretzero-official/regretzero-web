@@ -127,6 +127,18 @@ describe("everyday Korean counseling (no jargon slogans)", () => {
       expect(joined).not.toMatch(/청구서/);
       expect(joined).not.toMatch(/칸이 달라/);
       expect(joined).not.toMatch(/해 결이다|문 닫힌 결이다/);
+      expect(joined).not.toMatch(/지금은 아니다/);
+      expect(joined).not.toMatch(/문은 아직이야|문은 아직 닫혀/);
+      expect(joined).not.toMatch(/독이다/);
+      expect(joined).not.toMatch(/저자극/);
+      expect(joined).not.toMatch(/대기열/);
+      expect(joined).not.toMatch(/타임라인 결론|※ 결론—/);
+      expect(joined).not.toMatch(/氣는 조급하면 흐트러/);
+      expect(joined).not.toMatch(/이 방향이 맞아/);
+      expect(joined).not.toMatch(/달아오름/);
+      expect(joined).not.toMatch(/남아 있음 ≠/);
+      expect(joined).not.toMatch(/백련이 짚는다/);
+      expect(joined).not.toMatch(/구조 안 바꾸면/);
     }
   });
 
@@ -138,7 +150,7 @@ describe("everyday Korean counseling (no jargon slogans)", () => {
     const seoCover = seo.sections.find((s) => s.id === "cover")!.body;
     const chaCover = cha.sections.find((s) => s.id === "cover")!.body;
     expect(baekCover).toMatch(/다가가지 마|한두 달|다시 연락하려면/);
-    expect(baek.oneLiner).toMatch(/지금은 아니다/);
+    expect(baek.oneLiner).toMatch(/지금은 연락할 때가 아니야/);
     expect(seo.oneLiner).toMatch(/지운 건 아냐|손대긴 무서운/);
     expect(seoCover).toMatch(/느낌이 왔어/);
     expect(cha.oneLiner).toMatch(/괜찮은 상태|자존감부터/);

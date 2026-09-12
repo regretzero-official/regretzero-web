@@ -113,7 +113,7 @@ ${voice.traitClose?.(p) ?? ""}`,
     title: "연애 패턴 · 잔향의 스크립트",
     body: L(
       4,
-      `스크립트: 진입→몰입→달아오름→차단→잔향. 지금 ${months}은 잔향 구간.
+      `스크립트: 진입→몰입→감정 커짐→차단→잔향. 지금 ${months}은 잔향 구간.
 같은 식으로 ${p}에게 가면 또 지친다. 재시도의 핵심은 더 잘해주기가 아니라 **덜 매달리는 안정**.
 
 ${voice.patternClose?.(p) ?? ""}
@@ -245,7 +245,7 @@ ${voice.signOff}`,
     "breakup-reason": { beat: "이별 원인", scene: "미움보다 속도·피로. 자책 문장을 교정한다." },
     "keep-leave": { beat: "남겨둘/놓을", scene: "사랑 점수가 아니라 네 자존감부터 잡아 결정 문장을 쓴다." },
     "self-routine": { beat: "자존 루틴", scene: "퍼주지 마. 루틴이 매력이다." },
-    pitfalls: { beat: "함정", scene: "감정 최고점 선언·자정 장문은 독." },
+    pitfalls: { beat: "함정", scene: "감정 최고점 선언·자정 장문은 지금 하면 더 안 좋아져." },
     closing: { beat: "마지막 말", scene: "남겨도 놓아도, 네가 작아지면 잘못된 결정이다." },
   };
   return applyPads(sections, pads, form, p, chart, vn, "breakup");
