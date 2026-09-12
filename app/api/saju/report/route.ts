@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
       productId?: unknown;
       form?: unknown;
       previewOnly?: unknown;
+      characterId?: unknown;
     };
 
     if (!isProductId(body.productId) || !getSajuProduct(body.productId)) {
@@ -70,7 +71,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid form." }, { status: 400 });
     }
 
-    const report = await generateSajuReport(body.productId, form);
+    const characterId =
+      typeof body.characterId === "string" ? body.characterId.trim().slice(0, 40) : null;
+
+    const report = await generateSajuReport(body.productId, form, characterId);
 
     if (body.previewOnly) {
       return NextResponse.json({

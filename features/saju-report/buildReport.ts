@@ -91,7 +91,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `나는 느낌이 왔어. ${p} 생각하면 가슴이 먼저 반응하지? 언니 말 들어봐—그 반응, 끝이 아니라 잔향이야.`,
+        openerAside: (p) => `느낌이 왔어. 그 잔향, 끝 아냐. ${p} 생각하면 가슴이 먼저 반응하지? 언니 말 들어봐.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}, ${birth}, ${gender}. 낮엔 괜찮은 척해도 밤에 감정이 더 깊게 남는 결이야. 헤어진 지 ${months}—“${breakup}”이 아직 몸 안쪽에 남아 있을 가능성이 커.`,
         coverClose: `단정 예언은 안 해. 기운은 고정값이 아니라 흐름이야. 그래도 네 원국·이별·침묵의 결을 겹치면 위 방향이 제일 설득력 있어.`,
         frameAside: "서나리 식으로—표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직해.",
@@ -121,7 +121,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `기운이 보여. ${p} 쪽으로 아직 줄이 남아 있어. 다만 지금 흔들면 줄이 더 엉킨다. 흔들리지 마.`,
+        openerAside: (p) => `기운이 보여. 지금 흔들지 마. ${p} 쪽으로 아직 줄이 남아 있어. 흔들면 줄이 더 엉킨다.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 원국이다. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 몸 안에 있다.`,
         coverClose: "확정 예언은 하지 않는다. 氣는 흐른다. 그래도 원국·이별·침묵의 결을 겹치면, 위 방향이 가장 설득력 있다.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다.",
@@ -151,7 +151,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p}한테 왜 그렇게 퍼줘. 너는 더 아껴도 돼. 팩트부터—지금은 더 잘해주기 시즌이 아니야.`,
+        openerAside: (p) => `왜 그렇게 퍼줘. 너는 더 아껴도 돼. ${p}한테 더 잘해주기 시즌 아냐—팩트부터.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 타입이지? 헤어진 지 ${months}. “${breakup}”—로맨스 포장 말고 소모로 읽어.`,
         coverClose: "예언 안 해. 근데 네 원국 결 + 이별 결 + 침묵 패턴 겹치면, 위 방향이 제일 현실적이야.",
         frameAside: "차유리 식으로—감정 점수 말고, 네가 버티는 구조로 읽어. 자존이 먼저다.",
@@ -181,7 +181,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `헐, 또 ${p} 생각했지? 일단 네 마음부터. 괜찮아, 그 마음 이상한 거 아니야. 다만 행동만 조심하자.`,
+        openerAside: (p) => `헐, 일단 네 마음부터. 또 ${p} 생각했지? 괜찮아, 그 마음 이상한 거 아니야. 행동만 조심하자.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}! ${birth}, ${gender}. 낮엔 괜찮은 척하다가 밤에 감정이 커지는 결에 가까워. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있을 수 있어.`,
         coverClose: "확정 예언은 안 할게. 그래도 네 결 + 이별 결 + 침묵 패턴을 겹치면, 위 방향이 제일 설득력 있어.",
         frameAside: "한보라가 먼저 공감하고, 그다음 현실 한 줄—위험 집착은 말릴게.",
@@ -211,7 +211,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p} 생각이 남는다면, 그건 약함이 아니라 깊이예요. 다만 깊이가 무게가 되지 않게, 제가 옆에서 지켜드릴게요.`,
+        openerAside: (p) => `다치지 않게, 곁에서 읽어드릴게요. ${p} 생각이 남는다면 약함이 아니라 깊이예요. 그 깊이가 무게가 되지 않게 제가 지켜드릴게요.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}님. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결에 가까워요. 헤어진 지 ${months}, “${breakup}”의 잔향이 아직 남아 있을 수 있어요.`,
         coverClose: "확정 예언은 하지 않아요. 그래도 원국·이별·침묵의 결을 겹치면 위 방향이 가장 설득력 있어요.",
         frameAside: "이도령이 지키는 건 예언이 아니라, 당신이 다치지 않는 여지예요.",
@@ -241,7 +241,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `${p} 생각난다고 네가 작아질 필요는 없어. 자신감 있게—들이대는 자신감이 아니라, 정돈된 자신감.`,
+        openerAside: (p) => `괜찮아. 같이 정리하자. ${p} 생각난다고 네가 작아질 필요는 없어—들이대는 자신감이 아니라, 정돈된 자신감.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 결이지. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있을 수 있어.`,
         coverClose: "예언은 안 해. 그래도 네 결 + 이별 결 + 침묵 패턴이면 위 방향이 제일 설득력 있어.",
         frameAside: "강세온 식으로—너는 이미 매력 있어. 문제는 타이밍과 온도야.",
@@ -272,7 +272,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `너, 밤에 또 ${p} 생각했지. 氣는 거짓말 잘 안 해. 다만 지금 들이대면 흐름이 또 엉킨다.`,
+        openerAside: (p) => `급할수록 한 박자 쉬어. 너, 밤에 또 ${p} 생각했지. 氣는 거짓말 잘 안 해—지금 들이대면 흐름이 또 엉킨다.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 있다.`,
         coverClose: "단정은 안 한다. 氣는 고정값이 아니니까. 그래도 원국·이별·침묵을 겹치면 위 방향이 가장 설득력 있다.",
         frameAside: "한시우 방식은 단순하다. 표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직하다.",
@@ -876,14 +876,18 @@ function sectionsForProduct(
 export function buildTemplateReport(
   productId: SajuProductId,
   form: SajuBirthForm,
+  selectedCharacterId?: SajuCharacterId | string | null,
 ): SajuReportPayload {
   const product = getSajuProduct(productId);
   if (!product) {
     throw new Error("Unknown product");
   }
-  const character = getSajuCharacter(product.characterId);
+  const resolvedId = product.counselorIds.includes(selectedCharacterId as SajuCharacterId)
+    ? (selectedCharacterId as SajuCharacterId)
+    : product.characterId;
+  const character = getSajuCharacter(resolvedId);
   const characterName = character?.name ?? product.characterName;
-  const voice = voicePack(product.characterId, characterName);
+  const voice = voicePack(resolvedId, characterName);
   const chart = computeChart(form);
   const built = sectionsForProduct(productId, form, voice, product.title, chart);
   const canonical = getCanonicalSections(productId);
@@ -903,7 +907,7 @@ export function buildTemplateReport(
 
   return {
     productId,
-    characterId: product.characterId,
+    characterId: resolvedId,
     characterName,
     title: `${product.title} 리포트｜${characterName}`,
     oneLiner: oneLinerFor(productId, form),

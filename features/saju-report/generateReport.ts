@@ -62,16 +62,16 @@ function productOutline(productId: SajuProductId): string {
   return common;
 }
 
-function systemPrompt(productId: SajuProductId): string {
+function systemPrompt(productId: SajuProductId, characterId: string): string {
   const product = getSajuProduct(productId)!;
-  const character = getSajuCharacter(product.characterId)!;
+  const character = getSajuCharacter(characterId) ?? getSajuCharacter(product.characterId)!;
   return `${character.systemPrompt}
 
 지금은 짧은 채팅이 아니라 **긴 ${product.title} 상담 리포트**를 집필합니다.
 보이스 규칙 (최우선):
 - ${character.name}(${character.roleLabel ?? "가이드"})처럼 말할 것. 이름만 바꾼 동일 문단 금지.
 - 카톡/상담 톤. AI 에세이·“~입니다. ~입니다.” 스택·마케팅 클리셰(“프리미엄”“MVP”“정리하세요”“프레임” 남발) 금지.
-- 섹션마다 캐릭터 고유 감각어·호흡을 넣을 것. 백련≠차유리≠서나리≠한보라가 10초 안에 구분돼야 함.
+- 섹션마다 캐릭터 고유 감각어·호흡을 넣을 것. 백련≠차유리≠서나리≠한보라≠이도령≠한시우≠강세온이 10초 안에 구분돼야 함.
 - 확정 예언 금지. “~일 가능성”, “흐름상”, “기운이…” 식으로.
 - 고객 디테일(출생·상대·개월·고민·이별 메모)을 적극 인용.
 - 의료/법률 주장 금지. 한국어만. 마크다운 헤딩(##) OK.
@@ -150,14 +150,16 @@ async function callOpenAICompatible(args: {
 export async function generateSajuReport(
   productId: SajuProductId,
   form: SajuBirthForm,
+  selectedCharacterId?: string | null,
 ): Promise<SajuReportPayload> {
-  const template = buildTemplateReport(productId, form);
+  const template = buildTemplateReport(productId, form, selectedCharacterId);
   const product = getSajuProduct(productId)!;
   const chart = template.chart ?? computeChart(form);
-  const system = systemPrompt(productId);
+  const system = systemPrompt(productId, template.characterId);
+  const narrator = template.characterName;
   const user = `다음 고객 정보로 **${product.title}** 긴 한국어 상담 리포트를 작성하라.
 제목/본문에 확정 예언처럼 쓰지 말 것. “프리미엄/MVP/프레임” 마케팅 톤 금지.
-분량 목표: **약 6000~10000자**. 섹션마다 ${product.characterName} 고유 보이스(이름만 교체 금지).
+분량 목표: **약 6000~10000자**. 섹션마다 ${narrator} 고유 보이스(이름만 교체 금지).
 고지(재미·위로용)는 맨 끝 섹션에만 짧게.
 
 고객 정보:
@@ -168,7 +170,7 @@ ${formatChartPlain(chart)}
 
 ${productOutline(productId)}
 
-톤: 구체적·상담. ${product.characterName}이 직접 말하는 것처럼.
+톤: 구체적·상담. ${narrator}이 직접 말하는 것처럼.
 원국 숫자는 위 만세력 결과를 인용하고, 해석·조언만 캐릭터 보이스로 풀어라.`;
 
   const openaiKey = process.env.OPENAI_API_KEY;

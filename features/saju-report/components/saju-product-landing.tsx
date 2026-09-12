@@ -1,16 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { getSajuCharacter } from "@/features/saju-chat/characters";
 import { SAJU_DEMO_REVIEWS } from "@/features/saju-report/demo-reviews";
 import {
   getLandingBySlug,
-  hubDeepLink,
   type SajuLandingSlug,
 } from "@/features/saju-report/product-landings";
 import { getCanonicalSectionCount } from "@/features/saju-report/canonical-sections";
-import { getSajuProduct } from "@/features/saju-report/products";
+import { getProductCounselors, getSajuProduct } from "@/features/saju-report/products";
 
+import { LandingCounselorChrome } from "./landing-counselor-hero";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
 import { SajuEntryGate, SajuEntryReplayLink } from "./saju-entry-overlay";
 import {
@@ -27,8 +26,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
     return null;
   }
 
-  const character = getSajuCharacter(product.characterId);
-  const startHref = hubDeepLink(product.id);
+  const counselors = getProductCounselors(product);
   const freeCount = landing.previewUnlockedCount;
   const totalSections = getCanonicalSectionCount(product.id);
   const freeScopeLine = `미리보기 ${freeCount}개 섹션 무료 · 나머지 잠금(${product.shortTitle} ${totalSections}장)`;
@@ -36,6 +34,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
     r.tags.some((t) => t === landing.reviewTag || t === product.characterName),
   );
   const reviewList = reviews.length > 0 ? reviews : SAJU_DEMO_REVIEWS.slice(0, 2);
+  const defaultChar = getSajuCharacter(product.characterId);
 
   return (
     <div className="saju-shell">
@@ -56,226 +55,191 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
         </header>
 
         <main className={`flex-1 space-y-10 ${SAJU_BOTTOM_NAV_PAD}`}>
-          {/* 1. Hero */}
-          <section className="px-5 pt-5">
-            <div className="overflow-hidden rounded-[24px] border border-white/10">
-              <div className="relative aspect-[4/5] w-full sm:aspect-[5/6]">
-                {character ? (
-                  <Image
-                    alt={product.characterName}
-                    className="object-cover object-top"
-                    fill
-                    priority
-                    sizes="(max-width:480px) 100vw, 480px"
-                    src={character.portraitSrc}
+          <LandingCounselorChrome
+            product={product}
+            counselors={counselors}
+            heroHook={landing.heroHook}
+            heroSub={landing.heroSub}
+            ctaLabel={landing.ctaLabel}
+            freeScopeLine={freeScopeLine}
+            footerExtra={
+              <>
+                <p className="mt-3 text-center text-[11px] text-[#6E666C]">
+                  <SajuEntryReplayLink
+                    slug={slug}
+                    className="underline-offset-2 hover:text-[#FF7A99] hover:underline"
                   />
-                ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#12151C] via-[#12151C]/55 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  <span
-                    className="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white"
-                    style={{ background: product.accent }}
-                  >
-                    {product.badge} · {product.characterName}
-                    {character?.roleLabel ? ` · ${character.roleLabel}` : ""}
-                  </span>
-                  <p className="mt-3 text-[0.8rem] font-semibold tracking-[0.04em] text-[#FF7A99]">
-                    {product.title}
-                  </p>
-                  <h1 className="mt-2 text-[1.55rem] font-black leading-[1.25] tracking-[-0.045em] text-[#F8F4F6]">
-                    {landing.heroHook}
-                  </h1>
-                  <p className="mt-2.5 text-sm leading-6 text-[#D8D0D4]">{landing.heroSub}</p>
-                  <Link
-                    href={startHref}
-                    className="saju-cta mt-4 inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold"
-                  >
-                    {landing.ctaLabel} →
-                  </Link>
-                  <p className="mt-2 text-[11px] leading-5 text-[#B8AEB4]/90">{freeScopeLine}</p>
+                </p>
+                <div className="mt-4">
+                  <SajuTrustStrip />
                 </div>
-              </div>
-            </div>
-            <p className="mt-3 text-center text-[11px] text-[#6E666C]">
-              <SajuEntryReplayLink
-                slug={slug}
-                className="underline-offset-2 hover:text-[#FF7A99] hover:underline"
-              />
-            </p>
-            <div className="mt-4">
-              <SajuTrustStrip />
-            </div>
-          </section>
-
-          {/* 2. Who / deliverables */}
-          <section className="px-5">
-            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-              이런 분께 맞아요
-            </h2>
-            <ul className="mt-3 space-y-2">
-              {landing.whoFor.map((item) => (
-                <li
-                  key={item}
-                  className="saju-card flex gap-2.5 rounded-[16px] px-3.5 py-3 text-sm leading-5 text-[#B8AEB4]"
-                >
-                  <span className="mt-0.5 text-[#FF7A99]" aria-hidden>
-                    ·
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <h2 className="mt-8 text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-              이런 걸 받아요
-            </h2>
-            <p className="mt-1 text-xs text-[#9A9098]">
-              {product.characterName}이 풀어주는 긴 리포트 · {product.priceLabel}
-            </p>
-            <ul className="mt-3 space-y-2">
-              {landing.deliverables.map((item) => (
-                <li
-                  key={item}
-                  className="saju-card-elevated rounded-[16px] px-3.5 py-3 text-sm leading-5 text-[#D8D0D4]"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* 3. Preview outline with locks */}
-          <section className="px-5">
-            <div className="flex flex-wrap items-end justify-between gap-2">
+                <p className="mt-3 text-center text-[11px] font-medium text-[#9A9098]">
+                  여자의 마음은 여자가 잘 알지
+                  <span className="text-[#6E666C]"> · 상담사는 골라요</span>
+                </p>
+              </>
+            }
+          >
+            {/* 2. Who / deliverables */}
+            <section className="px-5">
               <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
-                미리보기 구성
+                이런 분께 맞아요
               </h2>
-              <span className="rounded-full border border-[#E8336D]/40 bg-[#E8336D]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#FF7A99]">
-                미리보기 {landing.previewUnlockedCount}/{product.sections.length}
-              </span>
-            </div>
-            <p className="mt-1 text-xs leading-5 text-[#9A9098]">
-              일부는 무료로 열리고, 나머지는 잠금 아이콘으로 표시돼요.
-            </p>
-            <ol className="mt-4 space-y-2">
-              {product.sections.map((title, index) => {
-                const locked = index >= landing.previewUnlockedCount;
-                return (
+              <ul className="mt-3 space-y-2">
+                {landing.whoFor.map((item) => (
                   <li
-                    key={title}
-                    className={`flex items-center justify-between gap-3 rounded-[16px] border px-3.5 py-3 text-sm ${
-                      locked
-                        ? "border-white/8 bg-[#09090B] text-[#6E666C]"
-                        : "border-[#E8336D]/25 bg-[#E8336D]/10 text-[#F4F0F2]"
-                    }`}
+                    key={item}
+                    className="saju-card flex gap-2.5 rounded-[16px] px-3.5 py-3 text-sm leading-5 text-[#B8AEB4]"
                   >
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${
-                          locked ? "bg-white/5 text-[#9A9098]" : "bg-[#E8336D] text-white"
-                        }`}
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span className={locked ? "blur-[0.3px]" : "font-semibold"}>{title}</span>
+                    <span className="mt-0.5 text-[#FF7A99]" aria-hidden>
+                      ·
                     </span>
-                    {locked ? (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
-                        <LockIcon />
-                        잠금
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold tracking-wide text-[#FF7A99]">
-                        미리보기
-                      </span>
-                    )}
+                    <span>{item}</span>
                   </li>
-                );
-              })}
-            </ol>
+                ))}
+              </ul>
 
-            {landing.curiosity.length > 0 ? (
-              <div className="mt-5 saju-card rounded-[20px] px-4 py-4">
-                <div className="text-sm font-semibold text-[#F4F0F2]">이런 게 궁금하다면</div>
-                <ul className="mt-2 space-y-1.5 text-sm leading-6 text-[#B8AEB4]">
-                  {landing.curiosity.map((q) => (
-                    <li key={q}>· {q}</li>
-                  ))}
-                </ul>
+              <h2 className="mt-8 text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
+                이런 걸 받아요
+              </h2>
+              <p className="mt-1 text-xs text-[#9A9098]">
+                {defaultChar?.name ?? product.characterName} 기본 · 상담사 선택 가능 ·{" "}
+                {product.priceLabel}
+              </p>
+              <ul className="mt-3 space-y-2">
+                {landing.deliverables.map((item) => (
+                  <li
+                    key={item}
+                    className="saju-card-elevated rounded-[16px] px-3.5 py-3 text-sm leading-5 text-[#D8D0D4]"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* 3. Preview outline with locks */}
+            <section className="px-5">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">
+                  미리보기 구성
+                </h2>
+                <span className="rounded-full border border-[#E8336D]/40 bg-[#E8336D]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#FF7A99]">
+                  미리보기 {landing.previewUnlockedCount}/{product.sections.length}
+                </span>
               </div>
-            ) : null}
-          </section>
+              <p className="mt-1 text-xs leading-5 text-[#9A9098]">
+                일부는 무료로 열리고, 나머지는 잠금 아이콘으로 표시돼요.
+              </p>
+              <ol className="mt-4 space-y-2">
+                {product.sections.map((title, index) => {
+                  const locked = index >= landing.previewUnlockedCount;
+                  return (
+                    <li
+                      key={title}
+                      className={`flex items-center justify-between gap-3 rounded-[16px] border px-3.5 py-3 text-sm ${
+                        locked
+                          ? "border-white/8 bg-[#09090B] text-[#6E666C]"
+                          : "border-[#E8336D]/25 bg-[#E8336D]/10 text-[#F4F0F2]"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span
+                          className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${
+                            locked ? "bg-white/5 text-[#9A9098]" : "bg-[#E8336D] text-white"
+                          }`}
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className={locked ? "blur-[0.3px]" : "font-semibold"}>{title}</span>
+                      </span>
+                      {locked ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
+                          <LockIcon />
+                          잠금
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold tracking-wide text-[#FF7A99]">
+                          미리보기
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
 
-          {/* 4. Reviews */}
-          <section className="px-5">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">후기</h2>
-              <span className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#FF7A99]">
-                후기
-              </span>
-            </div>
-            <p className="mb-4 text-xs leading-5 text-[#9A9098]">
-              입니다.
-            </p>
-            <div className="space-y-3">
-              {reviewList.map((r) => (
-                <DemoReviewCard key={r.id} review={r} />
-              ))}
-            </div>
-          </section>
+              {landing.curiosity.length > 0 ? (
+                <div className="mt-5 saju-card rounded-[20px] px-4 py-4">
+                  <div className="text-sm font-semibold text-[#F4F0F2]">이런 게 궁금하다면</div>
+                  <ul className="mt-2 space-y-1.5 text-sm leading-6 text-[#B8AEB4]">
+                    {landing.curiosity.map((q) => (
+                      <li key={q}>· {q}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
 
-          {/* 6. FAQ / disclaimer */}
-          <section className="px-5">
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">자주 묻는 말</h2>
-              <Link
-                href="/saju/faq"
-                className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
-              >
-                전체 FAQ →
-              </Link>
-            </div>
-            <div className="mt-3 space-y-2">
-              {landing.faq.map((item) => (
-                <details
-                  key={item.q}
-                  className="saju-card group rounded-[16px] px-3.5 py-3 open:pb-3.5"
+            {/* 4. Reviews */}
+            <section className="px-5">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">후기</h2>
+                <span className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#FF7A99]">
+                  후기
+                </span>
+              </div>
+              <p className="mb-4 text-xs leading-5 text-[#9A9098]">입니다.</p>
+              <div className="space-y-3">
+                {reviewList.map((r) => (
+                  <DemoReviewCard key={r.id} review={r} />
+                ))}
+              </div>
+            </section>
+
+            {/* 6. FAQ / disclaimer */}
+            <section className="px-5">
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">자주 묻는 말</h2>
+                <Link
+                  href="/saju/faq"
+                  className="text-[11px] font-semibold text-[#FF7A99] underline-offset-2 hover:underline"
                 >
-                  <summary className="cursor-pointer list-none text-sm font-semibold text-[#F4F0F2] [&::-webkit-details-marker]:hidden">
-                    <span className="flex items-center justify-between gap-2">
-                      {item.q}
-                      <span className="text-[#9A9098] transition group-open:rotate-45">+</span>
-                    </span>
-                  </summary>
-                  <p className="mt-2 text-sm leading-6 text-[#B8AEB4]">{item.a}</p>
-                </details>
-              ))}
-            </div>
-            <div className="mt-5">
-              <SajuBusinessFooter />
-            </div>
-          </section>
+                  전체 FAQ →
+                </Link>
+              </div>
+              <div className="mt-3 space-y-2">
+                {landing.faq.map((item) => (
+                  <details
+                    key={item.q}
+                    className="saju-card group rounded-[16px] px-3.5 py-3 open:pb-3.5"
+                  >
+                    <summary className="cursor-pointer list-none text-sm font-semibold text-[#F4F0F2] [&::-webkit-details-marker]:hidden">
+                      <span className="flex items-center justify-between gap-2">
+                        {item.q}
+                        <span className="text-[#9A9098] transition group-open:rotate-45">+</span>
+                      </span>
+                    </summary>
+                    <p className="mt-2 text-sm leading-6 text-[#B8AEB4]">{item.a}</p>
+                  </details>
+                ))}
+              </div>
+              <div className="mt-5">
+                <SajuBusinessFooter />
+              </div>
+            </section>
 
-          {/* 7. Back to hub */}
-          <section className="px-5">
-            <Link
-              href="/saju"
-              className="flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#FF7A99] transition hover:bg-white/8"
-            >
-              다른 사주 보러 가기 →
-            </Link>
-          </section>
+            {/* 7. Back to hub */}
+            <section className="px-5">
+              <Link
+                href="/saju"
+                className="flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#FF7A99] transition hover:bg-white/8"
+              >
+                다른 사주 보러 가기 →
+              </Link>
+            </section>
+          </LandingCounselorChrome>
         </main>
 
-        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
-          <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">{freeScopeLine}</p>
-          <Link
-            href={startHref}
-            className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
-          >
-            {landing.ctaLabel}
-          </Link>
-        </div>
         <SajuBottomNav />
       </div>
     </div>
