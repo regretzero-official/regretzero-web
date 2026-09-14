@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { existsSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 import { emptyBirthForm } from "../buildReport";
 import { FORM_STEPS } from "../form-steps";
 import {
+  SAJU_AMBIENT_PAD_MP3,
+  SAJU_AMBIENT_PAD_OGG,
+  SAJU_AMBIENT_PREF_KEY,
   SAJU_AMBIENT_SRC_MP3,
   SAJU_AMBIENT_SRC_OGG,
 } from "../hooks/use-theater-ambient";
@@ -37,9 +42,28 @@ describe("Foxbunny form step parity", () => {
 });
 
 describe("theater ambient audio assets", () => {
-  it("exposes small ambient loop paths under public/saju/audio", () => {
+  it("exposes shrine + soft pad loops under public/saju/audio", () => {
     expect(SAJU_AMBIENT_SRC_MP3).toBe("/saju/audio/ambient-shrine.mp3");
     expect(SAJU_AMBIENT_SRC_OGG).toBe("/saju/audio/ambient-shrine.ogg");
+    expect(SAJU_AMBIENT_PAD_MP3).toBe("/saju/audio/ambient-pad.mp3");
+    expect(SAJU_AMBIENT_PAD_OGG).toBe("/saju/audio/ambient-pad.ogg");
+    expect(SAJU_AMBIENT_PREF_KEY).toBe("saju-theater-ambient-on");
+  });
+
+  it("keeps ambient files small on disk", () => {
+    const root = join(process.cwd(), "public");
+    for (const rel of [
+      SAJU_AMBIENT_SRC_MP3,
+      SAJU_AMBIENT_SRC_OGG,
+      SAJU_AMBIENT_PAD_MP3,
+      SAJU_AMBIENT_PAD_OGG,
+    ]) {
+      const path = join(root, rel.replace(/^\//, ""));
+      expect(existsSync(path), path).toBe(true);
+      const size = statSync(path).size;
+      expect(size).toBeGreaterThan(8_000);
+      expect(size).toBeLessThan(250_000);
+    }
   });
 });
 

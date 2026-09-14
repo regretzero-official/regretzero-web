@@ -72,7 +72,14 @@ export function SajuEntryOverlay({
   const reducedMotion = usePrefersReducedMotion();
   const [selected, setSelected] = useState<string | null>(null);
   const [beat, setBeat] = useState<SajuEntryBeatId>("shrine");
-  const { soundOn, needsGesture, toggleSound, mute } = useTheaterAmbient(true);
+  const {
+    soundOn,
+    needsGesture,
+    showGestureOverlay,
+    toggleSound,
+    enableFromGesture,
+    mute,
+  } = useTheaterAmbient(true);
 
   const finish = useCallback(() => {
     mute();
@@ -118,11 +125,27 @@ export function SajuEntryOverlay({
           <div className="pointer-events-none absolute inset-0 saju-shrine-veil" aria-hidden />
         ) : null}
 
-        <div className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-10">
+        {showGestureOverlay ? (
+          <button
+            type="button"
+            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-black/45 px-6 text-center backdrop-blur-[2px] transition active:bg-black/55"
+            onClick={() => void enableFromGesture()}
+            aria-label="사운드를 들으려면 화면을 터치하세요"
+          >
+            <span className="rounded-full border border-white/20 bg-black/55 px-4 py-2 text-[13px] font-semibold text-white/90 shadow-lg">
+              🔊 화면을 터치하면 소리가 켜져요
+            </span>
+            <span className="max-w-[260px] text-[11px] font-medium leading-snug text-white/60">
+              사당 앰비언트 · 언제든 끌 수 있어요
+            </span>
+          </button>
+        ) : null}
+
+        <div className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-30">
           <BeatDots beat={beat} />
         </div>
 
-        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex flex-col items-end gap-1.5">
+        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-30 flex flex-col items-end gap-1.5">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -140,15 +163,15 @@ export function SajuEntryOverlay({
               {entry.skipLabel}
             </button>
           </div>
-          {!soundOn ? (
+          {!soundOn && !showGestureOverlay ? (
             <p className="max-w-[220px] rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-right text-[10px] font-semibold leading-snug text-white/65 backdrop-blur">
-              사운드를 들으려면 터치하세요
+              {needsGesture ? "사운드를 들으려면 터치하세요" : "소리가 꺼져 있어요"}
             </p>
           ) : null}
         </div>
 
         <div
-          className={`absolute inset-x-0 bottom-0 z-10 px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-10 ${
+          className={`absolute inset-x-0 bottom-0 z-30 px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-10 ${
             anim ? "saju-entry-panel-in" : "saju-entry-panel-ready"
           }`}
           key={beat}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { SAJU_CHARACTERS } from "@/features/saju-chat/characters";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
@@ -11,16 +11,16 @@ import { getProductCounselors } from "@/features/saju-report/products";
 import type { SajuBirthForm, SajuProduct } from "@/features/saju-report/types";
 
 import { CounselorSwitcher } from "./counselor-switcher";
-import { SAJU_BOTTOM_NAV_PAD } from "./saju-bottom-nav";
 
 const GENDER_CHOICES = ["여성", "남성", "기타"] as const;
 
 const BREAKUP_CHIPS = [
-  "서로 지쳐 멀어진 느낌",
-  "연락이 끊긴 채 끝났어요",
-  "싸움 끝에 헤어진 것 같아요",
+  "서로 마음이 식어 멀어진 느낌이에요",
+  "연락이 끊긴 채 끝이 났어요",
+  "큰 싸움 끝에 헤어진 것 같아요",
   "상대가 먼저 거리를 뒀어요",
   "아직 이유조차 모르겠어요",
+  "다시 이어지고 싶은데 말이 안 나와요",
 ] as const;
 
 const CONCERN_CHIPS = [
@@ -29,6 +29,7 @@ const CONCERN_CHIPS = [
   "재회가 가능한 타이밍일까?",
   "붙잡아야 할지, 놓아야 할지 모르겠어요",
   "상대 속마음이 궁금해요",
+  "내가 너무 늦어 버린 건 아닐까요?",
 ] as const;
 
 const CONCERN_MAX = 160;
@@ -51,6 +52,18 @@ function daysInMonth(year: number, month: number) {
 function freePreviewScopeLine(product: SajuProduct) {
   const total = getCanonicalSectionCount(product.id);
   return `무료 1장 · 나머지 잠금(${product.shortTitle} ${total}장)`;
+}
+
+/** Mask free typing into HH:MM when digits are entered. */
+function maskBirthTimeInput(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed === "모름") return trimmed;
+  // Allow plain Korean phrases (오후 2시 등) without forcing mask
+  if (/[가-힣]/.test(trimmed)) return raw.slice(0, 24);
+  const digits = trimmed.replace(/\D/g, "").slice(0, 4);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
 }
 
 function FormStepper({ step }: { step: FormStepId }) {
@@ -97,11 +110,24 @@ function FormStepper({ step }: { step: FormStepId }) {
   );
 }
 
+function StickyNextBar({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="sticky bottom-0 z-20 -mx-5 mt-6 border-t border-white/8 bg-[#08090d]/92 px-5 pt-3 backdrop-blur-md"
+      style={{
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function BirthTimeField({
   label,
   value,
   onChange,
-  placeholder = "예: 14:30 또는 오후 2시",
+  placeholder = "14:30",
 }: {
   label: string;
   value: string;
@@ -116,21 +142,26 @@ function BirthTimeField({
       <input
         className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm disabled:opacity-45"
         value={explicitlyUnknown ? "" : value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(maskBirthTimeInput(e.target.value))}
         placeholder={explicitlyUnknown ? "시간 모름" : placeholder}
         disabled={explicitlyUnknown}
-        inputMode="text"
+        inputMode="numeric"
+        autoComplete="off"
         aria-label={label}
       />
-      <label className="mt-2 flex cursor-pointer items-center gap-2 text-[12px] font-semibold text-[#B8AEB4]">
+      <label className="mt-2.5 flex min-h-11 cursor-pointer items-center gap-3 rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-[13px] font-semibold text-[#D8D0D4] transition hover:bg-white/[0.07]">
         <input
           type="checkbox"
-          className="h-4 w-4 rounded border-white/20 accent-[#E8336D]"
+          className="h-5 w-5 shrink-0 rounded border-white/20 accent-[#E8336D]"
           checked={explicitlyUnknown}
           onChange={(e) => onChange(e.target.checked ? "모름" : "")}
         />
-        <span>출생 시간 모름</span>
-        <span className="font-medium text-[#6E666C]">· 시주 없이 볼게요</span>
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span>출생 시간을 모르겠어요</span>
+          <span className="text-[11px] font-medium text-[#6E666C]">
+            체크하면 시주 없이 양력 날짜만으로 볼게요
+          </span>
+        </span>
       </label>
     </div>
   );
@@ -143,7 +174,7 @@ function BirthYmdSelects({
   onYear,
   onMonth,
   onDay,
-  yearPlaceholder = "연도",
+  yearPlaceholder = "년",
 }: {
   year: string;
   month: string;
@@ -163,8 +194,8 @@ function BirthYmdSelects({
 
   return (
     <div className="grid grid-cols-3 gap-2">
-      <label className="block">
-        <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">연도</span>
+      <label className="block min-w-0">
+        <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">년</span>
         <select
           className={selectClass}
           value={year}
@@ -178,12 +209,12 @@ function BirthYmdSelects({
           <option value="">{yearPlaceholder}</option>
           {BIRTH_YEARS.map((y) => (
             <option key={y} value={String(y)}>
-              {y}
+              {y}년
             </option>
           ))}
         </select>
       </label>
-      <label className="block">
+      <label className="block min-w-0">
         <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">월</span>
         <select
           className={selectClass}
@@ -198,12 +229,12 @@ function BirthYmdSelects({
           <option value="">월</option>
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
             <option key={m} value={String(m)}>
-              {m}
+              {m}월
             </option>
           ))}
         </select>
       </label>
-      <label className="block">
+      <label className="block min-w-0">
         <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">일</span>
         <select
           className={selectClass}
@@ -214,7 +245,7 @@ function BirthYmdSelects({
           <option value="">일</option>
           {Array.from({ length: maxDay }, (_, i) => i + 1).map((d) => (
             <option key={d} value={String(d)}>
-              {d}
+              {d}일
             </option>
           ))}
         </select>
@@ -225,27 +256,49 @@ function BirthYmdSelects({
 
 function SuggestionChips({
   chips,
+  value,
   onPick,
   label,
 }: {
   chips: readonly string[];
+  value: string;
   onPick: (text: string) => void;
   label: string;
 }) {
+  const isChipSelected = (chip: string) => value.trim() === chip;
+  const hasCustom =
+    value.trim().length > 0 && !chips.some((c) => c === value.trim());
+
   return (
     <div className="mt-2">
       <p className="mb-1.5 text-[10px] font-semibold tracking-wide text-[#6E666C]">{label}</p>
+      {hasCustom ? (
+        <p className="mb-1.5 text-[10px] leading-snug text-[#9A9098]">
+          직접 쓴 글이 있어요 · 칩을 누르면 그 문장으로 바뀌어요
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-1.5">
-        {chips.map((chip) => (
-          <button
-            key={chip}
-            type="button"
-            onClick={() => onPick(chip)}
-            className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1.5 text-left text-[11px] font-semibold leading-snug text-[#D8D0D4] transition hover:border-[#E8336D]/40 hover:bg-[#E8336D]/12 hover:text-[#FF7A99]"
-          >
-            {chip}
-          </button>
-        ))}
+        {chips.map((chip) => {
+          const active = isChipSelected(chip);
+          return (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => {
+                // One-tap fill: empty or matching chip → set; custom text → confirm replace via toggle-off then set
+                if (active) return;
+                onPick(chip);
+              }}
+              className={`rounded-full border px-2.5 py-1.5 text-left text-[11px] font-semibold leading-snug transition ${
+                active
+                  ? "border-transparent bg-[#E8336D] text-white shadow-[0_6px_18px_rgba(232,51,109,0.28)]"
+                  : "border-white/12 bg-white/5 text-[#D8D0D4] hover:border-[#E8336D]/40 hover:bg-[#E8336D]/12 hover:text-[#FF7A99]"
+              }`}
+            >
+              {chip}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -259,6 +312,27 @@ function parseMonthsApart(raw: string): number | null {
   if (!Number.isInteger(n)) return null;
   if (n < MONTHS_MIN || n > MONTHS_MAX) return null;
   return n;
+}
+
+function monthsError(raw: string): string | null {
+  const t = raw.trim();
+  if (!t) return null;
+  if (!/^\d+$/.test(t)) return "숫자만 적어 주세요";
+  const n = Number(t);
+  if (n < MONTHS_MIN || n > MONTHS_MAX) {
+    return `${MONTHS_MIN}~${MONTHS_MAX}개월 사이로 적어 주세요`;
+  }
+  return null;
+}
+
+function formatSolarYmd(y: string, m: string, d: string) {
+  if (!y && !m && !d) return "미입력";
+  return `${y || "????"}년 ${m || "?"}월 ${d || "?"}일`;
+}
+
+function formatTimeLabel(t: string) {
+  if (t === "모름" || !t.trim()) return "시간 모름";
+  return t;
 }
 
 export function SajuBirthFormView({
@@ -300,9 +374,16 @@ export function SajuBirthFormView({
   }, [form.birthYear, form.birthMonth, form.birthDay]);
 
   const monthsParsed = parseMonthsApart(form.monthsApart);
+  const monthsErr = monthsError(form.monthsApart);
   const situationOk = useMemo(() => {
     return monthsParsed !== null && form.concern.trim().length > 0;
   }, [monthsParsed, form.concern]);
+
+  const nudgeMonths = (delta: number) => {
+    const cur = monthsParsed ?? 0;
+    const next = Math.min(MONTHS_MAX, Math.max(MONTHS_MIN, cur + delta));
+    patch({ monthsApart: String(next) });
+  };
 
   const goNext = () => {
     if (step === "gender") setStep("basic");
@@ -323,7 +404,7 @@ export function SajuBirthFormView({
     step === "gender" ? "상품으로" : step === "basic" ? "이전 · 성별" : "이전";
 
   return (
-    <div className={SAJU_BOTTOM_NAV_PAD}>
+    <div className="pb-4">
       <div className="saju-header sticky top-12 z-30 border-b border-white/5 px-5 pb-3 pt-3">
         <button
           type="button"
@@ -377,7 +458,7 @@ export function SajuBirthFormView({
         ) : null}
       </div>
 
-      <div className="mt-5 space-y-4 px-5 pb-8">
+      <div className="mt-5 space-y-4 px-5 pb-4">
         {step === "gender" ? (
           <>
             <div className="pt-2">
@@ -388,13 +469,13 @@ export function SajuBirthFormView({
                 성별에 따라 대운의 시기가 달라져요
               </p>
             </div>
-            <div className="flex flex-col gap-2.5 pt-2">
+            <div className="flex flex-col gap-3 pt-2">
               {GENDER_CHOICES.map((g) => (
                 <button
                   key={g}
                   type="button"
                   onClick={() => patch({ gender: g })}
-                  className={`min-h-14 rounded-[16px] text-base font-semibold transition ${
+                  className={`min-h-[56px] rounded-[18px] text-[1.05rem] font-semibold transition active:scale-[0.99] ${
                     form.gender === g
                       ? "bg-[#E8336D] text-white shadow-[0_10px_28px_rgba(232,51,109,0.35)]"
                       : "border border-white/10 bg-white/5 text-[#D8D0D4] hover:bg-white/8"
@@ -404,17 +485,23 @@ export function SajuBirthFormView({
                 </button>
               ))}
             </div>
-            <p className="text-center text-[11px] text-[#6E666C]">
-              선택하기 전에는 다음으로 갈 수 없어요
-            </p>
-            <button
-              type="button"
-              disabled={!genderOk}
-              onClick={goNext}
-              className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-40"
-            >
-              다음 · 기본정보
-            </button>
+            <StickyNextBar>
+              {!genderOk ? (
+                <p className="mb-2 text-center text-[12px] font-semibold text-[#FF7A99]/90">
+                  성별을 선택해야 다음으로 갈 수 있어요
+                </p>
+              ) : (
+                <p className="mb-2 text-center text-[11px] text-[#6E666C]">선택됨 · 다음으로 가도 돼요</p>
+              )}
+              <button
+                type="button"
+                disabled={!genderOk}
+                onClick={goNext}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                다음 · 기본정보
+              </button>
+            </StickyNextBar>
           </>
         ) : null}
 
@@ -433,7 +520,7 @@ export function SajuBirthFormView({
             <div>
               <p className="mb-1 text-xs font-semibold text-[#9A9098]">내 출생 · 양력</p>
               <p className="mb-2 text-[11px] leading-5 text-[#6E666C]">
-                지금은 양력 기준으로 봐요
+                지금은 양력 기준으로 봐요 · 최근 연도가 위에 있어요
               </p>
               <BirthYmdSelects
                 year={form.birthYear}
@@ -462,20 +549,34 @@ export function SajuBirthFormView({
               </label>
             </div>
 
-            <button
-              type="button"
-              disabled={!basicOk}
-              onClick={goNext}
-              className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-40"
-            >
-              다음 · 상대 정보
-            </button>
+            <StickyNextBar>
+              {!basicOk ? (
+                <p className="mb-2 text-center text-[12px] font-semibold text-[#FF7A99]/90">
+                  양력 생년월일을 모두 골라 주세요
+                </p>
+              ) : null}
+              <button
+                type="button"
+                disabled={!basicOk}
+                onClick={goNext}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                다음 · 상대 정보
+              </button>
+            </StickyNextBar>
           </>
         ) : null}
 
         {step === "partner" ? (
           <>
-            <p className="text-xs font-semibold text-[#9A9098]">상대 출생 · 아는 만큼만</p>
+            <div className="pt-1">
+              <h2 className="text-[1.15rem] font-bold tracking-[-0.03em] text-[#F8F4F6]">
+                상대를 알려 주세요
+              </h2>
+              <p className="mt-1.5 text-sm leading-6 text-[#9A9098]">
+                아는 만큼만 적어도 돼요. 이름은 비워 둬도 괜찮아요.
+              </p>
+            </div>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 이름</span>
               <input
@@ -484,10 +585,15 @@ export function SajuBirthFormView({
                 onChange={(e) => patch({ partnerName: e.target.value })}
                 placeholder="민재"
               />
+              {!form.partnerName.trim() ? (
+                <p className="mt-1.5 text-[11px] text-[#6E666C]">
+                  비워 두면 점사에서 「상대」로 불러요
+                </p>
+              ) : null}
             </label>
             <div>
               <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">상대 성별</span>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2.5 sm:flex-row">
                 {GENDER_CHOICES.map((g) => (
                   <button
                     key={g}
@@ -495,9 +601,9 @@ export function SajuBirthFormView({
                     onClick={() =>
                       patch({ partnerGender: form.partnerGender === g ? "" : g })
                     }
-                    className={`min-h-10 flex-1 rounded-full text-xs font-semibold transition ${
+                    className={`min-h-12 flex-1 rounded-[16px] text-sm font-semibold transition ${
                       form.partnerGender === g
-                        ? "bg-[#E8336D] text-white"
+                        ? "bg-[#E8336D] text-white shadow-[0_8px_22px_rgba(232,51,109,0.3)]"
                         : "border border-white/10 bg-white/5 text-[#B8AEB4]"
                     }`}
                   >
@@ -507,7 +613,8 @@ export function SajuBirthFormView({
               </div>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold text-[#9A9098]">상대 출생 · 양력</p>
+              <p className="mb-1 text-xs font-semibold text-[#9A9098]">상대 출생 · 양력</p>
+              <p className="mb-2 text-[11px] leading-5 text-[#6E666C]">선택 · 몰라도 다음으로 갈 수 있어요</p>
               <BirthYmdSelects
                 year={form.partnerBirthYear}
                 month={form.partnerBirthMonth}
@@ -515,48 +622,75 @@ export function SajuBirthFormView({
                 onYear={(partnerBirthYear) => patch({ partnerBirthYear })}
                 onMonth={(partnerBirthMonth) => patch({ partnerBirthMonth })}
                 onDay={(partnerBirthDay) => patch({ partnerBirthDay })}
-                yearPlaceholder="연도(선택)"
+                yearPlaceholder="년(선택)"
               />
             </div>
             <BirthTimeField
               label="상대 출생 시간"
               value={form.partnerBirthTime}
               onChange={(partnerBirthTime) => patch({ partnerBirthTime })}
-              placeholder="예: 15:00 또는 모름"
+              placeholder="15:00"
             />
-            <button
-              type="button"
-              onClick={goNext}
-              className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
-            >
-              다음 · 상황
-            </button>
+            <StickyNextBar>
+              <button
+                type="button"
+                onClick={goNext}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold"
+              >
+                다음 · 상황
+              </button>
+            </StickyNextBar>
           </>
         ) : null}
 
         {step === "situation" ? (
           <>
-            <label className="block">
+            <div>
               <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">
                 헤어진 지 (개월)
               </span>
-              <input
-                className="saju-input min-h-12 w-full rounded-[14px] px-4 text-sm"
-                inputMode="numeric"
-                value={form.monthsApart}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/[^\d]/g, "");
-                  patch({ monthsApart: raw });
-                }}
-                placeholder="직접 입력 · 0~120"
-                required
-              />
-              <p className="mt-1.5 text-[11px] text-[#6E666C]">
-                {monthsParsed === null && form.monthsApart.trim()
-                  ? `${MONTHS_MIN}~${MONTHS_MAX} 사이 숫자로 적어 주세요`
-                  : "비워 두지 말고, 대략이라도 적어 주세요 (기본값 없음)"}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="한 달 줄이기"
+                  onClick={() => nudgeMonths(-1)}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-white/12 bg-white/5 text-lg font-bold text-[#D8D0D4] transition hover:bg-white/10"
+                >
+                  −
+                </button>
+                <input
+                  className="saju-input min-h-12 w-full rounded-[14px] px-4 text-center text-sm tabular-nums"
+                  inputMode="numeric"
+                  value={form.monthsApart}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^\d]/g, "");
+                    patch({ monthsApart: raw });
+                  }}
+                  placeholder="직접 입력 · 0~120"
+                  required
+                  aria-invalid={Boolean(monthsErr)}
+                />
+                <button
+                  type="button"
+                  aria-label="한 달 늘리기"
+                  onClick={() => nudgeMonths(1)}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-white/12 bg-white/5 text-lg font-bold text-[#D8D0D4] transition hover:bg-white/10"
+                >
+                  +
+                </button>
+              </div>
+              <p
+                className={`mt-1.5 text-[11px] ${
+                  monthsErr ? "font-semibold text-[#FF7A99]" : "text-[#6E666C]"
+                }`}
+              >
+                {monthsErr
+                  ? monthsErr
+                  : form.monthsApart.trim()
+                    ? `약 ${monthsParsed}개월 · ${MONTHS_MIN}~${MONTHS_MAX} 가능`
+                    : "비워 두지 말고, 대략이라도 적어 주세요 (기본값 없음)"}
               </p>
-            </label>
+            </div>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">이별 상황</span>
               <input
@@ -568,7 +702,8 @@ export function SajuBirthFormView({
               />
               <SuggestionChips
                 chips={BREAKUP_CHIPS}
-                label="탭해서 채우기"
+                value={form.breakupNote}
+                label="감정 칩 · 한 번 탭하면 채워져요"
                 onPick={(text) => patch({ breakupNote: text.slice(0, BREAKUP_MAX) })}
               />
               <p className="mt-1 text-right text-[10px] text-[#6E666C]">
@@ -589,80 +724,151 @@ export function SajuBirthFormView({
               />
               <SuggestionChips
                 chips={CONCERN_CHIPS}
-                label="감정 프롬프트 · 탭해서 채우기"
+                value={form.concern}
+                label="마음 프롬프트 · 탭해서 채우기"
                 onPick={(text) => patch({ concern: text.slice(0, CONCERN_MAX) })}
               />
               <p className="mt-1 text-right text-[10px] text-[#6E666C]">
                 {form.concern.length}/{CONCERN_MAX}
               </p>
             </label>
-            <button
-              type="button"
-              disabled={!situationOk}
-              onClick={goNext}
-              className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-40"
-            >
-              다음 · 확인
-            </button>
+            <StickyNextBar>
+              {!situationOk ? (
+                <p className="mb-2 text-center text-[12px] font-semibold text-[#FF7A99]/90">
+                  {!form.monthsApart.trim() || monthsErr
+                    ? "헤어진 개월 수를 0~120으로 적어 주세요"
+                    : "궁금한 것을 적어 주세요"}
+                </p>
+              ) : null}
+              <button
+                type="button"
+                disabled={!situationOk}
+                onClick={goNext}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                다음 · 확인
+              </button>
+            </StickyNextBar>
           </>
         ) : null}
 
         {step === "confirm" ? (
           <>
-            <div className="saju-card-elevated space-y-3 rounded-[20px] px-4 py-4 text-sm leading-6 text-[#D8D0D4]">
-              <div className="text-xs font-bold tracking-[0.08em] text-[#FF7A99]">입력 확인</div>
-              <p>
-                <span className="text-[#9A9098]">나 · </span>
-                {form.displayName || "호칭 미입력"} · {form.gender || "성별 미선택"} · 양력{" "}
-                {form.birthYear || "????"}.{form.birthMonth || "?"}.{form.birthDay || "?"} ·{" "}
-                {form.birthTime === "모름" || !form.birthTime.trim()
-                  ? "시간 모름"
-                  : form.birthTime}
-                {form.birthPlace ? ` · ${form.birthPlace}` : ""}
-              </p>
-              <p>
-                <span className="text-[#9A9098]">상대 · </span>
-                {form.partnerName || "이름 미입력"}
-                {form.partnerGender ? ` · ${form.partnerGender}` : ""}
-                {form.partnerBirthYear
-                  ? ` · ${form.partnerBirthYear}.${form.partnerBirthMonth || "?"}.${form.partnerBirthDay || "?"}`
-                  : " · 생일 일부 미입력"}
-                {form.partnerBirthTime === "모름"
-                  ? " · 시간 모름"
-                  : form.partnerBirthTime
-                    ? ` · ${form.partnerBirthTime}`
-                    : ""}
-              </p>
-              <p>
-                <span className="text-[#9A9098]">상황 · </span>
-                헤어진 지 {form.monthsApart || "?"}개월
-                {form.breakupNote ? ` · ${form.breakupNote}` : ""}
-              </p>
-              <p className="text-[#F4F0F2]">
-                <span className="text-[#9A9098]">궁금한 것 · </span>
-                {form.concern || "—"}
-              </p>
+            <div className="space-y-3">
+              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">나</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#B8AEB4]">
+                    양력
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-[#F4F0F2]">
+                  {form.displayName || "호칭 미입력"} · {form.gender || "성별 미선택"}
+                </p>
+                <p className="mt-1.5 text-[13px] leading-6 text-[#D8D0D4]">
+                  {formatSolarYmd(form.birthYear, form.birthMonth, form.birthDay)}
+                  <span className="mx-1.5 text-[#6E666C]">·</span>
+                  <span
+                    className={
+                      form.birthTime === "모름" || !form.birthTime.trim()
+                        ? "font-semibold text-[#FF7A99]/85"
+                        : undefined
+                    }
+                  >
+                    {formatTimeLabel(form.birthTime)}
+                  </span>
+                  {form.birthPlace ? (
+                    <>
+                      <span className="mx-1.5 text-[#6E666C]">·</span>
+                      {form.birthPlace}
+                    </>
+                  ) : null}
+                </p>
+              </div>
+
+              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">상대</span>
+                  {form.partnerBirthYear ? (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#B8AEB4]">
+                      양력
+                    </span>
+                  ) : (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#6E666C]">
+                      생일 일부 미입력
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-[#F4F0F2]">
+                  {form.partnerName || "이름 미입력 (상대)"}
+                  {form.partnerGender ? ` · ${form.partnerGender}` : ""}
+                </p>
+                <p className="mt-1.5 text-[13px] leading-6 text-[#D8D0D4]">
+                  {form.partnerBirthYear
+                    ? formatSolarYmd(
+                        form.partnerBirthYear,
+                        form.partnerBirthMonth,
+                        form.partnerBirthDay,
+                      )
+                    : "생일 미입력"}
+                  {form.partnerBirthTime === "모름" || form.partnerBirthTime.trim() ? (
+                    <>
+                      <span className="mx-1.5 text-[#6E666C]">·</span>
+                      <span
+                        className={
+                          form.partnerBirthTime === "모름"
+                            ? "font-semibold text-[#FF7A99]/85"
+                            : undefined
+                        }
+                      >
+                        {formatTimeLabel(form.partnerBirthTime)}
+                      </span>
+                    </>
+                  ) : null}
+                </p>
+              </div>
+
+              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
+                <div className="mb-2 text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">상황</div>
+                <p className="text-[13px] leading-6 text-[#D8D0D4]">
+                  헤어진 지{" "}
+                  <span className="font-semibold text-[#F4F0F2]">
+                    {form.monthsApart || "?"}개월
+                  </span>
+                  {form.breakupNote ? (
+                    <>
+                      <span className="mx-1.5 text-[#6E666C]">·</span>
+                      {form.breakupNote}
+                    </>
+                  ) : null}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#F4F0F2]">
+                  <span className="text-[#9A9098]">궁금한 것 · </span>
+                  {form.concern || "—"}
+                </p>
+              </div>
             </div>
             <p className="text-center text-[11px] leading-5 text-[#9A9098]">{scopeLine}</p>
-            <button
-              type="button"
-              disabled={loading || !genderOk || !basicOk || !situationOk}
-              onClick={onSubmit}
-              className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
-            >
-              {loading ? "점사 준비 중…" : "무료 미리보기 보기"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep("gender")}
-              className="flex min-h-11 w-full items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#B8AEB4]"
-            >
-              처음부터 수정
-            </button>
+            <StickyNextBar>
+              <button
+                type="button"
+                disabled={loading || !genderOk || !basicOk || !situationOk}
+                onClick={onSubmit}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
+              >
+                {loading ? "점사 준비 중…" : "무료 미리보기 보기"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep("gender")}
+                className="mt-2 flex min-h-11 w-full items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#B8AEB4]"
+              >
+                처음부터 수정
+              </button>
+            </StickyNextBar>
           </>
         ) : null}
       </div>
     </div>
   );
 }
-
