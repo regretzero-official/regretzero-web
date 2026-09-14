@@ -87,3 +87,30 @@ describe("sticky honesty", () => {
     }
   });
 });
+
+describe("form polish source contracts", () => {
+  it("wires aria-describedby reasons and soft optional copy", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const src = readFileSync(
+      join(process.cwd(), "features/saju-report/components/saju-birth-form.tsx"),
+      "utf8",
+    );
+    expect(src).toContain("aria-describedby");
+    expect(src).toContain("비워도 돼요");
+    expect(src).toContain('setStep("gender")');
+    expect(src).toContain('setStep("basic")');
+    expect(src).toContain('setStep("partner")');
+    expect(src).toContain('setStep("situation")');
+    expect(src).toContain("ConfirmEditButton");
+    expect(src).toContain("bottom-[calc(env(safe-area-inset-bottom)+64px)]");
+    expect(src).toContain("pb-[calc(env(safe-area-inset-bottom)+168px)]");
+    // do not regress ambient sound hooks in theater
+    const ambient = readFileSync(
+      join(process.cwd(), "features/saju-report/hooks/use-theater-ambient.ts"),
+      "utf8",
+    );
+    expect(ambient).toContain("SAJU_AMBIENT_SRC_MP3");
+    expect(ambient).toContain("SAJU_AMBIENT_PAD_MP3");
+  });
+});
