@@ -15,6 +15,8 @@ export type SajuProductLanding = {
   curiosity: string[];
   faq: { q: string; a: string }[];
   ctaLabel: string;
+  /** Sticky bar microcopy — honest, no fake participation counts */
+  stickyHint: string;
   reviewTag: string;
 };
 
@@ -58,7 +60,8 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
         a: "원치 않는 연락·스토킹은 권하지 않아요. 타이밍과 조심할 말도 함께 적어드려요.",
       },
     ],
-    ctaLabel: "무료로 시작하기",
+    ctaLabel: "재회 기운 무료로 확인하기",
+    stickyHint: "지금 미리보기 가능 · 데모 결제",
     reviewTag: "재회운",
   },
   {
@@ -100,7 +103,8 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
         a: "지금은 실제 청구 없이 전체 결과를 열어볼 수 있어요.",
       },
     ],
-    ctaLabel: "무료로 시작하기",
+    ctaLabel: "상대 속마음 무료로 확인하기",
+    stickyHint: "지금 미리보기 가능 · 데모 결제",
     reviewTag: "속마음",
   },
   {
@@ -142,7 +146,8 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
         a: "네. 입력 후 일부 섹션을 먼저 보여드리고, 나머지는 잠금으로 표시돼요.",
       },
     ],
-    ctaLabel: "무료로 시작하기",
+    ctaLabel: "이별 결정 무료로 짚어보기",
+    stickyHint: "지금 미리보기 가능 · 데모 결제",
     reviewTag: "이별 결정",
   },
   {
@@ -184,7 +189,8 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
         a: "재회 ‘가능성과 기운’보다, 지금 당장 어떻게 움직일지에 더 가깝게 써드려요.",
       },
     ],
-    ctaLabel: "무료로 시작하기",
+    ctaLabel: "지금 해도 되는지 무료로 보기",
+    stickyHint: "지금 미리보기 가능 · 데모 결제",
     reviewTag: "행동 전략",
   },
 ];

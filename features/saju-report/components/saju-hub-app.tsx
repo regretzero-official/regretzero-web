@@ -15,10 +15,13 @@ import {
   hubDeepLink,
 } from "@/features/saju-report/product-landings";
 import {
+  HUB_SHELVES,
+  productsForShelf,
+} from "@/features/saju-report/hub-shelves";
+import {
   CHARACTER_PRIMARY_PRODUCT,
   SAJU_PRODUCTS,
   SAJU_REPORT_PRICE,
-  getProductCounselors,
   getSajuProduct,
   resolveProductCounselor,
 } from "@/features/saju-report/products";
@@ -39,6 +42,7 @@ import { ReportMarkdown } from "./report-markdown";
 import { SajuBirthFormView } from "./saju-birth-form";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
 import { SajuLoadingTheater } from "./saju-loading-theater";
+import { SajuUnlockCelebration } from "./saju-unlock-celebration";
 import {
   DemoReviewCard,
   LockIcon,
@@ -48,14 +52,22 @@ import {
   SajuTrustStrip,
 } from "./saju-trust";
 
-function ProductCard({ product }: { product: SajuProduct }) {
+function ProductCard({
+  product,
+  compact = false,
+}: {
+  product: SajuProduct;
+  compact?: boolean;
+}) {
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
   const landing = getLandingByProductId(product.id);
   const href = landing?.path ?? `/saju?product=${product.id}`;
   return (
     <Link
       href={href}
-      className="saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985]"
+      className={`saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985] ${
+        compact ? "w-[72%] min-w-[210px] max-w-[260px] shrink-0 snap-center" : ""
+      }`}
       style={{ boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 28px ${product.accent}18` }}
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden">
@@ -68,30 +80,83 @@ function ProductCard({ product }: { product: SajuProduct }) {
             src={character.portraitSrc}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
         <span
           className="absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white"
           style={{ background: product.accent }}
         >
           {product.badge}
         </span>
-        <div className="absolute inset-x-0 bottom-0 p-3">
-          <div className="text-[0.95rem] font-bold leading-tight tracking-[-0.03em] text-[#F8F4F6]">
-            {product.title}
+        <div className="absolute inset-x-0 bottom-0 space-y-2 p-3">
+          <div>
+            <div className="text-[0.95rem] font-bold leading-tight tracking-[-0.03em] text-[#F8F4F6]">
+              {product.shortTitle}
+            </div>
+            <div className="mt-0.5 text-[11px] text-white/70">
+              {product.characterName}
+              {product.counselorIds.length > 1 ? " +" : ""}
+            </div>
           </div>
-          <div className="mt-0.5 text-[11px] text-white/70">
-            {product.characterName}
-            {product.counselorIds.length > 1 ? " +" : ""}
-          </div>
+          <span className="saju-cta inline-flex min-h-9 w-full items-center justify-center rounded-full px-3 text-xs font-semibold">
+            무료로 시작하기
+          </span>
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <p className="line-clamp-2 text-[11px] leading-4 text-[#B8AEB4]">{product.painPoint}</p>
-        <span className="saju-cta mt-auto inline-flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-semibold">
-          자세히 보기
-        </span>
-      </div>
     </Link>
+  );
+}
+
+function ProductShelf({
+  title,
+  subtitle,
+  products,
+}: {
+  title: string;
+  subtitle: string;
+  products: SajuProduct[];
+}) {
+  const [active, setActive] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  const onScroll = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el || products.length === 0) return;
+    const card = el.querySelector<HTMLElement>("[data-shelf-card]");
+    const cardW = card?.offsetWidth ?? 220;
+    const idx = Math.round(el.scrollLeft / Math.max(cardW * 0.85, 1));
+    setActive(Math.max(0, Math.min(products.length - 1, idx)));
+  }, [products.length]);
+
+  return (
+    <section className="px-5">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">{title}</h2>
+          <p className="mt-1 text-xs text-[#9A9098]">{subtitle}</p>
+        </div>
+        <div className="flex items-center gap-1.5 pb-0.5" aria-hidden>
+          {products.map((p, i) => (
+            <span
+              key={p.id}
+              className={`h-1.5 rounded-full transition-all ${
+                i === active ? "w-4 bg-[#FF7A99]" : "w-1.5 bg-white/25"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+      <div
+        ref={scrollerRef}
+        onScroll={onScroll}
+        className="saju-scroll-x flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1"
+      >
+        {products.map((product) => (
+          <div key={product.id} data-shelf-card>
+            <ProductCard product={product} compact />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -217,11 +282,22 @@ function HubLanding({
 
       <SajuCredibilitySection />
 
-      <section id="products" className="scroll-mt-20 px-5">
+      <div id="products" className="scroll-mt-20 space-y-8">
+        {HUB_SHELVES.map((shelf) => (
+          <ProductShelf
+            key={shelf.id}
+            title={shelf.title}
+            subtitle={shelf.subtitle}
+            products={productsForShelf(shelf)}
+          />
+        ))}
+      </div>
+
+      <section className="px-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">어떤 사주가 필요하세요?</h2>
-            <p className="mt-1 text-xs text-[#9A9098]">지금 마음에 가장 가까운 걸 골라보세요</p>
+            <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">전체 사주</h2>
+            <p className="mt-1 text-xs text-[#9A9098]">탭·검색으로 빠르게 찾기</p>
           </div>
           <span className="saju-pill rounded-full px-2.5 py-1 text-[10px] font-semibold">
             ₩9,900
@@ -467,7 +543,7 @@ function PreviewView({
 
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
         <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">
-          무료 1장 · 나머지 {Math.max(0, total - 1)}장 잠금 · 데모 결제
+          지금 미리보기 가능 · 무료 1장 · 나머지 잠금 · 데모 결제
         </p>
         <button
           type="button"
@@ -579,6 +655,48 @@ function ReportView({
           </article>
         ))}
       </div>
+
+      <section className="mt-8 space-y-3 px-5 pb-4" aria-label="다음에 할 일">
+        <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">다음에 할 일</h2>
+        <p className="text-xs leading-5 text-[#9A9098]">
+          리포트는 내 사주함에 저장돼 있어요. 다른 점사도 이어서 볼 수 있어요.
+        </p>
+        <Link
+          href="/saju/my"
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
+        >
+          내 사주함 열기
+        </Link>
+        <button
+          type="button"
+          onClick={onBackHub}
+          className="flex min-h-11 w-full items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#FF7A99] transition hover:bg-white/8"
+        >
+          사주 허브로 돌아가기
+        </button>
+        <div className="pt-2">
+          <div className="mb-2 text-xs font-bold tracking-[0.04em] text-[#FF7A99]">다른 상품</div>
+          <div className="saju-scroll-x flex gap-3 overflow-x-auto pb-1">
+            {SAJU_PRODUCTS.filter((p) => p.id !== report.productId).map((p) => {
+              const landing = getLandingByProductId(p.id);
+              const href = landing?.path ?? `/saju?product=${p.id}`;
+              return (
+                <Link
+                  key={p.id}
+                  href={href}
+                  className="saju-card flex min-w-[150px] max-w-[170px] shrink-0 flex-col rounded-[16px] px-3 py-3 transition active:scale-[0.98]"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9A9098]">
+                    {p.badge}
+                  </span>
+                  <span className="mt-1 text-sm font-bold text-[#F4F0F2]">{p.shortTitle}</span>
+                  <span className="mt-2 text-[11px] font-semibold text-[#FF7A99]">무료로 시작하기 →</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -604,6 +722,7 @@ export function SajuHubApp({
   const pendingPreviewRef = useRef<SajuReportPayload | null>(null);
   const [unlocking, setUnlocking] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [showUnlockCelebration, setShowUnlockCelebration] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const product = useMemo(
@@ -708,14 +827,21 @@ export function SajuHubApp({
       saveSajuReading(full);
       setReport(full);
       setCheckoutOpen(false);
-      setStep("report");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setShowUnlockCelebration(true);
     } catch {
       setError("리포트 생성에 실패했어요. 다시 시도해 주세요.");
     } finally {
       setUnlocking(false);
     }
   }, [fetchReport, productId]);
+
+  const finishUnlockCelebration = useCallback(() => {
+    setShowUnlockCelebration(false);
+    setStep("report");
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, []);
 
   return (
     <div className="saju-shell">
@@ -785,6 +911,13 @@ export function SajuHubApp({
             accent={product?.accent}
             ready={loadingReady}
             onComplete={finishLoadingTheater}
+          />
+        ) : null}
+        {showUnlockCelebration && report ? (
+          <SajuUnlockCelebration
+            accent={product?.accent}
+            sectionTitles={report.sections.map((s) => s.title)}
+            onComplete={finishUnlockCelebration}
           />
         ) : null}
       </div>

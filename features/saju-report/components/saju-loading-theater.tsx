@@ -11,6 +11,7 @@ import {
   LOADING_STAGE_MS,
   SAJU_LOADING_STAGES,
 } from "@/features/saju-report/loading-theater";
+import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
 
 type SajuLoadingTheaterProps = {
   characterId: SajuCharacterId;
@@ -34,7 +35,14 @@ export function SajuLoadingTheater({
   const [stageIndex, setStageIndex] = useState(0);
   const [skipped, setSkipped] = useState(false);
   const [hintSkip, setHintSkip] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
+  const theaterActive = !skipped;
+  const {
+    soundOn,
+    needsGesture,
+    toggleSound,
+    enableFromGesture,
+    mute,
+  } = useTheaterAmbient(theaterActive);
 
   useEffect(() => {
     const hint = window.setTimeout(() => setHintSkip(true), LOADING_SKIP_HINT_MS);
@@ -91,27 +99,56 @@ export function SajuLoadingTheater({
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_100%)]" />
 
-        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex items-center gap-2">
+        {needsGesture ? (
           <button
             type="button"
-            onClick={() => setSoundOn((v) => !v)}
-            className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
-            aria-pressed={soundOn}
+            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-black/40 px-6 text-center backdrop-blur-[2px] transition active:bg-black/50"
+            onClick={() => void enableFromGesture()}
+            aria-label="사운드를 들으려면 화면을 터치하세요"
           >
-            사운드 {soundOn ? "켜짐" : "꺼짐"}
+            <span className="rounded-full border border-white/20 bg-black/55 px-4 py-2 text-[13px] font-semibold text-white/90 shadow-lg">
+              🔊 터치하면 점사 소리가 이어져요
+            </span>
+            <span className="max-w-[260px] text-[11px] font-medium leading-snug text-white/60">
+              입장에서 켠 소리를 이으려면 한 번만 터치해 주세요
+            </span>
           </button>
-          <button
-            type="button"
-            onClick={() => setSkipped(true)}
-            className={`rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition hover:bg-black/60 ${
-              hintSkip ? "text-white" : "text-white/70"
-            }`}
-          >
-            건너뛰기
-          </button>
+        ) : null}
+
+        <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-30 flex items-center gap-2">
+          <div className="flex flex-col items-end gap-1.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void toggleSound()}
+                className="rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white/75 backdrop-blur transition hover:bg-black/60"
+                aria-pressed={soundOn}
+                title={needsGesture ? "사운드를 들으려면 터치하세요" : undefined}
+              >
+                사운드 {soundOn ? "켜짐" : "꺼짐"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  mute();
+                  setSkipped(true);
+                }}
+                className={`rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition hover:bg-black/60 ${
+                  hintSkip ? "text-white" : "text-white/70"
+                }`}
+              >
+                건너뛰기
+              </button>
+            </div>
+            {!soundOn && !needsGesture ? (
+              <p className="max-w-[220px] rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-right text-[10px] font-semibold leading-snug text-white/65 backdrop-blur">
+                {needsGesture ? "사운드를 들으려면 터치하세요" : "소리가 꺼져 있어요"}
+              </p>
+            ) : null}
+          </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-12">
+        <div className="absolute inset-x-0 bottom-0 z-30 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-12">
           <div className="mb-3 flex items-center gap-2">
             <span
               className="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white"

@@ -29,7 +29,8 @@ export type SajuProduct = {
 
 export type SajuBirthForm = {
   displayName: string;
-  gender: "여성" | "남성" | "기타";
+  /** Empty until user selects on gender-first step */
+  gender: "" | "여성" | "남성" | "기타";
   birthYear: string;
   birthMonth: string;
   birthDay: string;

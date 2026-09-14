@@ -949,7 +949,7 @@ export function buildTemplateReport(
 export function emptyBirthForm(): SajuBirthForm {
   return {
     displayName: "",
-    gender: "여성",
+    gender: "",
     birthYear: "",
     birthMonth: "",
     birthDay: "",
@@ -961,7 +961,7 @@ export function emptyBirthForm(): SajuBirthForm {
     partnerBirthDay: "",
     partnerBirthTime: "",
     partnerGender: "",
-    monthsApart: "3",
+    monthsApart: "",
     breakupNote: "",
     concern: "",
   };

@@ -333,7 +333,7 @@ export function computeChart(form: SajuBirthForm): SajuChart {
     month,
     day,
     birthTime: form.birthTime,
-    gender: form.gender,
+    gender: form.gender || undefined,
   });
 
   const currentYear = new Date().getFullYear();

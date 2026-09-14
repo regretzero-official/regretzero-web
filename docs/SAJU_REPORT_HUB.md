@@ -21,12 +21,14 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 
 ## Flow
 
-1. Hub: 2-col product cards, character portraits, **예시 후기(데모)**, sticky CTA
-2. Birth / concern form
-3. Free blurred preview
-4. Checkout sheet (요약 → 카드/카카오페이/토스 UI → 확인) · “테스트 결제(실제 청구 없음)” 1회 · unlock **₩9,900** → full report (`rz-saju-report-demo-unlock` + `rz-saju-my-readings`)
-5. Bottom nav on `/saju*`: 홈 · 상품 · 내 사주 · FAQ · 문의
-6. Secondary: `/saju/chat` — 캐릭터와 대화(베타)
+1. Hub: discovery shelves (horizontal product carousels + related grouping) · 2-col all grid · character portraits · **예시 후기(데모)** · sticky CTA (“무료로 시작하기”)
+2. Product landing: multi-beat **입장 연출** (사당 → 훅 → 마음 고르기 → 연 알려주세요) · optional sound stub · skip always · sticky CTA with honest “지금 미리보기 가능” (no fake participation counts)
+3. Birth / concern form (multi-step; 출생시간 모름)
+4. Loading theater → free 1-section preview + sticky unlock
+5. Checkout sheet (요약 → 카드/카카오페이/토스 UI → 확인) · demo pay · unlock celebration (“잠금이 열렸어요”) → full report (`rz-saju-report-demo-unlock` + `rz-saju-my-readings`)
+6. Full report end: retention cards → 내 사주함 · 다른 상품 · 허브
+7. Bottom nav on `/saju*`: 홈 · 상품 · 내 사주 · FAQ · 문의
+8. Secondary: `/saju/chat` — 캐릭터와 대화(베타)
 
 ## Products (MVP)
 
