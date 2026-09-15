@@ -51,8 +51,6 @@ ${oneLiner}
 
 쉬운 이유: ${p} 마음엔 남아 있는데 **손대긴 무서운 상태**야. 그 상태에서 네가 밀면 그리움이 아니라 부담만 커져.
 
-${voice.openerAside(p)}
-
 고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${months}, 네가 남긴 말—“${breakup}”. 고민은 「${concern}」. 그 조합이면 미움보다 **피로·자기보호**가 거리의 핵이야.
 
 *(근거 한 줄)* 일간 **${dm}** · ${chart.summaryLine}
