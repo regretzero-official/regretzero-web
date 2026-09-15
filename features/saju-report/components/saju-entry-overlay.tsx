@@ -102,7 +102,7 @@ export function SajuEntryOverlay({
 
   return (
     <div
-      className="saju-entry-overlay fixed inset-0 z-[80] flex items-end justify-center bg-black"
+      className="saju-entry-overlay fixed inset-0 z-[80] flex items-end justify-center"
       role="dialog"
       aria-modal="true"
       aria-label={`${product.characterName} 입장 연출`}
@@ -111,16 +111,16 @@ export function SajuEntryOverlay({
       <div className="relative h-full w-full max-w-[480px] overflow-hidden">
         <Image
           alt={product.characterName}
-          className={`object-cover object-top ${anim ? "saju-entry-portrait" : ""} ${
-            beat === "shrine" ? "brightness-[0.72]" : ""
+          className={`object-cover object-top saju-card-face--romantic ${anim ? "saju-entry-portrait" : ""} ${
+            beat === "shrine" ? "brightness-[0.9]" : "brightness-[0.96]"
           }`}
           fill
           priority
           sizes="(max-width:480px) 100vw, 480px"
           src={character.portraitSrc}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 saju-theater-scrim" />
+        <div className="pointer-events-none absolute inset-0 saju-theater-vignette" />
         {beat === "shrine" ? (
           <div className="pointer-events-none absolute inset-0 saju-shrine-veil" aria-hidden />
         ) : null}
@@ -136,7 +136,7 @@ export function SajuEntryOverlay({
               🔊 화면을 터치하면 소리가 켜져요
             </span>
             <span className="max-w-[260px] text-[11px] font-medium leading-snug text-white/60">
-              사당 앰비언트 · 언제든 끌 수 있어요
+              부드러운 배경음 · 언제든 끌 수 있어요
             </span>
           </button>
         ) : null}

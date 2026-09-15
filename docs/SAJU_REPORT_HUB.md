@@ -2,7 +2,7 @@
 
 Foxbunny-**style** (not a clone) product hub + paid long-report flow for love / breakup / reunion with light saju framing. Uses Regretzero characters: 서나리(점쟁이), 백련(무당), 차유리(깍쟁이), 한보라(아이돌), plus male trio 이도령 · 한시우 · 강세온.
 
-Core female-guide line: **여자의 마음은 여자가 잘 알지.**
+Hub visual mix: bright webtoon-soft cards **and** romantic dark cards; male counselors (이도령·한시우·강세온) lead featured shelves alongside female faces — no ghost/mask horror.
 
 ## Per-product landings
 
@@ -22,7 +22,7 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 
 ## Mobile rebuild shell (P0)
 
-- Hub: cinematic image-first shelves (viewport-dominant cards), sticky pink CTA; tiny avatar strip deprioritized
+- Hub: cinematic image-first shelves (viewport-dominant cards) with **bright + romantic** card tones; male/female faces interleaved; sticky pink CTA (`#F23870`); tiny avatar strip interleaved
 - Form: ~3 screens (`나` → `상대` → `상황`)
 - Free preview: section 01 free; 02+ locked blur/skeleton cards
 - Paywall: ₩9,900 demo unlock (no real charge)
@@ -33,7 +33,7 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 ## Flow
 
 1. Hub: discovery shelves (horizontal product carousels + related grouping) · 2-col all grid · character portraits · **예시 후기(데모)** · sticky CTA (“무료로 시작하기”)
-2. Product landing: multi-beat **입장 연출** (사당 → 훅 → 마음 고르기 → 연 알려주세요) · optional sound stub · skip always · sticky CTA with honest “지금 미리보기 가능” (no fake participation counts)
+2. Product landing: multi-beat **입장 연출** (입장 → 훅 → 마음 고르기 → 연 알려주세요; warmer soft light, not horror vignette) · optional sound stub · skip always · sticky CTA with honest “지금 미리보기 가능” (no fake participation counts)
 3. Birth / concern form (multi-step; 출생시간 모름)
 4. Loading theater → free 1-section preview + sticky unlock
 5. Checkout sheet (요약 → 카드/카카오페이/토스 UI → 확인) · demo pay · unlock celebration (“잠금이 열렸어요”) → full report (`rz-saju-report-demo-unlock` + `rz-saju-my-readings`)
