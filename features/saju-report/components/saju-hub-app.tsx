@@ -37,7 +37,10 @@ import {
   unlockSajuReportDemo,
 } from "@/features/saju-report/unlock";
 
+import { getReportBooks } from "@/features/saju-report/report-books";
+
 import { CheckoutSheet } from "./checkout-sheet";
+import { GoogleSaveButton } from "./google-save-button";
 import { ReportMarkdown } from "./report-markdown";
 import { SajuBirthFormView } from "./saju-birth-form";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
@@ -55,49 +58,66 @@ import {
 function ProductCard({
   product,
   compact = false,
+  cinematic = false,
 }: {
   product: SajuProduct;
   compact?: boolean;
+  /** Viewport-dominant shelf card — 80%+ image, 1-line overlay */
+  cinematic?: boolean;
 }) {
   const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
   const landing = getLandingByProductId(product.id);
   const href = landing?.path ?? `/saju?product=${product.id}`;
+  const widthClass = cinematic
+    ? "w-[86%] min-w-[280px] max-w-[360px] shrink-0 snap-center"
+    : compact
+      ? "w-[72%] min-w-[210px] max-w-[260px] shrink-0 snap-center"
+      : "";
   return (
     <Link
       href={href}
-      className={`saju-product-card group flex flex-col overflow-hidden rounded-[22px] text-left transition active:scale-[0.985] ${
-        compact ? "w-[72%] min-w-[210px] max-w-[260px] shrink-0 snap-center" : ""
+      className={`saju-product-card group relative flex flex-col overflow-hidden rounded-[24px] text-left transition active:scale-[0.985] ${widthClass} ${
+        cinematic ? "saju-shelf-card" : ""
       }`}
-      style={{ boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 28px ${product.accent}18` }}
+      style={{ boxShadow: `0 20px 48px rgba(0,0,0,0.5), 0 0 32px ${product.accent}18` }}
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden">
+      <div
+        className={`relative w-full overflow-hidden ${
+          cinematic ? "min-h-[min(72dvh,560px)] flex-1" : "aspect-[3/4]"
+        }`}
+      >
         {character ? (
           <Image
             alt={product.characterName}
             className="object-cover object-top transition duration-500 group-hover:scale-[1.04]"
             fill
-            sizes="(max-width:480px) 45vw, 200px"
+            sizes={cinematic ? "(max-width:480px) 86vw, 360px" : "(max-width:480px) 45vw, 200px"}
             src={character.portraitSrc}
+            priority={cinematic}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
         <span
-          className="absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white"
+          className="absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white"
           style={{ background: product.accent }}
         >
           {product.badge}
         </span>
-        <div className="absolute inset-x-0 bottom-0 space-y-2 p-3">
-          <div>
-            <div className="text-[0.95rem] font-bold leading-tight tracking-[-0.03em] text-[#F8F4F6]">
-              {product.shortTitle}
-            </div>
-            <div className="mt-0.5 text-[11px] text-white/70">
+        <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
+          <div className="text-[1.05rem] font-bold leading-snug tracking-[-0.03em] text-[#F8F4F6] line-clamp-1">
+            {cinematic ? product.painPoint : product.shortTitle}
+          </div>
+          {!cinematic ? (
+            <div className="text-[11px] text-white/70">
               {product.characterName}
               {product.counselorIds.length > 1 ? " +" : ""}
             </div>
-          </div>
-          <span className="saju-cta inline-flex min-h-9 w-full items-center justify-center rounded-full px-3 text-xs font-semibold">
+          ) : (
+            <div className="text-[11px] text-white/65">
+              {product.shortTitle} · {product.characterName}
+            </div>
+          )}
+          <span className="saju-cta inline-flex min-h-10 w-full items-center justify-center rounded-full px-3 text-xs font-semibold">
             무료로 시작하기
           </span>
         </div>
@@ -148,11 +168,11 @@ function ProductShelf({
       <div
         ref={scrollerRef}
         onScroll={onScroll}
-        className="saju-scroll-x flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1"
+        className="saju-scroll-x -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2"
       >
         {products.map((product) => (
           <div key={product.id} data-shelf-card>
-            <ProductCard product={product} compact />
+            <ProductCard product={product} cinematic />
           </div>
         ))}
       </div>
@@ -233,49 +253,43 @@ function HubLanding({
   }, [filter, query]);
 
   return (
-    <div className={`space-y-8 ${SAJU_BOTTOM_NAV_PAD}`}>
+    <div className={`space-y-8 pb-[calc(env(safe-area-inset-bottom)+148px)]`}>
       <section className="px-5 pt-5">
-        {/* image-first: large portrait stack before copy */}
-        <div className="flex justify-center -space-x-4">
-          {SAJU_CHARACTERS.map((c, i) => (
+        <p className="text-center text-[11px] font-semibold tracking-[0.08em] text-[#FF7A99]">
+          밤의 사주
+        </p>
+        <h1 className="mt-2 text-center text-[1.65rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
+          그 사람, 아직{" "}
+          <span className="text-[#FF7A99]">나를 생각할까?</span>
+        </h1>
+        <p className="mt-2 text-center text-[12px] leading-5 text-[#9A9098]">
+          이미지로 고르고, 무료 미리보기부터 · 로그인 없이
+        </p>
+        <p className="mt-1.5 text-center text-[11px] font-medium tracking-[-0.01em] text-[#6E666C]">
+          여자의 마음은 여자가 잘 알지 · 상담사는 골라요
+        </p>
+        {/* Deprioritized tiny catalog — not the hero */}
+        <div className="mt-4 flex justify-center -space-x-2 opacity-70">
+          {SAJU_CHARACTERS.slice(0, 4).map((c, i) => (
             <div
               key={c.id}
-              className="relative h-[112px] w-[84px] overflow-hidden rounded-[18px] border-2 border-[#120E12] shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
-              style={{ zIndex: SAJU_CHARACTERS.length - i }}
+              className="relative h-9 w-9 overflow-hidden rounded-full border border-[#120E12]"
+              style={{ zIndex: 4 - i }}
             >
               <Image
                 alt={c.name}
                 className="object-cover object-top"
                 fill
-                sizes="84px"
+                sizes="36px"
                 src={c.portraitSrc}
-                priority={i < 4}
               />
             </div>
           ))}
+          <span className="flex h-9 items-center pl-2 text-[10px] font-semibold text-[#6E666C]">
+            +3
+          </span>
         </div>
-        <p className="mt-3 text-center text-[11px] font-semibold leading-5 text-[#B8AEB4]">
-          서나리 · 백련 · 차유리 · 한보라
-          <br />
-          <span className="text-[#9A9098]">이도령 · 한시우 · 강세온</span>
-        </p>
-        <p className="mt-2 text-center text-[11px] font-medium tracking-[-0.01em] text-[#9A9098]">
-          여자의 마음은 여자가 잘 알지
-          <span className="text-[#6E666C]"> · 도령도 곁에</span>
-        </p>
-        <h1 className="mt-4 text-center text-[1.55rem] font-black leading-[1.2] tracking-[-0.05em] text-[#F8F4F6]">
-          그 사람, 아직{" "}
-          <span className="text-[#FF7A99]">나를 생각할까?</span>
-        </h1>
-
-        <button
-          type="button"
-          onClick={onScrollProducts}
-          className="saju-cta mt-5 flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold"
-        >
-          무료로 시작하기
-        </button>
-        <div className="mt-3">
+        <div className="mt-4">
           <SajuTrustStrip />
         </div>
       </section>
@@ -416,10 +430,52 @@ function HubLanding({
           </Link>
         </div>
       </section>
+
+      <div className="saju-sticky-hub-cta fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 py-3">
+        <button
+          type="button"
+          onClick={onScrollProducts}
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold shadow-[0_12px_40px_rgba(242,56,112,0.4)]"
+        >
+          무료로 시작하기
+        </button>
+      </div>
     </div>
   );
 }
 
+
+function LockedSectionSkeleton({
+  title,
+  index,
+}: {
+  title: string;
+  index: number;
+}) {
+  return (
+    <article className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[#09090B] px-4 py-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-bold text-[#6E666C]">
+          <span className="mr-2 text-[10px] font-bold text-[#6E666C]">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          {title}
+        </h2>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
+          <LockIcon className="h-3 w-3" />
+          잠금
+        </span>
+      </div>
+      <div className="mt-3 space-y-2" aria-hidden>
+        <div className="saju-locked-skeleton h-3 rounded-full opacity-60" />
+        <div className="saju-locked-skeleton h-3 w-[92%] rounded-full opacity-50" />
+        <div className="saju-locked-skeleton h-3 w-[78%] rounded-full opacity-40" />
+        <div className="saju-locked-skeleton mt-3 h-16 rounded-[12px] opacity-35" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[#09090B]/55 to-[#09090B]/92" />
+    </article>
+  );
+}
 
 function PreviewView({
   product,
@@ -441,8 +497,8 @@ function PreviewView({
   onConfirmUnlock: () => void;
 }) {
   const character = SAJU_CHARACTERS.find((c) => c.id === report.characterId);
-  const clear = report.previewSections[0];
-  const blurred = report.previewSections[1] ?? report.sections[1];
+  const clear = report.previewSections[0] ?? report.sections[0];
+  const lockedSections = report.sections.slice(1);
   const total = report.sections.length;
   const priceLabel = `₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`;
 
@@ -472,8 +528,8 @@ function PreviewView({
           </div>
           <div className="bg-[#12151C] px-4 pb-4 pt-1">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="rounded-full border border-[#E8336D]/45 bg-[#E8336D]/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-[#FF7A99]">
-                무료 1장 · 나머지 잠금
+              <div className="rounded-full border border-[#F23870]/45 bg-[#F23870]/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-[#FF7A99]">
+                무료 01 · 나머지 잠금
               </div>
               <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#9A9098]">
                 참고용
@@ -482,7 +538,7 @@ function PreviewView({
             <h1 className="mt-2 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
               {report.title}
             </h1>
-            <div className="mt-2 rounded-[14px] border border-[#E8336D]/25 bg-[#E8336D]/10 px-3 py-2.5 text-sm leading-6 text-[#FF7A99]">
+            <div className="mt-2 rounded-[14px] border border-[#F23870]/25 bg-[#F23870]/10 px-3 py-2.5 text-sm leading-6 text-[#FF7A99]">
               <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]/80">
                 미리보기에서 한줄 결론
               </div>
@@ -502,8 +558,11 @@ function PreviewView({
         {clear ? (
           <article className="saju-card rounded-[20px] px-4 py-4">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <h2 className="text-base font-bold text-[#F4F0F2]">{clear.title}</h2>
-              <span className="shrink-0 rounded-full border border-[#E8336D]/35 bg-[#E8336D]/12 px-2 py-0.5 text-[10px] font-bold text-[#FF7A99]">
+              <h2 className="text-base font-bold text-[#F4F0F2]">
+                <span className="mr-2 text-[10px] font-bold text-[#FF7A99]">01</span>
+                {clear.title}
+              </h2>
+              <span className="shrink-0 rounded-full border border-[#F23870]/35 bg-[#F23870]/12 px-2 py-0.5 text-[10px] font-bold text-[#FF7A99]">
                 무료 공개
               </span>
             </div>
@@ -513,20 +572,13 @@ function PreviewView({
           </article>
         ) : null}
 
-        {blurred ? (
-          <article className="relative overflow-hidden rounded-[20px] border border-white/10 bg-[#09090B] px-4 py-4">
-            <h2 className="text-base font-bold text-[#F4F0F2]">{blurred.title}</h2>
-            <div className="mt-3 select-none blur-[6px]" aria-hidden>
-              <ReportMarkdown body={blurred.body.slice(0, 700)} />
-            </div>
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent via-[#09090B]/75 to-[#09090B]">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#12151C]/95 px-4 py-2 text-sm font-semibold text-[#FF7A99]">
-                <LockIcon />
-                이어서 잠금 · 전체 리포트
-              </div>
-            </div>
-          </article>
-        ) : null}
+        {lockedSections.map((section, i) => (
+          <LockedSectionSkeleton
+            key={section.id}
+            title={section.title}
+            index={i + 1}
+          />
+        ))}
 
         <div className="saju-card-elevated rounded-[20px] px-4 py-4">
           <LockedSectionsPaywall
@@ -539,17 +591,21 @@ function PreviewView({
             과 내 사주 저장
           </p>
         </div>
+
+        <GoogleSaveButton
+          hint="미리보기는 로그인 없이 봤어요. 보관함에 남기려면 구글로 저장해요."
+        />
       </div>
 
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
         <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">
-          지금 미리보기 가능 · 무료 1장 · 나머지 잠금 · 데모 결제
+          지금 미리보기 가능 · 무료 01 · 나머지 잠금 · 데모 결제
         </p>
         <button
           type="button"
           disabled={unlocking}
           onClick={onOpenCheckout}
-          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-[0_12px_40px_rgba(232,51,109,0.35)] disabled:opacity-50"
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-[0_12px_40px_rgba(242,56,112,0.35)] disabled:opacity-50"
         >
           {unlocking ? "리포트 생성 중…" : `전체 잠금 해제 · ${priceLabel}`}
         </button>
@@ -577,6 +633,7 @@ function ReportView({
   onBackHub: () => void;
 }) {
   const character = SAJU_CHARACTERS.find((c) => c.id === report.characterId);
+  const books = getReportBooks(report.productId, report.sections);
   return (
     <div className={SAJU_BOTTOM_NAV_PAD}>
       <div className="px-5 pt-4">
@@ -606,32 +663,56 @@ function ReportView({
             <h1 className="text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">{report.title}</h1>
           </div>
         </div>
-        <div className="mt-3 rounded-[16px] border border-[#E8336D]/30 bg-[#E8336D]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
+        <div className="mt-3 rounded-[16px] border border-[#F23870]/30 bg-[#F23870]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
           <ReportMarkdown body={report.oneLiner} />
         </div>
         <WonGukChip report={report} />
         <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 참고용이에요</p>
+
         <nav
-          aria-label="리포트 목차"
+          aria-label="리포트 목차 · 4권"
           className="mt-4 saju-card rounded-[18px] px-4 py-3"
         >
-          <div className="text-xs font-bold tracking-[0.04em] text-[#FF7A99]">목차</div>
-          <ol className="mt-2 space-y-1.5">
-            {report.sections.map((section, index) => (
-              <li key={section.id}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-bold tracking-[0.04em] text-[#FF7A99]">
+              목차 · {books.length}권 · {report.sections.length}장
+            </div>
+          </div>
+          <div className="mt-3 space-y-3">
+            {books.map((book) => (
+              <div key={book.id}>
                 <a
-                  href={`#hub-section-${section.id}`}
-                  className="flex gap-2 text-[12px] leading-5 text-[#B8AEB4] hover:text-[#FF7A99]"
+                  href={`#hub-book-${book.id}`}
+                  className="text-[12px] font-bold text-[#F4F0F2] hover:text-[#FF7A99]"
                 >
-                  <span className="shrink-0 font-semibold text-[#6E666C]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="line-clamp-1">{section.title}</span>
+                  {book.label}
                 </a>
-              </li>
+                <ol className="mt-1.5 space-y-1 border-l border-white/10 pl-3">
+                  {book.sectionIndexes.map((si) => {
+                    const section = report.sections[si];
+                    if (!section) return null;
+                    return (
+                      <li key={section.id}>
+                        <a
+                          href={`#hub-section-${section.id}`}
+                          className="flex gap-2 text-[12px] leading-5 text-[#B8AEB4] hover:text-[#FF7A99]"
+                        >
+                          <span className="shrink-0 font-semibold text-[#6E666C]">
+                            {String(si + 1).padStart(2, "0")}
+                          </span>
+                          <span className="line-clamp-1">{section.title}</span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
             ))}
-          </ol>
+          </div>
         </nav>
+        <div className="mt-4">
+          <GoogleSaveButton hint="다른 기기에서도 보려면 구글로 저장해요." />
+        </div>
         <p className="mt-3 text-center text-[11px]">
           <Link href="/saju/my" className="font-semibold text-[#FF7A99] underline-offset-2 hover:underline">
             내 사주에서 다시 보기 →
@@ -639,20 +720,37 @@ function ReportView({
         </p>
       </div>
 
-      <div className="mt-5 space-y-4 px-5">
-        {report.sections.map((section) => (
-          <article
-            key={section.id}
-            id={`hub-section-${section.id}`}
-            className="saju-card scroll-mt-24 rounded-[20px] px-4 py-4"
-          >
-            <h2 className="text-base font-bold tracking-[-0.03em] text-[#F4F0F2]">
-              {section.title}
-            </h2>
-            <div className="mt-3">
-              <ReportMarkdown body={section.body} />
+      <div className="mt-5 space-y-6 px-5">
+        {books.map((book) => (
+          <section key={book.id} id={`hub-book-${book.id}`} className="scroll-mt-24 space-y-4">
+            <div className="sticky top-14 z-20 -mx-1 rounded-[14px] border border-[#F23870]/25 bg-[#12151C]/95 px-3 py-2 backdrop-blur">
+              <div className="text-[11px] font-bold tracking-[0.08em] text-[#FF7A99]">
+                {book.shortLabel}
+              </div>
+              <div className="text-sm font-bold text-[#F4F0F2]">{book.label}</div>
             </div>
-          </article>
+            {book.sectionIndexes.map((si) => {
+              const section = report.sections[si];
+              if (!section) return null;
+              return (
+                <article
+                  key={section.id}
+                  id={`hub-section-${section.id}`}
+                  className="saju-card scroll-mt-28 rounded-[20px] px-4 py-4"
+                >
+                  <h2 className="text-base font-bold tracking-[-0.03em] text-[#F4F0F2]">
+                    <span className="mr-2 text-[10px] font-bold text-[#FF7A99]">
+                      {String(si + 1).padStart(2, "0")}
+                    </span>
+                    {section.title}
+                  </h2>
+                  <div className="mt-3">
+                    <ReportMarkdown body={section.body} />
+                  </div>
+                </article>
+              );
+            })}
+          </section>
         ))}
       </div>
 

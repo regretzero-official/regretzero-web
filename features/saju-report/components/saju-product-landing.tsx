@@ -203,7 +203,7 @@ function LandingBody({ slug }: { slug: SajuLandingSlug }) {
                   후기
                 </span>
               </div>
-              <p className="mb-4 text-xs leading-5 text-[#9A9098]">입니다.</p>
+              <p className="mb-4 text-xs leading-5 text-[#9A9098]">예시 후기 · 참고용이에요.</p>
               <div className="space-y-3">
                 {reviewList.map((r) => (
                   <DemoReviewCard key={r.id} review={r} />

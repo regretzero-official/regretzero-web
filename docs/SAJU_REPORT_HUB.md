@@ -19,6 +19,17 @@ Hub cards link to these landings first. Sticky CTA on a landing deep-links into 
 
 First visit to a product landing shows an optional cinematic **입장 연출** (character portrait + voice line + concern chips). Seen state is stored in `localStorage` (`rz-saju-entry-seen`). Replay with `?entry=1`. `prefers-reduced-motion` shows a static overlay (no ken-burns / slide).
 
+
+## Mobile rebuild shell (P0)
+
+- Hub: cinematic image-first shelves (viewport-dominant cards), sticky pink CTA; tiny avatar strip deprioritized
+- Form: ~3 screens (`나` → `상대` → `상황`)
+- Free preview: section 01 free; 02+ locked blur/skeleton cards
+- Paywall: ₩9,900 demo unlock (no real charge)
+- Google auth shell: 「저장하려면 구글」 only after free preview / on save (`auth-shell` localStorage stub until OAuth secrets)
+- Result: 4-book TOC for reunion (15 sections) with anchors
+- Palette: near-black/navy + `#F23870`
+
 ## Flow
 
 1. Hub: discovery shelves (horizontal product carousels + related grouping) · 2-col all grid · character portraits · **예시 후기(데모)** · sticky CTA (“무료로 시작하기”)

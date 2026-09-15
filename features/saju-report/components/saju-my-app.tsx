@@ -12,6 +12,12 @@ import {
   type SavedSajuReading,
 } from "@/features/saju-report/my-readings";
 
+import {
+  readSajuAuthShell,
+  type SajuAuthShellUser,
+} from "@/features/saju-report/auth-shell";
+
+import { GoogleSaveButton } from "./google-save-button";
 import { ReportMarkdown } from "./report-markdown";
 import { SAJU_BOTTOM_NAV_PAD, SajuBottomNav } from "./saju-bottom-nav";
 
@@ -103,9 +109,11 @@ export function SajuMyApp() {
   const [readings, setReadings] = useState<SavedSajuReading[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [openReport, setOpenReport] = useState<SajuReportPayload | null>(null);
+  const [authUser, setAuthUser] = useState<SajuAuthShellUser | null>(null);
 
   useEffect(() => {
     setReadings(readSavedSajuReadings());
+    setAuthUser(readSajuAuthShell());
     setHydrated(true);
   }, []);
 
@@ -141,7 +149,7 @@ export function SajuMyApp() {
           ) : (
             <div className={`px-5 pt-6 ${SAJU_BOTTOM_NAV_PAD}`}>
               <p className="text-[0.75rem] font-semibold tracking-[0.08em] text-[#FF7A99]">
-                MY READINGS
+                MY READINGS · 보관함
               </p>
               <h1 className="mt-2 text-[1.65rem] font-black leading-[1.25] tracking-[-0.045em] text-[#F8F4F6]">
                 잠금 해제한
@@ -151,21 +159,47 @@ export function SajuMyApp() {
               <p className="mt-3 text-sm leading-6 text-[#9A9098]">
                 이 기기에 저장된 전체 리포트예요. 잠금 해제 시 자동으로 남겨 둡니다.
               </p>
+              {hydrated && readings.length > 0 ? (
+                <div className="mt-4">
+                  <GoogleSaveButton
+                    onSignedIn={setAuthUser}
+                    hint={
+                      authUser
+                        ? ""
+                        : "저장하려면 구글 — 미리보기·입력은 로그인 없이 가능해요."
+                    }
+                  />
+                </div>
+              ) : null}
 
               {!hydrated ? (
                 <div className="mt-8 text-sm text-[#9A9098]">불러오는 중…</div>
               ) : readings.length === 0 ? (
-                <div className="mt-8 saju-card-elevated rounded-[22px] px-5 py-8 text-center">
-                  <div className="text-base font-bold text-[#F4F0F2]">아직 저장된 사주가 없어요</div>
-                  <p className="mt-2 text-sm leading-6 text-[#9A9098]">
-                    허브에서 미리보기를 보고 잠금 해제하면 여기에 쌓여요.
-                  </p>
-                  <Link
-                    href="/saju#products"
-                    className="saju-cta mt-5 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold"
-                  >
-                    사주 고르러 가기
-                  </Link>
+                <div className="mt-8 space-y-4">
+                  <div className="saju-card-elevated rounded-[22px] px-5 py-8 text-center">
+                    <div className="text-base font-bold text-[#F4F0F2]">
+                      {authUser ? "보관함이 비어 있어요" : "아직 저장된 사주가 없어요"}
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#9A9098]">
+                      {authUser
+                        ? `${authUser.name}님, 허브에서 미리보기를 보고 잠금 해제하면 여기에 쌓여요.`
+                        : "허브에서 미리보기를 보고 잠금 해제하면 여기에 쌓여요. 저장은 미리보기 후에만 구글이 필요해요."}
+                    </p>
+                    <Link
+                      href="/saju#products"
+                      className="saju-cta mt-5 inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold"
+                    >
+                      사주 고르러 가기
+                    </Link>
+                  </div>
+                  {!authUser ? (
+                    <GoogleSaveButton
+                      onSignedIn={setAuthUser}
+                      hint="보관함을 열려면 구글로 저장해요. 허브·입력·미리보기는 로그인 없이 가능해요."
+                    />
+                  ) : (
+                    <GoogleSaveButton onSignedIn={setAuthUser} hint="" />
+                  )}
                 </div>
               ) : (
                 <ul className="mt-6 space-y-3">

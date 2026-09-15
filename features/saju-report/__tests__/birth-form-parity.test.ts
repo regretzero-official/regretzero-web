@@ -15,21 +15,9 @@ import { SAJU_ENTRY_BY_SLUG } from "../entry-experience";
 import { SAJU_PRODUCT_LANDINGS } from "../product-landings";
 
 describe("Foxbunny form step parity", () => {
-  it("orders 성별 → 기본정보 → 상대 → 상황 → 확인", () => {
-    expect(FORM_STEPS.map((s) => s.id)).toEqual([
-      "gender",
-      "basic",
-      "partner",
-      "situation",
-      "confirm",
-    ]);
-    expect(FORM_STEPS.map((s) => s.label)).toEqual([
-      "성별",
-      "기본정보",
-      "상대",
-      "상황",
-      "확인",
-    ]);
+  it("orders 나 → 상대 → 상황 (~3 screens)", () => {
+    expect(FORM_STEPS.map((s) => s.id)).toEqual(["me", "partner", "situation"]);
+    expect(FORM_STEPS.map((s) => s.label)).toEqual(["나", "상대", "상황"]);
   });
 
   it("starts empty with no default gender or monthsApart", () => {
@@ -98,10 +86,10 @@ describe("form polish source contracts", () => {
     );
     expect(src).toContain("aria-describedby");
     expect(src).toContain("비워도 돼요");
-    expect(src).toContain('setStep("gender")');
-    expect(src).toContain('setStep("basic")');
+    expect(src).toContain('setStep("me")');
     expect(src).toContain('setStep("partner")');
     expect(src).toContain('setStep("situation")');
+    expect(src).not.toContain('setStep("confirm")');
     expect(src).toContain("ConfirmEditButton");
     expect(src).toContain("bottom-[calc(env(safe-area-inset-bottom)+64px)]");
     expect(src).toContain("pb-[calc(env(safe-area-inset-bottom)+168px)]");
