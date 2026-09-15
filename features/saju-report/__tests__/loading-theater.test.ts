@@ -11,7 +11,13 @@ import {
   SAJU_ENTRY_BY_SLUG,
 } from "../entry-experience";
 import { getCanonicalSectionCount } from "../canonical-sections";
-import { HUB_SHELVES, productsForShelf } from "../hub-shelves";
+import {
+  HUB_CHARACTER_ORDER,
+  HUB_GRID_ITEMS,
+  HUB_SHELVES,
+  itemsForShelf,
+  productsForShelf,
+} from "../hub-shelves";
 import { SAJU_PRODUCT_LANDINGS } from "../product-landings";
 
 describe("loading theater copy", () => {
@@ -56,10 +62,28 @@ describe("hub discovery shelves", () => {
   it("groups related products without empty shelves", () => {
     expect(HUB_SHELVES.length).toBeGreaterThanOrEqual(3);
     for (const shelf of HUB_SHELVES) {
-      const products = productsForShelf(shelf);
-      expect(products.length).toBe(shelf.productIds.length);
-      expect(products.length).toBeGreaterThanOrEqual(2);
+      const cards = itemsForShelf(shelf);
+      expect(cards.length).toBe(shelf.items.length);
+      expect(cards.length).toBeGreaterThanOrEqual(2);
+      expect(productsForShelf(shelf).length).toBeGreaterThanOrEqual(2);
     }
+  });
+
+  it("features male counselors prominently with bright/romantic mix", () => {
+    const featured = HUB_SHELVES.find((s) => s.id === "featured");
+    expect(featured).toBeTruthy();
+    const faces = featured!.items.map((i) => i.faceCharacterId);
+    for (const male of ["lee-doryeong", "han-siwoo", "kang-seon"] as const) {
+      expect(faces).toContain(male);
+    }
+    // First three featured faces lead with the male trio
+    expect(faces.slice(0, 3)).toEqual(["lee-doryeong", "kang-seon", "han-siwoo"]);
+    const tones = new Set(featured!.items.map((i) => i.tone));
+    expect(tones.has("bright")).toBe(true);
+    expect(tones.has("romantic")).toBe(true);
+    expect(HUB_CHARACTER_ORDER[0]).toBe("lee-doryeong");
+    expect(HUB_GRID_ITEMS.some((i) => i.faceCharacterId === "lee-doryeong")).toBe(true);
+    expect(HUB_GRID_ITEMS.some((i) => i.faceCharacterId === "kang-seon")).toBe(true);
   });
 });
 

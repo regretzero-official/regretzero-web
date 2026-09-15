@@ -15,8 +15,13 @@ import {
   hubDeepLink,
 } from "@/features/saju-report/product-landings";
 import {
+  HUB_CHARACTER_ORDER,
+  HUB_GRID_ITEMS,
   HUB_SHELVES,
-  productsForShelf,
+  itemsForShelf,
+  resolveHubItem,
+  type HubCardTone,
+  type ResolvedHubCard,
 } from "@/features/saju-report/hub-shelves";
 import {
   CHARACTER_PRIMARY_PRODUCT,
@@ -57,29 +62,49 @@ import {
 
 function ProductCard({
   product,
+  faceCharacterId,
+  tone = "romantic",
   compact = false,
   cinematic = false,
 }: {
   product: SajuProduct;
+  /** Portrait counselor — may differ from product default (male faces on hub) */
+  faceCharacterId?: SajuCharacterId;
+  tone?: HubCardTone;
   compact?: boolean;
   /** Viewport-dominant shelf card — 80%+ image, 1-line overlay */
   cinematic?: boolean;
 }) {
-  const character = SAJU_CHARACTERS.find((c) => c.id === product.characterId);
-  const landing = getLandingByProductId(product.id);
-  const href = landing?.path ?? `/saju?product=${product.id}`;
+  const faceId = faceCharacterId ?? product.characterId;
+  const character = SAJU_CHARACTERS.find((c) => c.id === faceId);
+  const href = hubDeepLink(product.id, faceId);
   const widthClass = cinematic
     ? "w-[86%] min-w-[280px] max-w-[360px] shrink-0 snap-center"
     : compact
       ? "w-[72%] min-w-[210px] max-w-[260px] shrink-0 snap-center"
       : "";
+  const toneClass =
+    tone === "bright" ? "saju-product-card--bright" : "saju-product-card--romantic";
+  const overlayClass =
+    tone === "bright"
+      ? "bg-gradient-to-t from-[#2a1820]/88 via-[#F23870]/18 to-[#fff5f8]/12"
+      : "bg-gradient-to-t from-[#120a10]/92 via-[#1a1018]/40 to-transparent";
+  const oneLiner = cinematic
+    ? product.painPoint
+    : product.shortTitle;
+  const faceName = character?.name ?? product.characterName;
   return (
     <Link
       href={href}
-      className={`saju-product-card group relative flex flex-col overflow-hidden rounded-[24px] text-left transition active:scale-[0.985] ${widthClass} ${
+      className={`saju-product-card group relative flex flex-col overflow-hidden rounded-[24px] text-left transition active:scale-[0.985] ${toneClass} ${widthClass} ${
         cinematic ? "saju-shelf-card" : ""
       }`}
-      style={{ boxShadow: `0 20px 48px rgba(0,0,0,0.5), 0 0 32px ${product.accent}18` }}
+      style={{
+        boxShadow:
+          tone === "bright"
+            ? `0 16px 40px rgba(242,56,112,0.22), 0 0 28px ${product.accent}22`
+            : `0 20px 48px rgba(18,10,16,0.45), 0 0 32px ${product.accent}18`,
+      }}
     >
       <div
         className={`relative w-full overflow-hidden ${
@@ -88,15 +113,17 @@ function ProductCard({
       >
         {character ? (
           <Image
-            alt={product.characterName}
-            className="object-cover object-top transition duration-500 group-hover:scale-[1.04]"
+            alt={faceName}
+            className={`object-cover object-top transition duration-500 group-hover:scale-[1.04] ${
+              tone === "bright" ? "saju-card-face--bright" : "saju-card-face--romantic"
+            }`}
             fill
             sizes={cinematic ? "(max-width:480px) 86vw, 360px" : "(max-width:480px) 45vw, 200px"}
             src={character.portraitSrc}
             priority={cinematic}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+        <div className={`pointer-events-none absolute inset-0 ${overlayClass}`} />
         <span
           className="absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white"
           style={{ background: product.accent }}
@@ -105,18 +132,11 @@ function ProductCard({
         </span>
         <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
           <div className="text-[1.05rem] font-bold leading-snug tracking-[-0.03em] text-[#F8F4F6] line-clamp-1">
-            {cinematic ? product.painPoint : product.shortTitle}
+            {oneLiner}
           </div>
-          {!cinematic ? (
-            <div className="text-[11px] text-white/70">
-              {product.characterName}
-              {product.counselorIds.length > 1 ? " +" : ""}
-            </div>
-          ) : (
-            <div className="text-[11px] text-white/65">
-              {product.shortTitle} · {product.characterName}
-            </div>
-          )}
+          <div className="text-[11px] text-white/70">
+            {cinematic ? `${product.shortTitle} · ${faceName}` : faceName}
+          </div>
           <span className="saju-cta inline-flex min-h-10 w-full items-center justify-center rounded-full px-3 text-xs font-semibold">
             무료로 시작하기
           </span>
@@ -129,23 +149,23 @@ function ProductCard({
 function ProductShelf({
   title,
   subtitle,
-  products,
+  cards,
 }: {
   title: string;
   subtitle: string;
-  products: SajuProduct[];
+  cards: ResolvedHubCard[];
 }) {
   const [active, setActive] = useState(0);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
   const onScroll = useCallback(() => {
     const el = scrollerRef.current;
-    if (!el || products.length === 0) return;
+    if (!el || cards.length === 0) return;
     const card = el.querySelector<HTMLElement>("[data-shelf-card]");
     const cardW = card?.offsetWidth ?? 220;
     const idx = Math.round(el.scrollLeft / Math.max(cardW * 0.85, 1));
-    setActive(Math.max(0, Math.min(products.length - 1, idx)));
-  }, [products.length]);
+    setActive(Math.max(0, Math.min(cards.length - 1, idx)));
+  }, [cards.length]);
 
   return (
     <section className="px-5">
@@ -155,9 +175,9 @@ function ProductShelf({
           <p className="mt-1 text-xs text-[#9A9098]">{subtitle}</p>
         </div>
         <div className="flex items-center gap-1.5 pb-0.5" aria-hidden>
-          {products.map((p, i) => (
+          {cards.map((c, i) => (
             <span
-              key={p.id}
+              key={`${c.productId}-${c.faceCharacterId}`}
               className={`h-1.5 rounded-full transition-all ${
                 i === active ? "w-4 bg-[#FF7A99]" : "w-1.5 bg-white/25"
               }`}
@@ -170,9 +190,14 @@ function ProductShelf({
         onScroll={onScroll}
         className="saju-scroll-x -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2"
       >
-        {products.map((product) => (
-          <div key={product.id} data-shelf-card>
-            <ProductCard product={product} cinematic />
+        {cards.map((card) => (
+          <div key={`${card.productId}-${card.faceCharacterId}`} data-shelf-card>
+            <ProductCard
+              product={card.product}
+              faceCharacterId={card.faceCharacterId}
+              tone={card.tone}
+              cinematic
+            />
           </div>
         ))}
       </div>
@@ -239,18 +264,29 @@ function HubLanding({
   const [filter, setFilter] = useState<HubFilter>("all");
   const [query, setQuery] = useState("");
 
-  const filteredProducts = useMemo(() => {
+  const filteredGrid = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SAJU_PRODUCTS.filter((p) => {
+    return HUB_GRID_ITEMS.map(resolveHubItem).filter((card): card is ResolvedHubCard => {
+      if (!card) return false;
+      const p = card.product;
       if (!productMatchesFilter(p, filter)) return false;
       if (!q) return true;
+      const face = SAJU_CHARACTERS.find((c) => c.id === card.faceCharacterId);
       const counselorNames = p.counselorIds
         .map((id) => SAJU_CHARACTERS.find((c) => c.id === id)?.name ?? "")
         .join(" ");
-      const hay = `${p.title} ${p.shortTitle} ${p.painPoint} ${p.characterName} ${counselorNames} ${p.badge}`.toLowerCase();
+      const hay = `${p.title} ${p.shortTitle} ${p.painPoint} ${p.characterName} ${face?.name ?? ""} ${counselorNames} ${p.badge}`.toLowerCase();
       return hay.includes(q);
     });
   }, [filter, query]);
+
+  const hubCharacters = useMemo(
+    () =>
+      HUB_CHARACTER_ORDER.map((id) => SAJU_CHARACTERS.find((c) => c.id === id)).filter(
+        (c): c is (typeof SAJU_CHARACTERS)[number] => c != null,
+      ),
+    [],
+  );
 
   return (
     <div className={`space-y-8 pb-[calc(env(safe-area-inset-bottom)+148px)]`}>
@@ -266,19 +302,19 @@ function HubLanding({
           이미지로 고르고, 무료 미리보기부터 · 로그인 없이
         </p>
         <p className="mt-1.5 text-center text-[11px] font-medium tracking-[-0.01em] text-[#6E666C]">
-          여자의 마음은 여자가 잘 알지 · 상담사는 골라요
+          이도령·한시우·강세온도 있어요 · 상담사는 골라요
         </p>
-        {/* Deprioritized tiny catalog — not the hero */}
-        <div className="mt-4 flex justify-center -space-x-2 opacity-70">
-          {SAJU_CHARACTERS.slice(0, 4).map((c, i) => (
+        {/* Tiny catalog — interleaved male/female faces */}
+        <div className="mt-4 flex justify-center -space-x-2 opacity-80">
+          {hubCharacters.slice(0, 5).map((c, i) => (
             <div
               key={c.id}
               className="relative h-9 w-9 overflow-hidden rounded-full border border-[#120E12]"
-              style={{ zIndex: 4 - i }}
+              style={{ zIndex: 5 - i }}
             >
               <Image
                 alt={c.name}
-                className="object-cover object-top"
+                className="object-cover object-top saju-card-face--bright"
                 fill
                 sizes="36px"
                 src={c.portraitSrc}
@@ -286,7 +322,7 @@ function HubLanding({
             </div>
           ))}
           <span className="flex h-9 items-center pl-2 text-[10px] font-semibold text-[#6E666C]">
-            +3
+            +{Math.max(hubCharacters.length - 5, 0)}
           </span>
         </div>
         <div className="mt-4">
@@ -302,7 +338,7 @@ function HubLanding({
             key={shelf.id}
             title={shelf.title}
             subtitle={shelf.subtitle}
-            products={productsForShelf(shelf)}
+            cards={itemsForShelf(shelf)}
           />
         ))}
       </div>
@@ -346,11 +382,16 @@ function HubLanding({
           />
         </label>
         <div className="mt-4 grid grid-cols-2 gap-3">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {filteredGrid.map((card) => (
+            <ProductCard
+              key={`${card.productId}-${card.faceCharacterId}`}
+              product={card.product}
+              faceCharacterId={card.faceCharacterId}
+              tone={card.tone}
+            />
           ))}
         </div>
-        {filteredProducts.length === 0 ? (
+        {filteredGrid.length === 0 ? (
           <p className="mt-4 text-center text-sm text-[#9A9098]">
             조건에 맞는 상품이 없어요. 전체 탭을 눌러 보세요.
           </p>
@@ -360,24 +401,35 @@ function HubLanding({
       <section className="px-5">
         <h2 className="text-lg font-bold tracking-[-0.04em] text-[#F4F0F2]">오늘 밤의 캐릭터</h2>
         <div className="mt-4 flex gap-3 overflow-x-auto saju-scroll-x pb-1">
-          {SAJU_CHARACTERS.map((c) => {
+          {hubCharacters.map((c, i) => {
             const productId = CHARACTER_PRIMARY_PRODUCT[c.id];
             const href = hubDeepLink(productId, c.id);
+            const tone: HubCardTone = i % 2 === 0 ? "romantic" : "bright";
             return (
               <Link
                 key={c.id}
                 href={href}
-                className="saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px] transition active:scale-[0.985]"
+                className={`saju-char-card relative w-[48%] min-w-[168px] shrink-0 overflow-hidden rounded-[22px] transition active:scale-[0.985] ${
+                  tone === "bright" ? "saju-product-card--bright" : "saju-product-card--romantic"
+                }`}
               >
                 <div className="relative aspect-[3/4] w-full">
                   <Image
                     alt={c.name}
-                    className="object-cover object-top"
+                    className={`object-cover object-top ${
+                      tone === "bright" ? "saju-card-face--bright" : "saju-card-face--romantic"
+                    }`}
                     fill
                     sizes="180px"
                     src={c.portraitSrc}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  <div
+                    className={`absolute inset-0 ${
+                      tone === "bright"
+                        ? "bg-gradient-to-t from-[#2a1820]/85 via-[#F23870]/15 to-[#fff5f8]/10"
+                        : "bg-gradient-to-t from-[#120a10]/90 via-[#1a1018]/35 to-transparent"
+                    }`}
+                  />
                   <div className="absolute inset-x-0 bottom-0 p-3">
                     {c.roleLabel ? (
                       <span

@@ -79,7 +79,7 @@ export function SajuLoadingTheater({
 
   return (
     <div
-      className="fixed inset-0 z-[85] flex items-end justify-center bg-black"
+      className="saju-theater-overlay fixed inset-0 z-[85] flex items-end justify-center"
       role="dialog"
       aria-modal="true"
       aria-busy={!ready}
@@ -89,15 +89,15 @@ export function SajuLoadingTheater({
         {character ? (
           <Image
             alt={character.name}
-            className="object-cover object-top saju-entry-portrait opacity-90"
+            className="object-cover object-top saju-entry-portrait saju-card-face--romantic brightness-[0.94]"
             fill
             priority
             sizes="(max-width:480px) 100vw, 480px"
             src={character.portraitSrc}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 saju-theater-scrim" />
+        <div className="pointer-events-none absolute inset-0 saju-theater-vignette" />
 
         {needsGesture ? (
           <button

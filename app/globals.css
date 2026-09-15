@@ -297,7 +297,7 @@ button {
 }
 
 
-/* Saju character chat (/saju) — dark romantic occult shell, scoped */
+/* Saju hub (/saju) — romantic dark + bright webtoon mix (not horror), scoped */
 .saju-shell {
   --saju-canvas: #08090d;
   --saju-shell-bg: #12151c;
@@ -398,6 +398,31 @@ button {
     linear-gradient(160deg, rgba(232, 51, 109, 0.12) 0%, transparent 42%),
     var(--saju-card);
   border: 1px solid var(--saju-border);
+}
+
+/* Bright webtoon-soft cards — lift warmth, avoid ghostly desat */
+.saju-shell .saju-product-card--bright {
+  background:
+    linear-gradient(165deg, rgba(255, 245, 248, 0.14) 0%, rgba(242, 56, 112, 0.16) 38%, transparent 70%),
+    linear-gradient(200deg, rgba(255, 200, 160, 0.08) 0%, transparent 50%),
+    #161018;
+  border: 1px solid rgba(255, 170, 190, 0.22);
+}
+
+.saju-shell .saju-product-card--romantic {
+  background:
+    linear-gradient(160deg, rgba(242, 56, 112, 0.18) 0%, transparent 45%),
+    linear-gradient(210deg, rgba(90, 40, 70, 0.35) 0%, transparent 55%),
+    var(--saju-card);
+  border: 1px solid rgba(242, 56, 112, 0.2);
+}
+
+.saju-shell .saju-card-face--bright {
+  filter: brightness(1.1) saturate(1.1) contrast(1.02);
+}
+
+.saju-shell .saju-card-face--romantic {
+  filter: brightness(1.04) saturate(1.06);
 }
 
 .saju-shell .saju-char-card {
@@ -508,17 +533,39 @@ button {
   }
 }
 
-/* Entry theater — shrine veil */
+/* Entry theater — warm soft veil (not eerie horror pulse) */
 .saju-shrine-veil {
   background:
-    radial-gradient(ellipse at 50% 20%, rgba(240, 160, 90, 0.18), transparent 55%),
-    radial-gradient(ellipse at 50% 80%, rgba(232, 51, 109, 0.12), transparent 50%);
-  animation: saju-shrine-pulse 3.6s ease-in-out infinite;
+    radial-gradient(ellipse at 50% 18%, rgba(255, 200, 160, 0.28), transparent 58%),
+    radial-gradient(ellipse at 50% 85%, rgba(242, 56, 112, 0.16), transparent 52%),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 245, 248, 0.06), transparent 60%);
+  animation: saju-shrine-pulse 4.8s ease-in-out infinite;
 }
 
 @keyframes saju-shrine-pulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 0.9; }
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.72; }
+}
+
+/* Soften entry/theater full-bleed overlays — warmer light, less black vignette */
+.saju-entry-overlay,
+.saju-theater-overlay {
+  background: #120a10;
+}
+
+.saju-entry-overlay .saju-theater-scrim,
+.saju-theater-overlay .saju-theater-scrim {
+  background:
+    linear-gradient(to top, rgba(18, 10, 16, 0.92) 0%, rgba(26, 16, 24, 0.45) 42%, rgba(242, 56, 112, 0.08) 100%);
+}
+
+.saju-entry-overlay .saju-theater-vignette,
+.saju-theater-overlay .saju-theater-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 42%,
+    rgba(40, 20, 32, 0.35) 100%
+  );
 }
 
 /* Unlock celebration */
