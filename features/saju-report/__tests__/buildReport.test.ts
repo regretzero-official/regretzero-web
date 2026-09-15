@@ -44,7 +44,8 @@ describe("buildTemplateReport depth", () => {
     expect(report.sections.length).toBe(15);
     expect(joined).toMatch(/근거 한 줄/);
     expect(joined).toMatch(/기운이 보여/);
-    expect(joined).toMatch(/밤의 점사|점사로|대화창|흐름상/);
+    expect(joined).toMatch(/점사로|대화창|흐름상|기운이 보여/);
+    expect(joined).not.toMatch(/밤의 점사다/);
     expect(joined).toMatch(/다음에 네가 할 선택/);
     expect(joined).toMatch(/점사로 한 번 더|점사처럼|점사할게/);
     expect(joined).not.toMatch(/웹소설처럼/);
@@ -262,11 +263,32 @@ describe("free section 01 readable paywall copy", () => {
     expect(baekCover).toMatch(/근거 한 줄/);
     expect(baekCover).toMatch(/다음 장\(02\)|속마음|타이밍|끌린 이유/);
     expect(baekCover).not.toMatch(/십성으로 보면|용신·희신·기신/);
+    expect(baekCover).not.toMatch(/밤의 점사다/);
+    // Conclusion once in body — opener/aside/close must not restate the same slogan stack
+    const contactSlogan = (baekCover.match(/지금은 연락할 때가 아니야/g) ?? []).length;
+    expect(contactSlogan).toBeLessThanOrEqual(1);
+    const dontApproach = (baekCover.match(/다가가지 마/g) ?? []).length;
+    expect(dontApproach).toBeLessThanOrEqual(1);
 
     expect(seoHead).toMatch(/한줄부터|느낌이 왔어|지운 건/);
     expect(seoCover).toMatch(/쉬운 이유/);
     expect(seoCover).toMatch(/헤어진 지|약 3개월/);
     expect(seoCover).toMatch(/근거 한 줄/);
     expect(seoCover).toMatch(/다음 장\(02\)|속마음|타이밍|질문/);
+  });
+
+  it("uses real partner name or 그 사람 — never slot leaks like 테스트상대", () => {
+    const leaked = buildTemplateReport("reunion-luck", {
+      ...form,
+      partnerName: "테스트상대",
+    });
+    const joined = [leaked.oneLiner, ...leaked.sections.map((s) => s.body)].join("\n");
+    expect(joined).not.toContain("테스트상대");
+    expect(joined).toContain("그 사람");
+
+    const empty = buildTemplateReport("reunion-luck", { ...form, partnerName: "" });
+    const emptyJoined = empty.sections.map((s) => s.body).join("\n");
+    expect(emptyJoined).toContain("그 사람");
+    expect(emptyJoined).not.toContain("민재");
   });
 });

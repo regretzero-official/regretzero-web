@@ -29,8 +29,33 @@ export function you(form: SajuBirthForm) {
   return safe(form.displayName, "너");
 }
 
+/** Dummy/slot labels that must never leak into live copy. */
+const PARTNER_SLOT_NAMES = new Set([
+  "테스트상대",
+  "테스트유저",
+  "테스트파트너",
+  "(이름 미상)",
+  "이름 미상",
+  "상대이름",
+  "파트너이름",
+]);
+
+function isPartnerSlotName(raw: string) {
+  const t = raw.trim();
+  if (!t) return true;
+  if (PARTNER_SLOT_NAMES.has(t)) return true;
+  if (PARTNER_SLOT_NAMES.has(t.toLowerCase())) return true;
+  // Placeholder tokens: {상대}, [name], <partner>, $partnerName
+  if (/^[{[<＄$].*[}\]>]$/.test(t)) return true;
+  if (/^(partner|name|상대|상대방)([_\s-]?name)?$/i.test(t)) return true;
+  return false;
+}
+
+/** Real partner name from form, or natural fallback — never slot/demo leaks. */
 export function partner(form: SajuBirthForm) {
-  return safe(form.partnerName, "그 사람");
+  const raw = form.partnerName.trim();
+  if (isPartnerSlotName(raw)) return "그 사람";
+  return raw;
 }
 
 export function monthsLabel(form: SajuBirthForm) {

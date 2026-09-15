@@ -550,7 +550,7 @@ export function SajuBirthFormView({
                 className="saju-input mt-1.5 min-h-12 w-full rounded-[14px] px-4 text-sm"
                 value={form.displayName}
                 onChange={(e) => patch({ displayName: e.target.value })}
-                placeholder="수진"
+                placeholder="이름 (선택)"
                 aria-describedby="display-name-optional"
               />
               <span id="display-name-optional" className="sr-only">
@@ -642,7 +642,7 @@ export function SajuBirthFormView({
                 className="saju-input mt-1.5 min-h-12 w-full rounded-[14px] px-4 text-sm"
                 value={form.partnerName}
                 onChange={(e) => patch({ partnerName: e.target.value })}
-                placeholder="민재"
+                placeholder="상대 이름"
                 aria-describedby="partner-name-optional"
               />
               <span id="partner-name-optional" className="sr-only">

@@ -633,14 +633,9 @@ function PreviewView({
             <h1 className="mt-2 text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">
               {report.title}
             </h1>
-            <div className="mt-2 rounded-[14px] border border-[#F23870]/25 bg-[#F23870]/10 px-3 py-2.5 text-sm leading-6 text-[#FF7A99]">
-              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#FF7A99]/80">
-                미리보기에서 한줄 결론
-              </div>
-              <div className="mt-1 text-[#F4F0F2]">
-                <ReportMarkdown body={report.oneLiner} />
-              </div>
-            </div>
+            <p className="mt-2 text-[12px] font-semibold tracking-wide text-[#9A9098]">
+              01 · 표지 / 한줄결론
+            </p>
             <WonGukChip report={report} />
             <p className="mt-2 text-[11px] leading-5 text-[#6E666C]">
               원국은 만세력 · 해석은 참고용이에요
@@ -743,9 +738,6 @@ function ReportView({
             </div>
             <h1 className="text-xl font-bold tracking-[-0.04em] text-[#F8F4F6]">{report.title}</h1>
           </div>
-        </div>
-        <div className="mt-3 rounded-[16px] border border-[#F23870]/30 bg-[#F23870]/10 px-3 py-2 text-sm leading-6 text-[#FF7A99]">
-          <ReportMarkdown body={report.oneLiner} />
         </div>
         <WonGukChip report={report} />
         <p className="mt-2 text-center text-[11px] text-[#6E666C]">원국은 만세력 · 해석은 참고용이에요</p>
