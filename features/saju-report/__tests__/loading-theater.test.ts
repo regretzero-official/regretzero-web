@@ -23,7 +23,7 @@ describe("loading theater copy", () => {
 
   it("provides counselor lines for all characters", () => {
     expect(Object.keys(SAJU_LOADING_COUNSELOR_LINES).length).toBeGreaterThanOrEqual(7);
-    expect(getLoadingCounselorLine("baek-ryeon")).toContain("기운");
+    expect(getLoadingCounselorLine("baek-ryeon")).toContain("원국");
     expect(getLoadingCounselorLine("unknown-id", "상담사")).toContain("상담사");
   });
 });
@@ -48,6 +48,11 @@ describe("entry theater beats", () => {
       expect(entry.inviteLine.length).toBeGreaterThan(0);
       expect(entry.soundEnableLabel).toContain("소리");
       expect(entry.concernChips.length).toBeGreaterThanOrEqual(2);
+      // Warm counselor tone — no horror / fear slogans
+      const joined = [entry.shrineLine, ...entry.lines, entry.inviteLine].join(" ");
+      expect(joined).not.toMatch(/독이/);
+      expect(joined).not.toMatch(/괴롭/);
+      expect(joined).not.toMatch(/뒤에 서/);
     }
   });
 });

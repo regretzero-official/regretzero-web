@@ -65,6 +65,28 @@ describe("theater ambient audio assets", () => {
       expect(size).toBeLessThan(250_000);
     }
   });
+
+  it("ships character-specific warm ambient beds under public/saju/audio/character", () => {
+    const root = join(process.cwd(), "public");
+    const ids = [
+      "baek-ryeon",
+      "seo-nari",
+      "cha-yuri",
+      "han-bora",
+      "lee-doryeong",
+      "han-siwoo",
+      "kang-seon",
+    ];
+    for (const id of ids) {
+      for (const ext of ["mp3", "ogg"] as const) {
+        const path = join(root, `saju/audio/character/${id}.${ext}`);
+        expect(existsSync(path), path).toBe(true);
+        const size = statSync(path).size;
+        expect(size).toBeGreaterThan(4_000);
+        expect(size).toBeLessThan(150_000);
+      }
+    }
+  });
 });
 
 describe("entry hook copy strength", () => {
@@ -112,5 +134,14 @@ describe("form polish source contracts", () => {
     );
     expect(ambient).toContain("SAJU_AMBIENT_SRC_MP3");
     expect(ambient).toContain("SAJU_AMBIENT_PAD_MP3");
+    expect(ambient).toContain("getCharacterAmbientSrc");
+    expect(ambient).toContain("characterId");
+    const director = readFileSync(
+      join(process.cwd(), "features/saju-report/hooks/use-theater-audio-director.ts"),
+      "utf8",
+    );
+    expect(director).not.toContain("speechSynthesis");
+    expect(director).toContain("THEATER_VOICE_AUTOPLAY_ENABLED");
+    expect(director).toContain("useTheaterAmbient(opts.active, opts.characterId)");
   });
 });

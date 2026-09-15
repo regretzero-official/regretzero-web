@@ -508,17 +508,18 @@ button {
   }
 }
 
-/* Entry theater — shrine veil */
+/* Entry theater — warm rose/gold counseling veil (not horror) */
 .saju-shrine-veil {
   background:
-    radial-gradient(ellipse at 50% 20%, rgba(240, 160, 90, 0.18), transparent 55%),
-    radial-gradient(ellipse at 50% 80%, rgba(232, 51, 109, 0.12), transparent 50%);
-  animation: saju-shrine-pulse 3.6s ease-in-out infinite;
+    radial-gradient(ellipse at 50% 18%, rgba(255, 196, 140, 0.22), transparent 58%),
+    radial-gradient(ellipse at 50% 78%, rgba(255, 122, 153, 0.1), transparent 52%),
+    radial-gradient(ellipse at 70% 40%, rgba(212, 175, 110, 0.08), transparent 45%);
+  animation: saju-shrine-pulse 4.8s ease-in-out infinite;
 }
 
 @keyframes saju-shrine-pulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 0.9; }
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.72; }
 }
 
 /* Unlock celebration */

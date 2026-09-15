@@ -18,7 +18,9 @@ import {
 import type { SajuLandingSlug } from "@/features/saju-report/product-landings";
 import { getLandingBySlug } from "@/features/saju-report/product-landings";
 import { getSajuProduct } from "@/features/saju-report/products";
-import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
+import { useTheaterAudioDirector } from "@/features/saju-report/hooks/use-theater-audio-director";
+
+const EMPTY_ENTRY_SPEAK = { shrineLine: "", lines: [] as string[], inviteLine: "" };
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -79,7 +81,14 @@ export function SajuEntryOverlay({
     toggleSound,
     enableFromGesture,
     mute,
-  } = useTheaterAmbient(true);
+  } = useTheaterAudioDirector({
+    mode: "entry",
+    active: true,
+    characterId: product?.characterId ?? character?.id ?? null,
+    slug,
+    beat,
+    entry: entry ?? EMPTY_ENTRY_SPEAK,
+  });
 
   const finish = useCallback(() => {
     mute();
@@ -102,7 +111,7 @@ export function SajuEntryOverlay({
 
   return (
     <div
-      className="saju-entry-overlay fixed inset-0 z-[80] flex items-end justify-center bg-black"
+      className="saju-entry-overlay fixed inset-0 z-[80] flex items-end justify-center bg-[#140f14]"
       role="dialog"
       aria-modal="true"
       aria-label={`${product.characterName} 입장 연출`}
@@ -119,8 +128,8 @@ export function SajuEntryOverlay({
           sizes="(max-width:480px) 100vw, 480px"
           src={character.portraitSrc}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1a1018] via-[#140f14]/70 to-[#2a1820]/25" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(20,12,18,0.45)_100%)]" />
         {beat === "shrine" ? (
           <div className="pointer-events-none absolute inset-0 saju-shrine-veil" aria-hidden />
         ) : null}
@@ -128,7 +137,7 @@ export function SajuEntryOverlay({
         {showGestureOverlay ? (
           <button
             type="button"
-            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-black/45 px-6 text-center backdrop-blur-[2px] transition active:bg-black/55"
+            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-[#1a1018]/40 px-6 text-center backdrop-blur-[2px] transition active:bg-[#1a1018]/50"
             onClick={() => void enableFromGesture()}
             aria-label="사운드를 들으려면 화면을 터치하세요"
           >
@@ -136,7 +145,7 @@ export function SajuEntryOverlay({
               🔊 화면을 터치하면 소리가 켜져요
             </span>
             <span className="max-w-[260px] text-[11px] font-medium leading-snug text-white/60">
-              사당 앰비언트 · 언제든 끌 수 있어요
+              캐릭터 분위기음 · 가벼운 장면 효과 · 언제든 끌 수 있어요
             </span>
           </button>
         ) : null}

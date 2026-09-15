@@ -11,11 +11,11 @@ export const SAJU_LOADING_STAGES = [
 /** Short counselor lines shown during loading theater */
 export const SAJU_LOADING_COUNSELOR_LINES: Record<SajuCharacterId, string> = {
   "seo-nari": "느낌이 왔어. 잠깐만—원국부터 풀어볼게.",
-  "baek-ryeon": "기운이 보여. 지금은 흔들지 마. 내가 먼저 짚을게.",
+  "baek-ryeon": "원국이 보여. 천천히, 내가 먼저 짚어줄게.",
   "cha-yuri": "또 그 사람이지? 팩트부터 짧게 정리할게.",
   "han-bora": "헐, 긴장하지 마. 일단 네 마음부터 같이 보자.",
   "lee-doryeong": "다치지 않게, 곁에서 천천히 읽어드릴게요.",
-  "han-siwoo": "급할수록 한 박자. 氣부터 읽어볼게.",
+  "han-siwoo": "급할수록 한 박자. 원국부터 차분히 읽어볼게.",
   "kang-seon": "괜찮아. 같이 정리하자. 조금만 기다려.",
 };
 
