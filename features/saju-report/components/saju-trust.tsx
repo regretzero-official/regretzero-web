@@ -161,13 +161,13 @@ export function LockedSectionsPaywall({
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <div className="text-sm font-semibold text-[#F4F0F2]">잠긴 섹션 · 전체 리포트</div>
+        <div className="text-sm font-semibold text-[#F4F0F2]">나머지 장 열기</div>
         <div className="rounded-full border border-[#E8336D]/40 bg-[#E8336D]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#FF7A99]">
           {progressLabel}
         </div>
       </div>
       <p className="mt-1.5 text-[11px] leading-5 text-[#9A9098]">
-        무료 {previewUnlockedCount}장만 열려 있고, 나머지 {lockedCount}장이 잠겨 있어요. 잠금 해제 시 {total}장 전체 · 긴 해석을 받아요.
+        +{lockedCount}장 더 · 속마음·타이밍
       </p>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
         <div

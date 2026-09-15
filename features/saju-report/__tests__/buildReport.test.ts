@@ -245,3 +245,28 @@ describe("male counselor selection", () => {
     expect(report.characterId).toBe("baek-ryeon");
   });
 });
+
+describe("free section 01 readable paywall copy", () => {
+  it("leads with conclusion-style opening, personalization, one cite, and 02 cliff", () => {
+    const baek = buildTemplateReport("reunion-luck", form);
+    const seo = buildTemplateReport("partner-heart", form);
+    const baekCover = baek.sections.find((s) => s.id === "cover")!.body;
+    const seoCover = seo.sections.find((s) => s.id === "cover")!.body;
+    const baekHead = baekCover.slice(0, 220);
+    const seoHead = seoCover.slice(0, 220);
+
+    expect(baekHead).toMatch(/한줄부터|지금은 연락할 때가 아니야|지금은 먼저 연락/);
+    expect(baekCover).toMatch(/쉬운 이유/);
+    expect(baekCover).toMatch(/헤어진 지|약 3개월/);
+    expect(baekCover).toMatch(/서로 지쳐 헤어진 느낌|민재/);
+    expect(baekCover).toMatch(/근거 한 줄/);
+    expect(baekCover).toMatch(/다음 장\(02\)|속마음|타이밍|끌린 이유/);
+    expect(baekCover).not.toMatch(/십성으로 보면|용신·희신·기신/);
+
+    expect(seoHead).toMatch(/한줄부터|느낌이 왔어|지운 건/);
+    expect(seoCover).toMatch(/쉬운 이유/);
+    expect(seoCover).toMatch(/헤어진 지|약 3개월/);
+    expect(seoCover).toMatch(/근거 한 줄/);
+    expect(seoCover).toMatch(/다음 장\(02\)|속마음|타이밍|질문/);
+  });
+});

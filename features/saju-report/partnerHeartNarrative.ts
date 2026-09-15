@@ -45,31 +45,19 @@ export function buildPartnerHeartNarrativeSections(
   const cover: SajuReportSection = {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `${y}. ${vn}${topicParticle(vn)} 바로 점사할게.
-
-${voice.openerAside(p)}
-
-${voice.coverBridge(y, birthLabel(form), form.gender, months, breakup)}
-
-네가 적어 준 고민의 핵:
-> ${concern}
-
-「지금 그 사람 마음은… 뭐지.」
-그 문장을 백 번 굴리는 밤—${vn}${topicParticle(vn)} 그 시간을 무시하지 않아. 진심과 불안이 한몸에 있어. 둘을 뭉치면 판단이 흐려져. 그래서 오늘은 **한줄 결론부터** 짚고, 그다음 원국·심리·행동으로 길게 풀어줄게. 체크리스트 강의가 아니라, **상담사가 사주를 보고 풀이해주는 상담**으로.
-
-**원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
-
-**결론만 먼저.**
+    body: `${y}. ${vn}—한줄부터.
 
 ${oneLiner}
 
-${bullets.map((b) => `- ${b}`).join("\n")}
+쉬운 이유: 지워진 게 아니라, ${p} 마음엔 남아 있는데 **손대긴 무서운 상태**야. 그 상태에서 네가 밀면 그리움이 아니라 부담만 커져. 지금은 더 밀지 마.
 
-이 리포트는 짧게 끝내지 않을게. “기다려”, “연락하지 마” — 말은 맞는데 **풀어주는 말이 없으면** 밤에 무너져. 그래서 ${vn}${topicParticle(vn)} 점사처럼 길게 말해. ${p}가 너를 지운 건 아닌데 지금 당장 다시 만나자 하진 않을 때의 심리, 네가 자정에 장문을 쓰고 싶을 때의 감정, 다가갈 온도·타이밍. 읽다가 “내 얘기다” 싶으면, 그게 맞는 호흡이야.
+${voice.openerAside(p)}
+
+고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${months}, 네가 남긴 말—“${breakup}”. 고민은 「${concern}」. 그 조합이면 미움보다 **피로·자기보호**가 거리의 핵이야.
+
+*(근거 한 줄)* 일간 **${dm}** · ${chart.summaryLine}
 
 ${voice.coverClose}
-
-자, 네가 진짜로 묻고 싶은 질문부터 정리하자.
 
 — ${vn} · ${productTitle}`,
   };

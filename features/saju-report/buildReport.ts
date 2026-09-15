@@ -97,7 +97,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `느낌이 왔어. 밤공기 속에 ${p} 이름만 스쳐도 가슴이 먼저 반응하지? 언니 말 들어봐—그 반응, 끝이 아니라 잔향이야.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}, ${birth}, ${gender}. 낮엔 괜찮은 척해도 밤에 감정이 더 깊게 남는 결이야. 헤어진 지 ${months}—“${breakup}”이 아직 몸 안쪽에 남아 있어. 오늘은 카톡처럼 쉽게, 점사처럼 길게 풀어줄게.`,
-        coverClose: `느낌이 왔어—이렇게 보면 돼. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 흔들리지 마.`,
+        coverClose: `느낌이 왔어—지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 다음 장(02)에서 질문·속마음·타이밍을 이어서 풀게. 지금은 여기까지.`,
         frameAside: "서나리 식으로—표면 감정은 거짓말하기 쉽고, 가슴의 온도·잔향이 더 정직해.",
         questionsLead: "네가 진짜로 묻고 싶은 건 한 겹이 아니야. 하나씩, 언니랑 풀어보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 이별은 사랑이 없어서보다 속도가 안 맞아서인 경우가 많아. 그 차이를 못 보면 ${p}랑 다시 만나도 같은 벽이야.`,
@@ -127,7 +127,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `기운이 보여. 밤의 점사다. ${p} 쪽으로 인연이 완전히 끊긴 건 아니야. 지금은 흔들 타이밍이 아니다. 흔들리면 더 엉킨다. 흔들리지 마.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어. 오늘은 강의가 아니라, 점사로 풀어줄게.`,
-        coverClose: "지금은 이렇다. 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 조급하면 더 꼬여. 따라와.",
+        coverClose: "지금은 이렇다. 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 다음 장(02)에서 끌린 이유부터, 속마음·연락 타이밍까지 이어서 풀어줄게. 지금은 여기까지. 따라와.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다. 점사는 짧고 단호하게.",
         questionsLead: "이번 밤의 점사—핵을 짧게 정리할게.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서가 아니라 속도가 어긋나서다. ${p}와 다시 붙더라도, 같은 호흡이면 같은 벽이다.`,
@@ -157,7 +157,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `${p}한테 왜 그렇게 퍼줘. 너는 더 아껴도 돼. 팩트부터—지금은 더 잘해주기 시즌이 아니야. 눈물 상담 말고, 자존 상담으로 가자.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 타입이지? 헤어진 지 ${months}. “${breakup}”—로맨스 포장 말고 소모로 읽어. 점사는 길게, 결정은 짧게.`,
-        coverClose: "팩트다. 지금은 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 희망 상담 필요 없어. 더 퍼주지 마.",
+        coverClose: "팩트다. 지금은 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 다음 장(02)에서 질문·결정 축을 이어서 짚을게. 지금은 여기까지. 더 퍼주지 마.",
         frameAside: "차유리 식으로—감정 점수 말고, 네가 버티는 구조로 읽어. 자존이 먼저다. dry하게.",
         questionsLead: "질문부터 팩트로. 감성 에세이 필요 없어. 핵만 딱.",
         questionsClose: (p) => `지쳐 헤어진 거면 사랑이 없어서가 아니라 속도가 안 맞은 거야. ${p}랑 다시 붙어도 예전처럼 하면 또 같아.`,
@@ -187,7 +187,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `헐, 또 ${p} 생각했지? 일단 네 마음부터. 괜찮아, 그 마음 이상한 거 아니야. 다만 행동만 조심하자—오늘은 응원 점사처럼, 근데 현실 pep 넣어서.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}! ${birth}, ${gender}. 낮엔 괜찮은 척하다가 밤에 감정이 커지는 결이야. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있어. 점사는 따뜻하게, 선택은 또렷하게 가자.`,
-        coverClose: "지금은 이렇게 해. 이렇게 보면 돼. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 같이 가자.",
+        coverClose: "지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 다음 장(02)에서 질문·타이밍·멘트를 이어서 가자. 지금은 여기까지.",
         frameAside: "한보라가 먼저 공감하고, 그다음 현실 한 줄—위험 집착은 말릴게.",
         questionsLead: "네가 묻고 싶은 거, 겹겹이지? 하나씩 같이 정리해보자.",
         questionsClose: (p) => `서로 지쳐 헤어진 거면, 사랑이 없어서보다 속도가 안 맞은 거야. ${p}랑 다시 만나도 호흡을 바꿔야 해.`,
@@ -217,7 +217,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `다치지 않게, 곁에서 읽어드릴게요. ${p} 생각이 남는다면 약함이 아니라 깊이예요. 그 깊이가 무게가 되지 않게 제가 지켜드릴게요.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}님. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결이에요. 헤어진 지 ${months}, “${breakup}”의 잔향이 아직 남아 있어요.`,
-        coverClose: "지금은 이렇습니다. 지금은 다가가지 마세요. 다시 연락하려면 최소 한두 달은 지나야 해요. 다치지 않게 지켜드릴게요.",
+        coverClose: "지금은 다가가지 마세요. 다시 연락하려면 최소 한두 달은 지나야 해요. 다음 장(02)에서 끌린 이유·속마음·타이밍을 이어서 읽어드릴게요. 지금은 여기까지.",
         frameAside: "이도령이 지키는 건 당신이 다치지 않는 선이에요. 흐름은 분명하게 읽어드릴게요.",
         questionsLead: "묻고 싶은 마음을 하나씩, 부드럽게 정리해 볼게요.",
         questionsClose: (p) => `지쳐 헤어진 인연은 사랑이 없어서보다 속도가 어긋나서인 경우가 많아요. ${p}와 다시 만나도 호흡을 바꿔야 해요.`,
@@ -247,7 +247,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `괜찮아. 같이 정리하자. ${p} 생각난다고 네가 작아질 필요는 없어—들이대는 자신감이 아니라, 네가 좀 괜찮은 상태의 자신감.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮엔 괜찮은 척, 밤에 감정이 커지는 결이지. 헤어진 지 ${months}, “${breakup}”이 아직 남아 있어.`,
-        coverClose: "여기서 멈춰. 이렇게 보면 돼. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 네가 좀 괜찮은 상태로 가자.",
+        coverClose: "여기서 멈춰. 지금은 다가가지 마. 한두 달에서 세 달쯤 지나야 다시 말할 타이밍이야. 다음 장(02)에서 속마음·타이밍을 이어서 정리하자. 지금은 여기까지.",
         frameAside: "강세온 식으로—너는 이미 매력 있어. 문제는 타이밍과 온도야.",
         questionsLead: "질문부터 깔끔하게. 네가 진짜 궁금한 것만.",
         questionsClose: (p) => `지쳐 헤어진 거면 속도 문제야. ${p}랑 다시 만나도 호흡 안 바꾸면 또 같아.`,
@@ -278,7 +278,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
         name: characterName,
         openerAside: (p) => `급할수록 한 박자 쉬어. 너, 밤에 또 ${p} 생각했지. 기운은 거짓말 잘 안 해—지금 들이대면 흐름이 또 엉킨다.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth}, ${gender}. 낮의 말보다 밤의 감정이 깊게 남는 결. 헤어진 지 ${months}. “${breakup}”의 잔기가 아직 있다.`,
-        coverClose: "지금은 이렇다. 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 조급하면 더 꼬여. 한 박자 쉬어.",
+        coverClose: "지금은 다가가지 마. 다시 연락하려면 최소 한두 달은 지나야 해. 다음 장(02)에서 타이밍·멘트를 이어서 짚을게. 지금은 여기까지. 한 박자 쉬어.",
         frameAside: "한시우 방식은 단순하다. 표면 감정은 거짓말하기 쉽고, 기운의 방향은 비교적 정직하다.",
         questionsLead: "질문의 핵만 짧게.",
         questionsClose: (p) => `지쳐 헤어진 인연은 속도 문제다. ${p}와 다시 붙어도 호흡이 같으면 같은 벽이다.`,
@@ -318,27 +318,24 @@ function commonCover(
   voice: VoicePack,
   productTitle: string,
   oneLiner: string,
-  bullets: string[],
+  _bullets: string[],
 ): SajuReportSection {
   const p = partner(form);
   const y = you(form);
   return {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `${voice.openerAside(p)}
-
-${voice.coverBridge(y, birthLabel(form), form.gender, monthsLabel(form), breakupLine(form))}
-
-밤의 대화창이 꺼지지 않은 채, 네가 적어 준 고민의 핵:
-> ${concernLine(form)}
-
-**결론만 먼저.** (이야기는 길게, 결정은 또렷하게.)
+    body: `${y}. ${voice.name}—한줄부터.
 
 ${oneLiner}
 
-${bullets.map((b) => `- ${b}`).join("\n")}
+쉬운 이유: 지금은 들이대서 풀 타이밍이 아니야. ${p} 쪽은 미움보다 피로·자기보호가 먼저고, 네가 밀면 거리만 더 멀어져.
 
-이 리포트는 체크리스트 강의가 아니라, **읽는 장면**으로 풀어갈게. 사주 숫자는 가끔 *(근거 한 줄)*로만 받쳐 주고, 본편은 네 감정·상대 심리·다음에 네가 할 선택이야.
+${voice.openerAside(p)}
+
+고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${monthsLabel(form)}, 네가 남긴 말—“${breakupLine(form)}”. 고민은 「${concernLine(form)}」.
+
+*(근거 한 줄)* 만세력 원국 기준으로 읽었어요.
 
 ${voice.coverClose}
 
