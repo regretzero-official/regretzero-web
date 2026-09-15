@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CHARACTER_AMBIENT_IDS,
+  getCharacterAmbientSrc,
   getSfxForEntryBeat,
   getSpeakLinesForEntryBeat,
   getTheaterVoiceClipSrc,
@@ -12,6 +14,7 @@ import {
   SFX_BY_ENTRY_BEAT,
   THEATER_ELEVENLABS_CAST,
   THEATER_SFX_SRC,
+  THEATER_VOICE_AUTOPLAY_ENABLED,
   THEATER_VOICE_PROFILES,
 } from "../theater-audio";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
@@ -33,21 +36,42 @@ describe("theater SFX map", () => {
   });
 });
 
-describe("ElevenLabs cast + clip paths", () => {
+describe("character ambient beds", () => {
+  it("covers all seven counselors with distinct ambient paths", () => {
+    expect(CHARACTER_AMBIENT_IDS).toHaveLength(7);
+    for (const id of CHARACTER_AMBIENT_IDS) {
+      expect(getCharacterAmbientSrc(id, "mp3")).toBe(
+        `/saju/audio/character/${id}.mp3`,
+      );
+      expect(getCharacterAmbientSrc(id, "ogg")).toBe(
+        `/saju/audio/character/${id}.ogg`,
+      );
+    }
+  });
+
+  it("falls back to generic shrine ambient when character is missing", () => {
+    expect(getCharacterAmbientSrc(null, "mp3")).toBe(
+      "/saju/audio/ambient-shrine.mp3",
+    );
+    expect(getCharacterAmbientSrc("unknown", "ogg")).toBe(
+      "/saju/audio/ambient-shrine.ogg",
+    );
+  });
+
+  it("keeps voice autoplay fully disabled (BGM-only theater)", () => {
+    expect(THEATER_VOICE_AUTOPLAY_ENABLED).toBe(false);
+  });
+});
+
+describe("ElevenLabs cast + clip paths (kept on disk unused)", () => {
   it("covers all seven counselors with distinct stock voices", () => {
     const ids = Object.keys(THEATER_ELEVENLABS_CAST) as SajuCharacterId[];
     expect(ids).toHaveLength(7);
     const voiceIds = new Set(ids.map((id) => THEATER_ELEVENLABS_CAST[id].voiceId));
     expect(voiceIds.size).toBe(7);
-    expect(THEATER_ELEVENLABS_CAST["baek-ryeon"].stability).toBeGreaterThan(
-      THEATER_ELEVENLABS_CAST["han-bora"].stability,
-    );
-    expect(THEATER_ELEVENLABS_CAST["han-bora"].style).toBeGreaterThan(
-      THEATER_ELEVENLABS_CAST["baek-ryeon"].style,
-    );
   });
 
-  it("builds voice clip urls for entry beats and loading", () => {
+  it("builds voice clip urls for entry beats and loading (not autoplayed)", () => {
     expect(
       getTheaterVoiceClipSrc({ characterId: "baek-ryeon", kind: "loading" }),
     ).toBe("/saju/audio/voice/baek-ryeon/loading.mp3");
@@ -61,7 +85,7 @@ describe("ElevenLabs cast + clip paths", () => {
     ).toBe("/saju/audio/voice/seo-nari/heart/shrine.mp3");
 
     const entry = {
-      shrineLine: "촛불이 흔들려.",
+      shrineLine: "촛불이 포근해.",
       lines: ["첫 줄", "둘째 줄"],
       inviteLine: "연을 알려주세요.",
     };
@@ -77,7 +101,7 @@ describe("ElevenLabs cast + clip paths", () => {
   });
 });
 
-describe("theater voice profiles (Web Speech fallback)", () => {
+describe("theater voice profiles (legacy Web Speech helpers)", () => {
   it("covers all seven counselors with distinct pitch/rate vibes", () => {
     const ids = Object.keys(THEATER_VOICE_PROFILES) as SajuCharacterId[];
     expect(ids).toHaveLength(7);
@@ -120,15 +144,15 @@ describe("theater voice profiles (Web Speech fallback)", () => {
   });
 });
 
-describe("speak lines by beat", () => {
+describe("speak lines by beat (copy helpers; not autoplayed as voice)", () => {
   const entry = {
-    shrineLine: "촛불이 흔들려.",
+    shrineLine: "촛불이 포근해.",
     lines: ["첫 줄", "둘째 줄"],
     inviteLine: "연을 알려주세요.",
   };
 
-  it("speaks shrine, hook, invite — not selfId", () => {
-    expect(getSpeakLinesForEntryBeat("shrine", entry)).toEqual(["촛불이 흔들려."]);
+  it("returns shrine, hook, invite — not selfId", () => {
+    expect(getSpeakLinesForEntryBeat("shrine", entry)).toEqual(["촛불이 포근해."]);
     expect(getSpeakLinesForEntryBeat("hook", entry)).toEqual(["첫 줄", "둘째 줄"]);
     expect(getSpeakLinesForEntryBeat("selfId", entry)).toEqual([]);
     expect(getSpeakLinesForEntryBeat("invite", entry)).toEqual(["연을 알려주세요."]);

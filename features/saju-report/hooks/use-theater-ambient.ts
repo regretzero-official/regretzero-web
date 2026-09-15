@@ -2,19 +2,25 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export const SAJU_AMBIENT_SRC_MP3 = "/saju/audio/ambient-shrine.mp3";
-export const SAJU_AMBIENT_SRC_OGG = "/saju/audio/ambient-shrine.ogg";
-export const SAJU_AMBIENT_PAD_MP3 = "/saju/audio/ambient-pad.mp3";
-export const SAJU_AMBIENT_PAD_OGG = "/saju/audio/ambient-pad.ogg";
+import {
+  getCharacterAmbientSrc,
+  SAJU_AMBIENT_FALLBACK_MP3,
+  SAJU_AMBIENT_FALLBACK_OGG,
+  SAJU_AMBIENT_PAD_MP3,
+  SAJU_AMBIENT_PAD_OGG,
+} from "@/features/saju-report/theater-audio";
 
 /** Session-scoped preference so entry → loading can inherit “already enabled”. */
 export const SAJU_AMBIENT_PREF_KEY = "saju-theater-ambient-on";
 
-const TARGET_VOLUME = 0.36;
-const PAD_VOLUME = 0.22;
-/** While character TTS speaks, duck the bed so voices read clearly. */
-const DUCK_MAIN = 0.12;
-const DUCK_PAD = 0.08;
+/** @deprecated use SAJU_AMBIENT_FALLBACK_* from theater-audio */
+export const SAJU_AMBIENT_SRC_MP3 = SAJU_AMBIENT_FALLBACK_MP3;
+/** @deprecated use SAJU_AMBIENT_FALLBACK_* from theater-audio */
+export const SAJU_AMBIENT_SRC_OGG = SAJU_AMBIENT_FALLBACK_OGG;
+export { SAJU_AMBIENT_PAD_MP3, SAJU_AMBIENT_PAD_OGG };
+
+const TARGET_VOLUME = 0.4;
+const PAD_VOLUME = 0.18;
 const FADE_MS = 420;
 const FADE_STEPS = 14;
 
@@ -46,14 +52,18 @@ export function writeAmbientPref(on: boolean) {
 
 /**
  * Foxbunny-style theater ambient: gesture-gated, volume ramps, session persist.
- * Soft second pad layer under the shrine loop for a slightly richer bed.
+ * Character-specific warm BGM bed + soft generic pad underlay. No TTS ducking.
  */
-export function useTheaterAmbient(active: boolean) {
+export function useTheaterAmbient(
+  active: boolean,
+  characterId?: string | null,
+) {
   const mainRef = useRef<HTMLAudioElement | null>(null);
   const padRef = useRef<HTMLAudioElement | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const wantSoundRef = useRef(false);
-  const duckedRef = useRef(false);
+  const characterIdRef = useRef(characterId);
+  characterIdRef.current = characterId;
   const [soundOn, setSoundOn] = useState(false);
   const [needsGesture, setNeedsGesture] = useState(false);
   /** True until the user has successfully enabled sound once this session. */
@@ -66,9 +76,29 @@ export function useTheaterAmbient(active: boolean) {
     }
   }, []);
 
+  const applyCharacterSrc = useCallback((main: HTMLAudioElement, ogg: boolean) => {
+    const id = characterIdRef.current;
+    const next = getCharacterAmbientSrc(id, ogg ? "ogg" : "mp3");
+    if (main.src && main.getAttribute("data-ambient-src") === next) return;
+    const wasPlaying = !main.paused;
+    const t = main.currentTime;
+    main.src = next;
+    main.setAttribute("data-ambient-src", next);
+    try {
+      if (wasPlaying) {
+        main.currentTime = Number.isFinite(t) ? t : 0;
+        void main.play().catch(() => undefined);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const ensureAudio = useCallback(() => {
     if (typeof window === "undefined") return null;
     if (mainRef.current && padRef.current) {
+      const ogg = preferOgg(mainRef.current);
+      applyCharacterSrc(mainRef.current, ogg);
       return { main: mainRef.current, pad: padRef.current };
     }
     const main = mainRef.current ?? new Audio();
@@ -80,17 +110,12 @@ export function useTheaterAmbient(active: boolean) {
     pad.preload = "auto";
     main.volume = 0;
     pad.volume = 0;
-    if (!main.src) main.src = ogg ? SAJU_AMBIENT_SRC_OGG : SAJU_AMBIENT_SRC_MP3;
+    applyCharacterSrc(main, ogg);
     if (!pad.src) pad.src = ogg ? SAJU_AMBIENT_PAD_OGG : SAJU_AMBIENT_PAD_MP3;
     mainRef.current = main;
     padRef.current = pad;
     return { main, pad };
-  }, []);
-
-  const targetVolumes = useCallback(() => {
-    if (duckedRef.current) return { main: DUCK_MAIN, pad: DUCK_PAD };
-    return { main: TARGET_VOLUME, pad: PAD_VOLUME };
-  }, []);
+  }, [applyCharacterSrc]);
 
   const rampVolumes = useCallback(
     (toMain: number, toPad: number, then?: () => void) => {
@@ -121,7 +146,6 @@ export function useTheaterAmbient(active: boolean) {
 
   const hardStop = useCallback(() => {
     clearFade();
-    duckedRef.current = false;
     for (const el of [mainRef.current, padRef.current]) {
       if (!el) continue;
       el.pause();
@@ -135,7 +159,6 @@ export function useTheaterAmbient(active: boolean) {
   }, [clearFade]);
 
   const fadeOutAndStop = useCallback(() => {
-    duckedRef.current = false;
     rampVolumes(0, 0, () => {
       hardStop();
     });
@@ -148,8 +171,7 @@ export function useTheaterAmbient(active: boolean) {
       pair.main.volume = 0;
       pair.pad.volume = 0;
       await Promise.all([pair.main.play(), pair.pad.play()]);
-      const vol = targetVolumes();
-      rampVolumes(vol.main, vol.pad);
+      rampVolumes(TARGET_VOLUME, PAD_VOLUME);
       setNeedsGesture(false);
       setAwaitingFirstEnable(false);
       writeAmbientPref(true);
@@ -160,19 +182,12 @@ export function useTheaterAmbient(active: boolean) {
       wantSoundRef.current = false;
       return false;
     }
-  }, [ensureAudio, rampVolumes, targetVolumes]);
+  }, [ensureAudio, rampVolumes]);
 
-  const setVoiceDucking = useCallback(
-    (ducked: boolean) => {
-      duckedRef.current = ducked;
-      if (!wantSoundRef.current && !soundOn) return;
-      const pair = ensureAudio();
-      if (!pair || pair.main.paused) return;
-      const vol = targetVolumes();
-      rampVolumes(vol.main, vol.pad);
-    },
-    [ensureAudio, rampVolumes, soundOn, targetVolumes],
-  );
+  /** No-op kept for API compat — voice TTS is disabled, so nothing to duck. */
+  const setVoiceDucking = useCallback((_ducked: boolean) => {
+    /* voice playback removed — character BGM stays at bed volume */
+  }, []);
 
   const toggleSound = useCallback(async () => {
     if (soundOn) {
@@ -204,6 +219,13 @@ export function useTheaterAmbient(active: boolean) {
     }
     return ok;
   }, [play, soundOn]);
+
+  // When character changes while playing, swap the bed src
+  useEffect(() => {
+    if (!active || !mainRef.current) return;
+    const ogg = preferOgg(mainRef.current);
+    applyCharacterSrc(mainRef.current, ogg);
+  }, [active, applyCharacterSrc, characterId]);
 
   // Mute with fade when theater becomes inactive (skipped / dismissed)
   useEffect(() => {
@@ -267,7 +289,7 @@ export function useTheaterAmbient(active: boolean) {
     toggleSound,
     enableFromGesture,
     mute: fadeOutAndStop,
-    /** Lower ambient bed while character TTS speaks. */
+    /** Kept for API compat; voice TTS disabled so this is a no-op. */
     setVoiceDucking,
   };
 }

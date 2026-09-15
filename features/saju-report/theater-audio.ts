@@ -10,6 +10,41 @@ export type TheaterSfxId = "candle" | "enter" | "chime";
 export const THEATER_SFX_BASE = "/saju/audio/sfx";
 export const THEATER_VOICE_BASE = "/saju/audio/voice";
 
+export const THEATER_CHARACTER_AMBIENT_BASE = "/saju/audio/character";
+
+/** Generic shrine fallback when character bed is missing. */
+export const SAJU_AMBIENT_FALLBACK_MP3 = "/saju/audio/ambient-shrine.mp3";
+export const SAJU_AMBIENT_FALLBACK_OGG = "/saju/audio/ambient-shrine.ogg";
+export const SAJU_AMBIENT_PAD_MP3 = "/saju/audio/ambient-pad.mp3";
+export const SAJU_AMBIENT_PAD_OGG = "/saju/audio/ambient-pad.ogg";
+
+/** Warm counseling-spa beds — not horror drones. */
+export const CHARACTER_AMBIENT_IDS = [
+  "baek-ryeon",
+  "seo-nari",
+  "cha-yuri",
+  "han-bora",
+  "lee-doryeong",
+  "han-siwoo",
+  "kang-seon",
+] as const;
+
+export type CharacterAmbientId = (typeof CHARACTER_AMBIENT_IDS)[number];
+
+export function getCharacterAmbientSrc(
+  characterId: string | null | undefined,
+  format: "mp3" | "ogg" = "mp3",
+): string {
+  if (characterId && (CHARACTER_AMBIENT_IDS as readonly string[]).includes(characterId)) {
+    return `${THEATER_CHARACTER_AMBIENT_BASE}/${characterId}.${format}`;
+  }
+  return format === "ogg" ? SAJU_AMBIENT_FALLBACK_OGG : SAJU_AMBIENT_FALLBACK_MP3;
+}
+
+/** Voice TTS / pre-rendered mp3 autoplay is fully disabled — character BGM only. */
+export const THEATER_VOICE_AUTOPLAY_ENABLED = false;
+
+
 export const THEATER_SFX_SRC: Record<
   TheaterSfxId,
   { mp3: string; ogg: string }

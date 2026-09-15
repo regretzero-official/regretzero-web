@@ -84,7 +84,7 @@ export function SajuLoadingTheater({
 
   return (
     <div
-      className="fixed inset-0 z-[85] flex items-end justify-center bg-black"
+      className="fixed inset-0 z-[85] flex items-end justify-center bg-[#140f14]"
       role="dialog"
       aria-modal="true"
       aria-busy={!ready}
@@ -101,13 +101,13 @@ export function SajuLoadingTheater({
             src={character.portraitSrc}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1a1018] via-[#140f14]/75 to-[#2a1820]/30" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(20,12,18,0.5)_100%)]" />
 
         {needsGesture ? (
           <button
             type="button"
-            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-black/40 px-6 text-center backdrop-blur-[2px] transition active:bg-black/50"
+            className="absolute inset-0 z-[25] flex flex-col items-center justify-center gap-3 bg-[#1a1018]/35 px-6 text-center backdrop-blur-[2px] transition active:bg-[#1a1018]/45"
             onClick={() => void enableFromGesture()}
             aria-label="사운드를 들으려면 화면을 터치하세요"
           >
