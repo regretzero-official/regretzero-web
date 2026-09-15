@@ -171,45 +171,19 @@ export function buildReunionNarrativeSections(
   const cover: SajuReportSection = {
     id: "cover",
     title: "표지 / 한줄결론",
-    body: `${y}. ${voice.name}—바로 점사할게. 대화창은 닫혀 있어도 ${p} 이름이 밤에 커질 수 있어. 그 마음을 부정하지 않아.
-
-${voice.openerAside(p)}
-
-${voice.coverBridge(y, birthLabel(form), form.gender, monthsLabel(form), breakupLine(form))}
-
-네가 적어 준 고민의 핵:
-> ${concernLine(form)}
-
-「지금 연락하면 이상할까.」
-그 문장을 백 번 굴리는 밤—${voice.name}—그 시간을 무시하지 않아. 진심과 불안이 한몸에 있어. 둘을 뭉치면 판단이 흐려져. 그래서 오늘은 **한줄 결론부터** 짚고, 그다음 원국·심리·행동으로 길게 풀어줄게. 체크리스트 강의가 아니라, **상담사가 사주를 보고 풀이해주는 상담**으로.
-
-**원국 요약:** ${chart.summaryLine} · 일간 **${dm}**
-${partnerFullDm
-  ? `상대 원국: **${pc!.summaryLine}** · 일간 **${partnerFullDm}**`
-  : partnerYearSense
-    ? `상대 연주 감각: **${chart.partnerYearPillar!.korean}** (연간 ${partnerYearSense} 결)`
-    : form.partnerName.trim()
-      ? `상대(${p}): 이름만 — 출생 정보가 더 있으면 원국 비교가 깊어져요.`
-      : ""}
-
-**결론만 먼저.**
+    body: `${y}. ${voice.name}—한줄부터.
 
 ${oneLiner}
 
-${bullets.map((b) => `- ${b}`).join("\n")}
+쉬운 이유: 인연이 끊긴 게 아니야. ${p}가 **지금 손대기 무서운 상태**라서, 네가 먼저 연락·장문·고백하면 거리만 더 멀어져. 지금은 먼저 연락할 타이밍이 아니야.
 
-이 결론을 한 줄로 더 압축하면 이거야. **아직 끝난 건 아니야. 지금은 흔들 타이밍이 아니다.** 헤어진 지 ${monthsLabel(form)}, 이별 메모는 “${breakupLine(form)}”. 그 조합이면 ${p} 쪽은 **미움보다 피로·자기보호**다. 너는 ‘끝났나’를 확인하고 싶고, 상대는 ‘또 그 피로로 돌아갈까’를 먼저 떠올린다. 그 속도 차이가 지금의 침묵이야.
+${voice.openerAside(p)}
 
-앞으로 읽을 부분은 흐리멍텅한 희망 상담이 아니야. **분명한 점사**야. 어느 달에 다시 연락할지, 어떤 말은 더 안 좋아지는지, ${p}가 너를 떠올리는 순간이 어떤 빈칸인지—그걸 일상어로 길게 풀어줄게. 사주 숫자는 가끔 한 줄로만 받쳐 줄게. 외울 필요 없어. “아, 그래서 내가 이렇게 깊게 남는구나”만 느끼면 돼.
+고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${monthsLabel(form)}, 네가 남긴 말—“${breakupLine(form)}”. 고민은 「${concernLine(form)}」. 그 조합이면 미움보다 **피로·자기보호**가 먼저야.
 
-
-이 리포트는 짧게 끝내지 않을게. 너는 이미 짧은 조언은 충분히 들었을 거야. “기다려”, “연락하지 마”, “자존감 챙겨”—말은 맞는데, **풀어주는 말이 없으면** 밤에 무너져. 그래서 ${voice.name}—점사처럼 길게 말해. ${p}가 너를 지운 건 아닌데 지금 당장 다시 만나자 하진 않을 때의 심리, 네가 자정에 장문을 쓰고 싶을 때의 감정, 한 달·세 달·여섯 달에서 뭐가 더 안 좋아지는지. 읽다가 “내 얘기다” 싶으면, 그게 맞는 호흡이야.
-
-한 가지 더. 결론을 달력에만 꽂지 마. “3개월에 연락”처럼 기계적으로 쓰면, 그 전에 네가 무너져 있어도 억지로 보내게 돼. **상태 우선, 달력은 참고.** 헤어진 지 ${monthsLabel(form)}이라는 숫자는 지도의 눈금일 뿐이야.
+*(근거 한 줄)* 일간 **${dm}** · ${chart.summaryLine}
 
 ${voice.coverClose}
-
-자, 너희가 처음 끌렸던 결부터 원국·심리로 풀어줄게.
 
 — ${voice.name} · ${productTitle}`,
   };

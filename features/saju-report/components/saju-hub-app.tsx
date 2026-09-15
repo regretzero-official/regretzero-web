@@ -54,7 +54,6 @@ import { SajuUnlockCelebration } from "./saju-unlock-celebration";
 import {
   DemoReviewCard,
   LockIcon,
-  LockedSectionsPaywall,
   SajuBusinessFooter,
   SajuCredibilitySection,
   SajuTrustStrip,
@@ -503,35 +502,73 @@ function HubLanding({
 }
 
 
-function LockedSectionSkeleton({
+function previewBlurLines(body: string, maxLines = 3): string[] {
+  return body
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0 && !l.startsWith("#") && !l.startsWith("---"))
+    .slice(0, maxLines)
+    .map((l) => (l.length > 72 ? `${l.slice(0, 72)}…` : l));
+}
+
+function paywallCtaLabel(productId: string): string {
+  switch (productId) {
+    case "breakup-decision":
+      return "나머지 장 열기 — 결정·자존";
+    case "breakup-reason":
+      return "나머지 장 열기 — 진짜 이유";
+    case "reunion-strategy":
+      return "나머지 장 열기 — 타이밍·멘트";
+    default:
+      return "나머지 장 열기 — 속마음·타이밍";
+  }
+}
+
+/** Next locked chapter teaser: title + blur 2~3 lines only (no full TOC). */
+function LockedSectionTeaser({
   title,
   index,
+  blurLines,
+  moreCount,
 }: {
   title: string;
   index: number;
+  blurLines: string[];
+  moreCount: number;
 }) {
   return (
-    <article className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[#09090B] px-4 py-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-[#6E666C]">
-          <span className="mr-2 text-[10px] font-bold text-[#6E666C]">
-            {String(index + 1).padStart(2, "0")}
+    <div className="space-y-3">
+      <article className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[#09090B] px-4 py-4">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-bold text-[#D8D0D4]">
+            <span className="mr-2 text-[10px] font-bold text-[#FF7A99]">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            {title}
+          </h2>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
+            <LockIcon className="h-3 w-3" />
+            잠금
           </span>
-          {title}
-        </h2>
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] font-semibold text-[#FF7A99]">
-          <LockIcon className="h-3 w-3" />
-          잠금
-        </span>
-      </div>
-      <div className="mt-3 space-y-2" aria-hidden>
-        <div className="saju-locked-skeleton h-3 rounded-full opacity-60" />
-        <div className="saju-locked-skeleton h-3 w-[92%] rounded-full opacity-50" />
-        <div className="saju-locked-skeleton h-3 w-[78%] rounded-full opacity-40" />
-        <div className="saju-locked-skeleton mt-3 h-16 rounded-[12px] opacity-35" />
-      </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[#09090B]/55 to-[#09090B]/92" />
-    </article>
+        </div>
+        <div className="relative mt-3 space-y-2 select-none" aria-hidden>
+          {(blurLines.length > 0 ? blurLines : ["····", "····", "····"]).map((line, i) => (
+            <p
+              key={`${i}-${line.slice(0, 12)}`}
+              className="text-[13px] leading-5 text-[#6E666C] blur-[5px]"
+            >
+              {line}
+            </p>
+          ))}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[#09090B]/35 to-[#09090B]/95" />
+        </div>
+      </article>
+      {moreCount > 0 ? (
+        <p className="text-center text-[11px] font-semibold tracking-wide text-[#9A9098]">
+          +{moreCount}장 더
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -557,11 +594,11 @@ function PreviewView({
   const character = SAJU_CHARACTERS.find((c) => c.id === report.characterId);
   const clear = report.previewSections[0] ?? report.sections[0];
   const lockedSections = report.sections.slice(1);
-  const total = report.sections.length;
+  const nextLocked = lockedSections[0];
   const priceLabel = `₩${SAJU_REPORT_PRICE.toLocaleString("ko-KR")}`;
 
   return (
-    <div className={`${SAJU_BOTTOM_NAV_PAD} pb-[calc(env(safe-area-inset-bottom)+148px)]`}>
+    <div className={`${SAJU_BOTTOM_NAV_PAD} pb-[calc(env(safe-area-inset-bottom)+188px)]`}>
       <div className="px-5 pt-4">
         <button
           type="button"
@@ -625,30 +662,19 @@ function PreviewView({
               </span>
             </div>
             <div className="mt-3">
-              <ReportMarkdown body={clear.body.slice(0, 900) + (clear.body.length > 900 ? "…" : "")} />
+              <ReportMarkdown body={clear.body} />
             </div>
           </article>
         ) : null}
 
-        {lockedSections.map((section, i) => (
-          <LockedSectionSkeleton
-            key={section.id}
-            title={section.title}
-            index={i + 1}
+        {nextLocked ? (
+          <LockedSectionTeaser
+            title={nextLocked.title}
+            index={1}
+            blurLines={previewBlurLines(nextLocked.body, 3)}
+            moreCount={Math.max(0, lockedSections.length - 1)}
           />
-        ))}
-
-        <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-          <LockedSectionsPaywall
-            sections={report.sections.map((s) => s.title)}
-            previewUnlockedCount={1}
-          />
-          <p className="mt-3 text-xs leading-5 text-[#9A9098]">
-            잠금 해제 시{" "}
-            <strong className="text-[#D8D0D4]">{total}개 섹션 · 긴 해석</strong>
-            과 내 사주 저장
-          </p>
-        </div>
+        ) : null}
 
         <GoogleSaveButton
           hint="미리보기는 로그인 없이 봤어요. 보관함에 남기려면 구글로 저장해요."
@@ -656,16 +682,13 @@ function PreviewView({
       </div>
 
       <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4 pb-2">
-        <p className="mb-1.5 text-center text-[10px] leading-4 text-[#9A9098]">
-          지금 미리보기 가능 · 무료 01 · 나머지 잠금 · 데모 결제
-        </p>
         <button
           type="button"
           disabled={unlocking}
           onClick={onOpenCheckout}
-          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-[0_12px_40px_rgba(242,56,112,0.35)] disabled:opacity-50"
+          className="saju-cta flex min-h-12 w-full items-center justify-center rounded-full px-4 text-sm font-semibold shadow-[0_12px_40px_rgba(242,56,112,0.35)] disabled:opacity-50"
         >
-          {unlocking ? "리포트 생성 중…" : `전체 잠금 해제 · ${priceLabel}`}
+          {unlocking ? "리포트 생성 중…" : `${paywallCtaLabel(product.id)} · ${priceLabel}`}
         </button>
       </div>
 
