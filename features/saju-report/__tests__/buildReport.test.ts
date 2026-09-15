@@ -43,8 +43,8 @@ describe("buildTemplateReport depth", () => {
     expect(report.sections.some((s) => s.id === "origin-compare")).toBe(true);
     expect(report.sections.length).toBe(15);
     expect(joined).toMatch(/근거 한 줄/);
-    expect(joined).toMatch(/기운이 보여/);
-    expect(joined).toMatch(/점사로|대화창|흐름상|기운이 보여/);
+    expect(joined).not.toMatch(/기운이 보여/);
+    expect(joined).toMatch(/점사로|대화창|흐름상/);
     expect(joined).not.toMatch(/밤의 점사다/);
     expect(joined).toMatch(/다음에 네가 할 선택/);
     expect(joined).toMatch(/점사로 한 번 더|점사처럼|점사할게/);
@@ -96,7 +96,7 @@ describe("character voice distinctness", () => {
     const cha = buildTemplateReport("breakup-decision", form);
     const baekBody = baek.sections.map((s) => s.body).join("\n");
     const chaBody = cha.sections.map((s) => s.body).join("\n");
-    expect(baekBody).toMatch(/기운이 보여|氣/);
+    expect(baekBody).toMatch(/氣|흔들리지 마/);
     expect(chaBody).toMatch(/퍼줘|아껴도 돼|팩트/);
     expect(baekBody.slice(0, 400)).not.toEqual(chaBody.slice(0, 400));
     expect(baek.sections.find((s) => s.id === "cover")?.body).toContain("백련");
@@ -221,8 +221,8 @@ describe("male counselor selection", () => {
     expect(report.characterId).toBe("lee-doryeong");
     expect(report.characterName).toBe("이도령");
     const cover = report.sections.find((s) => s.id === "cover")!.body;
-    expect(cover).toMatch(/다치지 않게|곁에서 읽어/);
     expect(cover).toContain("이도령");
+    expect(cover).toMatch(/읽어드릴게요|다음 장\(02\)/);
   });
 
   it("narrates reunion-strategy as han-siwoo when selected", () => {
@@ -238,7 +238,8 @@ describe("male counselor selection", () => {
     const breakup = buildTemplateReport("breakup-decision", form, "kang-seon");
     expect(heart.characterName).toBe("강세온");
     expect(breakup.characterName).toBe("강세온");
-    expect(heart.sections.find((s) => s.id === "cover")!.body).toMatch(/괜찮아\. 같이 정리하자|같이 정리/);
+    expect(heart.sections.find((s) => s.id === "cover")!.body).toContain("강세온");
+    expect(heart.sections.find((s) => s.id === "cover")!.body).toMatch(/정리하자|다음 장\(02\)/);
   });
 
   it("falls back to default when character is not on product", () => {
@@ -264,6 +265,12 @@ describe("free section 01 readable paywall copy", () => {
     expect(baekCover).toMatch(/다음 장\(02\)|속마음|타이밍|끌린 이유/);
     expect(baekCover).not.toMatch(/십성으로 보면|용신·희신·기신/);
     expect(baekCover).not.toMatch(/밤의 점사다/);
+    expect(baekCover).not.toMatch(/기운이 보여/);
+    expect(baekCover.indexOf("쉬운 이유")).toBeGreaterThan(-1);
+    expect(baekCover.indexOf("고객 디테일")).toBeGreaterThan(baekCover.indexOf("쉬운 이유"));
+    expect(baekCover.indexOf("근거 한 줄")).toBeGreaterThan(baekCover.indexOf("고객 디테일"));
+    const between = baekCover.slice(baekCover.indexOf("쉬운 이유"), baekCover.indexOf("고객 디테일"));
+    expect(between).not.toMatch(/기운이 보여|느낌이 왔어|밤의 점사다/);
     // Conclusion once in body — opener/aside/close must not restate the same slogan stack
     const contactSlogan = (baekCover.match(/지금은 연락할 때가 아니야/g) ?? []).length;
     expect(contactSlogan).toBeLessThanOrEqual(1);

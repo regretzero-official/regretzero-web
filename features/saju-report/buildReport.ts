@@ -126,7 +126,7 @@ function voicePack(characterId: string, characterName: string): VoicePack {
       return {
         id: characterId,
         name: characterName,
-        openerAside: (p) => `기운이 보여. ${p} 쪽 잔향이 아직 몸 안에 있어. 흔들리면 더 엉킨다. 흔들리지 마.`,
+        openerAside: (p) => `${p} 쪽 잔향이 아직 몸 안에 있어. 흔들리면 더 엉킨다. 흔들리지 마.`,
         coverBridge: (y, birth, gender, months, breakup) => `${y}. ${birth} · ${gender}. 밤의 감정이 낮의 말보다 깊게 남는 결이야. 헤어진 지 ${months}. “${breakup}”의 잔향이 아직 몸 안에 있어. 오늘은 강의가 아니라, 점사로 풀어줄게.`,
         coverClose: "다음 장(02)에서 끌린 이유부터, 속마음·연락 타이밍까지 이어서 풀어줄게. 지금은 여기까지. 따라와.",
         frameAside: "백련이 보는 건 말보다 氣다. 말은 포장되고, 기운은 비교적 정직하다. 점사는 짧고 단호하게.",
@@ -331,8 +331,6 @@ function commonCover(
 ${oneLiner}
 
 쉬운 이유: ${p} 쪽은 미움보다 피로·자기보호가 먼저고, 네가 밀면 거리만 더 멀어져.
-
-${voice.openerAside(p)}
 
 고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${monthsLabel(form)}, 네가 남긴 말—“${breakupLine(form)}”. 고민은 「${concernLine(form)}」.
 
