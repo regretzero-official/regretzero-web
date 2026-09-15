@@ -5,15 +5,18 @@ import { getSajuProduct, resolveProductCounselor } from "@/features/saju-report/
 import type { SajuProductId } from "@/features/saju-report/types";
 import type { SajuCharacterId } from "@/features/saju-chat/types";
 
-export const metadata: Metadata = {
-  title: "사주 리포트 허브 · 재회운·속마음·이별 결정",
-  description:
-    "서나리 · 백련 · 차유리 · 한보라 · 이도령 · 한시우 · 강세온의 긴 사주 상담 리포트. 재회운·상대 속마음·이별 결정·행동 전략. 참고용이에요. 절대 결과가 아니에요.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+import { sajuShareMetadata } from "./saju-metadata";
+
+const hubTitle = "사주 리포트 허브 · 재회운·속마음·이별 결정";
+const hubDescription =
+  "서나리 · 백련 · 차유리 · 한보라 · 이도령 · 한시우 · 강세온의 긴 사주 상담 리포트. 재회운·상대 속마음·이별 결정·행동 전략. 참고용이에요. 절대 결과가 아니에요.";
+
+export const metadata: Metadata = sajuShareMetadata({
+  title: hubTitle,
+  description: hubDescription,
+  url: "https://www.regretzero.kr/saju",
+  robots: { index: true, follow: true },
+});
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

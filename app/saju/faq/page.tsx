@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { sajuShareMetadata } from "../saju-metadata";
 import Link from "next/link";
 
 import { SajuBottomNav } from "@/features/saju-report/components/saju-bottom-nav";
@@ -6,12 +8,13 @@ import { SajuBusinessFooter } from "@/features/saju-report/components/saju-trust
 import { SAJU_FAQ_ITEMS } from "@/features/saju-report/faq";
 import { SAJU_PRODUCT_LANDINGS } from "@/features/saju-report/product-landings";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = sajuShareMetadata({
   title: "사주 FAQ · 자주 묻는 말",
   description:
     "밤의 사주 서비스 안내. 무료 미리보기와 잠금 해제, 개인정보·환불 안내. 참고용이에요.",
+  url: "https://www.regretzero.kr/saju/faq",
   robots: { index: false, follow: false },
-};
+});
 
 export default function SajuFaqPage() {
   return (
