@@ -130,7 +130,7 @@ export type NarrativeVoice = {
 
 /**
  * 점사/상담형 장 확장 — 직접 호명 + 흐름·원국 근거 + 상담 결론 + “다음에 네가 할 선택”
- * 문학 장면·웹소설 cliffhanger 대신, 점쟁이가 풀어주는 호흡. narrator 보이스 유지.
+ * 문학 장면·웹소설 cliffhanger 대신, 상담사가 풀어주는 호흡. narrator 보이스 유지.
  */
 export function novelDepth(
   form: SajuBirthForm,

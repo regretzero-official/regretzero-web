@@ -1,6 +1,6 @@
 # Saju Report Hub (`/saju`)
 
-Foxbunny-**style** (not a clone) product hub + paid long-report flow for love / breakup / reunion with light saju framing. Uses Regretzero characters: 서나리(점쟁이), 백련(무당), 차유리(깍쟁이), 한보라(아이돌), plus male trio 이도령 · 한시우 · 강세온.
+Foxbunny-**style** (not a clone) product hub + paid long-report flow for love / breakup / reunion with light saju framing. Uses Regretzero characters: 서나리(상담사), 백련(상담사), 차유리(깍쟁이), 한보라(아이돌), plus male trio 이도령 · 한시우 · 강세온.
 
 Hub visual mix: bright webtoon-soft cards **and** romantic dark cards; male counselors (이도령·한시우·강세온) lead featured shelves alongside female faces — no ghost/mask horror.
 
@@ -45,8 +45,8 @@ First visit to a product landing shows an optional cinematic **입장 연출** (
 
 | Product | Default | Alternates |
 | --- | --- | --- |
-| 재회운 사주 | 백련 (무당) | 이도령 (귀공자) |
-| 상대 속마음 사주 | 서나리 (점쟁이) | 이도령 · 강세온 |
+| 재회운 사주 | 백련 (상담사) | 이도령 (귀공자) |
+| 상대 속마음 사주 | 서나리 (상담사) | 이도령 · 강세온 |
 | 이별 결정 사주 | 차유리 (깍쟁이) | 강세온 (남친감) |
 | 재회 행동 전략 | 한보라 (아이돌) | 한시우 (밤 가이드) |
 
