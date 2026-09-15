@@ -83,16 +83,19 @@ function ProductCard({
     : compact
       ? "w-[72%] min-w-[210px] max-w-[260px] shrink-0 snap-center"
       : "";
-  const toneClass =
-    tone === "bright" ? "saju-product-card--bright" : "saju-product-card--romantic";
-  const overlayClass =
-    tone === "bright"
-      ? "bg-gradient-to-t from-[#2a1820]/88 via-[#F23870]/18 to-[#fff5f8]/12"
-      : "bg-gradient-to-t from-[#120a10]/92 via-[#1a1018]/40 to-transparent";
+  const isBright = tone === "bright";
+  const toneClass = isBright ? "saju-product-card--bright" : "saju-product-card--romantic";
+  const overlayClass = isBright
+    ? "bg-gradient-to-t from-[#1a2a28]/55 via-[#e8fff8]/10 to-transparent"
+    : "bg-gradient-to-t from-[#120a10]/92 via-[#1a1018]/40 to-transparent";
   const oneLiner = cinematic
     ? product.painPoint
     : product.shortTitle;
   const faceName = character?.name ?? product.characterName;
+  const faceSrc =
+    isBright && character?.brightPortraitSrc
+      ? character.brightPortraitSrc
+      : character?.portraitSrc;
   return (
     <Link
       href={href}
@@ -100,10 +103,9 @@ function ProductCard({
         cinematic ? "saju-shelf-card" : ""
       }`}
       style={{
-        boxShadow:
-          tone === "bright"
-            ? `0 16px 40px rgba(242,56,112,0.22), 0 0 28px ${product.accent}22`
-            : `0 20px 48px rgba(18,10,16,0.45), 0 0 32px ${product.accent}18`,
+        boxShadow: isBright
+          ? `0 16px 40px rgba(94,234,212,0.22), 0 0 28px ${product.accent}18`
+          : `0 20px 48px rgba(18,10,16,0.45), 0 0 32px ${product.accent}18`,
       }}
     >
       <div
@@ -111,15 +113,15 @@ function ProductCard({
           cinematic ? "min-h-[min(72dvh,560px)] flex-1" : "aspect-[3/4]"
         }`}
       >
-        {character ? (
+        {character && faceSrc ? (
           <Image
             alt={faceName}
             className={`object-cover object-top transition duration-500 group-hover:scale-[1.04] ${
-              tone === "bright" ? "saju-card-face--bright" : "saju-card-face--romantic"
+              isBright ? "saju-card-face--bright" : "saju-card-face--romantic"
             }`}
             fill
             sizes={cinematic ? "(max-width:480px) 86vw, 360px" : "(max-width:480px) 45vw, 200px"}
-            src={character.portraitSrc}
+            src={faceSrc}
             priority={cinematic}
           />
         ) : null}
@@ -131,10 +133,14 @@ function ProductCard({
           {product.badge}
         </span>
         <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
-          <div className="text-[1.05rem] font-bold leading-snug tracking-[-0.03em] text-[#F8F4F6] line-clamp-1">
+          <div
+            className={`text-[1.05rem] font-bold leading-snug tracking-[-0.03em] line-clamp-1 ${
+              isBright ? "text-[#1a1e24]" : "text-[#F8F4F6]"
+            }`}
+          >
             {oneLiner}
           </div>
-          <div className="text-[11px] text-white/70">
+          <div className={`text-[11px] ${isBright ? "text-[#3a4548]/80" : "text-white/70"}`}>
             {cinematic ? `${product.shortTitle} · ${faceName}` : faceName}
           </div>
           <span className="saju-cta inline-flex min-h-10 w-full items-center justify-center rounded-full px-3 text-xs font-semibold">

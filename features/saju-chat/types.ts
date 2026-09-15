@@ -8,8 +8,7 @@ export type SajuCharacterId =
   | "han-bora";
 
 export type SajuRoleLabel =
-  | "점쟁이"
-  | "무당"
+  | "상담사"
   | "깍쟁이"
   | "아이돌"
   | "귀공자"
@@ -44,6 +43,8 @@ export type SajuCharacter = {
   avatarEmoji: string;
   vibe: string;
   portraitSrc: string;
+  /** Daylight webtoon cut for hub bright cards — not a filtered dark portrait */
+  brightPortraitSrc?: string;
   systemPrompt: string;
   /** Optional guide archetype label shown in hub/chat UI */
   roleLabel?: SajuRoleLabel;

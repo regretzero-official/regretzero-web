@@ -29,12 +29,13 @@ export const HUB_SHELVES: HubShelf[] = [
     title: "지금 시작하기",
     subtitle: "이미지로 고르고, 무료 미리보기부터",
     items: [
+      /* scroll0 bright webtoon (daylight) beside scroll1 dark romance — clear contrast */
+      { productId: "reunion-strategy", faceCharacterId: "han-bora", tone: "bright" },
       { productId: "reunion-luck", faceCharacterId: "lee-doryeong", tone: "romantic" },
-      { productId: "partner-heart", faceCharacterId: "kang-seon", tone: "bright" },
-      { productId: "reunion-strategy", faceCharacterId: "han-siwoo", tone: "romantic" },
-      { productId: "breakup-decision", faceCharacterId: "cha-yuri", tone: "bright" },
-      { productId: "breakup-reason", faceCharacterId: "seo-nari", tone: "romantic" },
-      { productId: "reunion-luck", faceCharacterId: "baek-ryeon", tone: "bright" },
+      { productId: "partner-heart", faceCharacterId: "seo-nari", tone: "bright" },
+      { productId: "partner-heart", faceCharacterId: "kang-seon", tone: "romantic" },
+      { productId: "breakup-decision", faceCharacterId: "cha-yuri", tone: "romantic" },
+      { productId: "reunion-luck", faceCharacterId: "baek-ryeon", tone: "romantic" },
     ],
   },
   {
@@ -75,12 +76,12 @@ export const HUB_SHELVES: HubShelf[] = [
 
 /** Full-grid cards — cycle male/female art so the catalog isn’t female-only */
 export const HUB_GRID_ITEMS: HubShelfItem[] = [
+  { productId: "reunion-strategy", faceCharacterId: "han-bora", tone: "bright" },
   { productId: "reunion-luck", faceCharacterId: "lee-doryeong", tone: "romantic" },
   { productId: "partner-heart", faceCharacterId: "seo-nari", tone: "bright" },
-  { productId: "breakup-decision", faceCharacterId: "kang-seon", tone: "bright" },
-  { productId: "reunion-strategy", faceCharacterId: "han-bora", tone: "bright" },
+  { productId: "breakup-decision", faceCharacterId: "kang-seon", tone: "romantic" },
   { productId: "breakup-reason", faceCharacterId: "han-siwoo", tone: "romantic" },
-  { productId: "partner-heart", faceCharacterId: "kang-seon", tone: "romantic" },
+  { productId: "reunion-luck", faceCharacterId: "lee-doryeong", tone: "bright" },
 ];
 
 /** Hub character strip — interleave male + female so first faces aren’t all women */

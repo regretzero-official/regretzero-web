@@ -27,7 +27,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/reunion",
     heroHook: "그 사람, 아직 나를 생각할까?",
     heroSub:
-      "헤어진 뒤에도 밤에 생각날 때. 기본은 무당 백련, 이도령도 선택해요.",
+      "헤어진 뒤에도 밤에 생각날 때. 기본은 상담사 백련, 이도령도 선택해요.",
     whoFor: [
       "연락이 끊긴 전 연인에게 아직 마음이 남은 사람",
       "재회할 수 있는지, 상대 속마음과 함께 보고 싶은 사람",
@@ -70,7 +70,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/heart",
     heroHook: "연락 없는 그 사람, 속마음은 뭘까요?",
     heroSub:
-      "읽씹·잠수·애매한 거리. 기본은 점쟁이 서나리, 이도령·강세온도 있어요.",
+      "읽씹·잠수·애매한 거리. 기본은 상담사 서나리, 이도령·강세온도 있어요.",
     whoFor: [
       "상대가 나를 어떻게 생각하는지 답답한 사람",
       "표면 태도와 속마음이 달라 보여 혼란스러운 사람",
@@ -199,7 +199,7 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     path: "/saju/reason",
     heroHook: "우리 사이에 다른 사람이 있었을까?",
     heroSub:
-      "헤어진 진짜 이유가 밤에만 커질 때. 기본은 점쟁이 서나리, 이도령·차유리도 있어요.",
+      "헤어진 진짜 이유가 밤에만 커질 때. 기본은 상담사 서나리, 이도령·차유리도 있어요.",
     whoFor: [
       "표면으로 들은 이유가 전부인지 의심되는 사람",
       "다른 사람이 있었는지 자꾸 생각이 맴도는 사람",

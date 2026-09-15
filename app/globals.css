@@ -400,13 +400,12 @@ button {
   border: 1px solid var(--saju-border);
 }
 
-/* Bright webtoon-soft cards — lift warmth, avoid ghostly desat */
+/* Bright webtoon cards — daylight pastel/mint, NOT magenta-on-dark */
 .saju-shell .saju-product-card--bright {
   background:
-    linear-gradient(165deg, rgba(255, 245, 248, 0.14) 0%, rgba(242, 56, 112, 0.16) 38%, transparent 70%),
-    linear-gradient(200deg, rgba(255, 200, 160, 0.08) 0%, transparent 50%),
-    #161018;
-  border: 1px solid rgba(255, 170, 190, 0.22);
+    linear-gradient(165deg, #fff8fb 0%, #e8fff8 42%, #ffe8d6 100%);
+  border: 1px solid rgba(94, 234, 212, 0.45);
+  box-shadow: 0 12px 36px rgba(94, 234, 212, 0.18), 0 8px 24px rgba(255, 180, 160, 0.12);
 }
 
 .saju-shell .saju-product-card--romantic {
@@ -418,7 +417,8 @@ button {
 }
 
 .saju-shell .saju-card-face--bright {
-  filter: brightness(1.1) saturate(1.1) contrast(1.02);
+  /* only a gentle lift — real brightness comes from brightPortraitSrc artwork */
+  filter: brightness(1.04) saturate(1.05) contrast(1.01);
 }
 
 .saju-shell .saju-card-face--romantic {
