@@ -18,7 +18,9 @@ import {
 import type { SajuLandingSlug } from "@/features/saju-report/product-landings";
 import { getLandingBySlug } from "@/features/saju-report/product-landings";
 import { getSajuProduct } from "@/features/saju-report/products";
-import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
+import { useTheaterAudioDirector } from "@/features/saju-report/hooks/use-theater-audio-director";
+
+const EMPTY_ENTRY_SPEAK = { shrineLine: "", lines: [] as string[], inviteLine: "" };
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -79,7 +81,13 @@ export function SajuEntryOverlay({
     toggleSound,
     enableFromGesture,
     mute,
-  } = useTheaterAmbient(true);
+  } = useTheaterAudioDirector({
+    mode: "entry",
+    active: true,
+    characterId: product?.characterId ?? character?.id ?? null,
+    beat,
+    entry: entry ?? EMPTY_ENTRY_SPEAK,
+  });
 
   const finish = useCallback(() => {
     mute();
@@ -136,7 +144,7 @@ export function SajuEntryOverlay({
               🔊 화면을 터치하면 소리가 켜져요
             </span>
             <span className="max-w-[260px] text-[11px] font-medium leading-snug text-white/60">
-              사당 앰비언트 · 언제든 끌 수 있어요
+              캐릭터 목소리 · 장면 효과음 · 언제든 끌 수 있어요
             </span>
           </button>
         ) : null}

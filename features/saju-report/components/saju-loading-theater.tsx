@@ -11,7 +11,7 @@ import {
   LOADING_STAGE_MS,
   SAJU_LOADING_STAGES,
 } from "@/features/saju-report/loading-theater";
-import { useTheaterAmbient } from "@/features/saju-report/hooks/use-theater-ambient";
+import { useTheaterAudioDirector } from "@/features/saju-report/hooks/use-theater-audio-director";
 
 type SajuLoadingTheaterProps = {
   characterId: SajuCharacterId;
@@ -42,7 +42,12 @@ export function SajuLoadingTheater({
     toggleSound,
     enableFromGesture,
     mute,
-  } = useTheaterAmbient(theaterActive);
+  } = useTheaterAudioDirector({
+    mode: "loading",
+    active: theaterActive,
+    characterId,
+    loadingLine: line,
+  });
 
   useEffect(() => {
     const hint = window.setTimeout(() => setHintSkip(true), LOADING_SKIP_HINT_MS);

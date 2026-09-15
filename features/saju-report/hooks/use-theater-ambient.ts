@@ -12,6 +12,9 @@ export const SAJU_AMBIENT_PREF_KEY = "saju-theater-ambient-on";
 
 const TARGET_VOLUME = 0.36;
 const PAD_VOLUME = 0.22;
+/** While character TTS speaks, duck the bed so voices read clearly. */
+const DUCK_MAIN = 0.12;
+const DUCK_PAD = 0.08;
 const FADE_MS = 420;
 const FADE_STEPS = 14;
 
@@ -50,6 +53,7 @@ export function useTheaterAmbient(active: boolean) {
   const padRef = useRef<HTMLAudioElement | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const wantSoundRef = useRef(false);
+  const duckedRef = useRef(false);
   const [soundOn, setSoundOn] = useState(false);
   const [needsGesture, setNeedsGesture] = useState(false);
   /** True until the user has successfully enabled sound once this session. */
@@ -83,6 +87,11 @@ export function useTheaterAmbient(active: boolean) {
     return { main, pad };
   }, []);
 
+  const targetVolumes = useCallback(() => {
+    if (duckedRef.current) return { main: DUCK_MAIN, pad: DUCK_PAD };
+    return { main: TARGET_VOLUME, pad: PAD_VOLUME };
+  }, []);
+
   const rampVolumes = useCallback(
     (toMain: number, toPad: number, then?: () => void) => {
       clearFade();
@@ -112,6 +121,7 @@ export function useTheaterAmbient(active: boolean) {
 
   const hardStop = useCallback(() => {
     clearFade();
+    duckedRef.current = false;
     for (const el of [mainRef.current, padRef.current]) {
       if (!el) continue;
       el.pause();
@@ -125,6 +135,7 @@ export function useTheaterAmbient(active: boolean) {
   }, [clearFade]);
 
   const fadeOutAndStop = useCallback(() => {
+    duckedRef.current = false;
     rampVolumes(0, 0, () => {
       hardStop();
     });
@@ -137,7 +148,8 @@ export function useTheaterAmbient(active: boolean) {
       pair.main.volume = 0;
       pair.pad.volume = 0;
       await Promise.all([pair.main.play(), pair.pad.play()]);
-      rampVolumes(TARGET_VOLUME, PAD_VOLUME);
+      const vol = targetVolumes();
+      rampVolumes(vol.main, vol.pad);
       setNeedsGesture(false);
       setAwaitingFirstEnable(false);
       writeAmbientPref(true);
@@ -148,7 +160,19 @@ export function useTheaterAmbient(active: boolean) {
       wantSoundRef.current = false;
       return false;
     }
-  }, [ensureAudio, rampVolumes]);
+  }, [ensureAudio, rampVolumes, targetVolumes]);
+
+  const setVoiceDucking = useCallback(
+    (ducked: boolean) => {
+      duckedRef.current = ducked;
+      if (!wantSoundRef.current && !soundOn) return;
+      const pair = ensureAudio();
+      if (!pair || pair.main.paused) return;
+      const vol = targetVolumes();
+      rampVolumes(vol.main, vol.pad);
+    },
+    [ensureAudio, rampVolumes, soundOn, targetVolumes],
+  );
 
   const toggleSound = useCallback(async () => {
     if (soundOn) {
@@ -243,5 +267,7 @@ export function useTheaterAmbient(active: boolean) {
     toggleSound,
     enableFromGesture,
     mute: fadeOutAndStop,
+    /** Lower ambient bed while character TTS speaks. */
+    setVoiceDucking,
   };
 }
