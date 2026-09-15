@@ -85,6 +85,7 @@ export function SajuEntryOverlay({
     mode: "entry",
     active: true,
     characterId: product?.characterId ?? character?.id ?? null,
+    slug,
     beat,
     entry: entry ?? EMPTY_ENTRY_SPEAK,
   });

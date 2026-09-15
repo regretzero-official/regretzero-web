@@ -3,11 +3,14 @@ import { describe, expect, it } from "vitest";
 import {
   getSfxForEntryBeat,
   getSpeakLinesForEntryBeat,
+  getTheaterVoiceClipSrc,
+  getTheaterVoiceClipSrcsForEntryBeat,
   getTheaterVoiceProfile,
   isTheaterSpeechAvailable,
   LOADING_THEATER_SFX,
   pickTheaterSpeechVoice,
   SFX_BY_ENTRY_BEAT,
+  THEATER_ELEVENLABS_CAST,
   THEATER_SFX_SRC,
   THEATER_VOICE_PROFILES,
 } from "../theater-audio";
@@ -30,7 +33,51 @@ describe("theater SFX map", () => {
   });
 });
 
-describe("theater voice profiles", () => {
+describe("ElevenLabs cast + clip paths", () => {
+  it("covers all seven counselors with distinct stock voices", () => {
+    const ids = Object.keys(THEATER_ELEVENLABS_CAST) as SajuCharacterId[];
+    expect(ids).toHaveLength(7);
+    const voiceIds = new Set(ids.map((id) => THEATER_ELEVENLABS_CAST[id].voiceId));
+    expect(voiceIds.size).toBe(7);
+    expect(THEATER_ELEVENLABS_CAST["baek-ryeon"].stability).toBeGreaterThan(
+      THEATER_ELEVENLABS_CAST["han-bora"].stability,
+    );
+    expect(THEATER_ELEVENLABS_CAST["han-bora"].style).toBeGreaterThan(
+      THEATER_ELEVENLABS_CAST["baek-ryeon"].style,
+    );
+  });
+
+  it("builds voice clip urls for entry beats and loading", () => {
+    expect(
+      getTheaterVoiceClipSrc({ characterId: "baek-ryeon", kind: "loading" }),
+    ).toBe("/saju/audio/voice/baek-ryeon/loading.mp3");
+    expect(
+      getTheaterVoiceClipSrc({
+        characterId: "seo-nari",
+        kind: "entry",
+        slug: "heart",
+        beat: "shrine",
+      }),
+    ).toBe("/saju/audio/voice/seo-nari/heart/shrine.mp3");
+
+    const entry = {
+      shrineLine: "촛불이 흔들려.",
+      lines: ["첫 줄", "둘째 줄"],
+      inviteLine: "연을 알려주세요.",
+    };
+    expect(
+      getTheaterVoiceClipSrcsForEntryBeat("baek-ryeon", "reunion", "hook", entry),
+    ).toEqual([
+      "/saju/audio/voice/baek-ryeon/reunion/hook-0.mp3",
+      "/saju/audio/voice/baek-ryeon/reunion/hook-1.mp3",
+    ]);
+    expect(
+      getTheaterVoiceClipSrcsForEntryBeat("baek-ryeon", "reunion", "selfId", entry),
+    ).toEqual([]);
+  });
+});
+
+describe("theater voice profiles (Web Speech fallback)", () => {
   it("covers all seven counselors with distinct pitch/rate vibes", () => {
     const ids = Object.keys(THEATER_VOICE_PROFILES) as SajuCharacterId[];
     expect(ids).toHaveLength(7);
@@ -43,22 +90,15 @@ describe("theater voice profiles", () => {
     const siwoo = getTheaterVoiceProfile("han-siwoo");
     const seon = getTheaterVoiceProfile("kang-seon");
 
-    // 백련: lower, slower, firm
     expect(baek.pitch).toBeLessThan(1);
     expect(baek.rate).toBeLessThan(1);
-    // 서나리: warmer, slightly higher
     expect(nari.pitch).toBeGreaterThan(1);
-    // 차유리: dry, medium-fast
     expect(yuri.rate).toBeGreaterThan(1);
-    // 한보라: brighter, upbeat
     expect(bora.pitch).toBeGreaterThan(nari.pitch);
     expect(bora.rate).toBeGreaterThan(1);
-    // 이도령: soft polite slower
     expect(doh.rate).toBeLessThan(1);
     expect(doh.preferFemale).toBe(false);
-    // 한시우: cool lower
     expect(siwoo.pitch).toBeLessThan(1);
-    // 강세온: warm mid
     expect(seon.pitch).toBeGreaterThan(0.95);
     expect(seon.pitch).toBeLessThan(1.1);
 

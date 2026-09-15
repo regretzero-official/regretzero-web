@@ -1,9 +1,14 @@
 import type { SajuCharacterId } from "@/features/saju-chat/types";
-import type { SajuEntryBeatId, SajuEntryContent } from "@/features/saju-report/entry-experience";
+import type {
+  SajuEntryBeatId,
+  SajuEntryContent,
+} from "@/features/saju-report/entry-experience";
+import type { SajuLandingSlug } from "@/features/saju-report/product-landings";
 
 export type TheaterSfxId = "candle" | "enter" | "chime";
 
 export const THEATER_SFX_BASE = "/saju/audio/sfx";
+export const THEATER_VOICE_BASE = "/saju/audio/voice";
 
 export const THEATER_SFX_SRC: Record<
   TheaterSfxId,
@@ -38,21 +43,159 @@ export function getSfxForEntryBeat(beat: SajuEntryBeatId): TheaterSfxId {
 /** Loading theater uses a brief enter whoosh when sound starts. */
 export const LOADING_THEATER_SFX: TheaterSfxId = "enter";
 
+/** ElevenLabs stock casting used by generate-saju-theater-voices.mjs */
+export type TheaterElevenLabsCast = {
+  characterId: SajuCharacterId;
+  voiceName: string;
+  voiceId: string;
+  note: string;
+  /** TTS stability 0–1 (higher = more stable / less expressive) */
+  stability: number;
+  similarityBoost: number;
+  style: number;
+};
+
+export const THEATER_ELEVENLABS_CAST: Record<
+  SajuCharacterId,
+  TheaterElevenLabsCast
+> = {
+  "baek-ryeon": {
+    characterId: "baek-ryeon",
+    voiceName: "Lily",
+    voiceId: "pFZP5JQG7iQjIQuC4Bku",
+    note: "deep firm / mystical female",
+    stability: 0.72,
+    similarityBoost: 0.78,
+    style: 0.12,
+  },
+  "seo-nari": {
+    characterId: "seo-nari",
+    voiceName: "Sarah",
+    voiceId: "EXAVITQu4vr4xnSDxMaL",
+    note: "warm soft female",
+    stability: 0.5,
+    similarityBoost: 0.75,
+    style: 0.32,
+  },
+  "cha-yuri": {
+    characterId: "cha-yuri",
+    voiceName: "Laura",
+    voiceId: "FGY2WhTYpPnrIDTdsKH5",
+    note: "dry sharp female",
+    stability: 0.55,
+    similarityBoost: 0.8,
+    style: 0.22,
+  },
+  "han-bora": {
+    characterId: "han-bora",
+    voiceName: "Jessica",
+    voiceId: "cgSgspJ2msm6WN1Q7bA",
+    note: "bright young female",
+    stability: 0.32,
+    similarityBoost: 0.7,
+    style: 0.55,
+  },
+  "lee-doryeong": {
+    characterId: "lee-doryeong",
+    voiceName: "George",
+    voiceId: "JBFqnCBsd6RMkjVDRZzb",
+    note: "soft polite male",
+    stability: 0.62,
+    similarityBoost: 0.75,
+    style: 0.18,
+  },
+  "han-siwoo": {
+    characterId: "han-siwoo",
+    voiceName: "Callum",
+    voiceId: "N2lVS1w4EtoT3dr4eOWO",
+    note: "cool male",
+    stability: 0.55,
+    similarityBoost: 0.75,
+    style: 0.28,
+  },
+  "kang-seon": {
+    characterId: "kang-seon",
+    voiceName: "Brian",
+    voiceId: "nPczCjzI2devNBz1zQrb",
+    note: "warm male",
+    stability: 0.5,
+    similarityBoost: 0.75,
+    style: 0.35,
+  },
+};
+
+/**
+ * Pre-generated ElevenLabs clip path.
+ * Entry: /saju/audio/voice/{characterId}/{slug}/{beat}.mp3
+ * Loading: /saju/audio/voice/{characterId}/loading.mp3
+ */
+export function getTheaterVoiceClipSrc(opts: {
+  characterId: string;
+  kind: "loading";
+}): string;
+export function getTheaterVoiceClipSrc(opts: {
+  characterId: string;
+  kind: "entry";
+  slug: SajuLandingSlug;
+  beat: "shrine" | "invite" | `hook-${number}`;
+}): string;
+export function getTheaterVoiceClipSrc(opts: {
+  characterId: string;
+  kind: "loading" | "entry";
+  slug?: SajuLandingSlug;
+  beat?: string;
+}): string {
+  if (opts.kind === "loading") {
+    return `${THEATER_VOICE_BASE}/${opts.characterId}/loading.mp3`;
+  }
+  return `${THEATER_VOICE_BASE}/${opts.characterId}/${opts.slug}/${opts.beat}.mp3`;
+}
+
+/** Resolve ordered clip URLs for an entry beat (empty if nothing to speak). */
+export function getTheaterVoiceClipSrcsForEntryBeat(
+  characterId: string | null | undefined,
+  slug: SajuLandingSlug | null | undefined,
+  beat: SajuEntryBeatId,
+  entry: Pick<SajuEntryContent, "shrineLine" | "lines" | "inviteLine">,
+): string[] {
+  if (!characterId || !slug) return [];
+  const lines = getSpeakLinesForEntryBeat(beat, entry);
+  if (!lines.length) return [];
+  if (beat === "hook") {
+    return lines.map((_, i) =>
+      getTheaterVoiceClipSrc({
+        characterId,
+        kind: "entry",
+        slug,
+        beat: `hook-${i}`,
+      }),
+    );
+  }
+  if (beat === "shrine" || beat === "invite") {
+    return [
+      getTheaterVoiceClipSrc({
+        characterId,
+        kind: "entry",
+        slug,
+        beat,
+      }),
+    ];
+  }
+  return [];
+}
+
 export type TheaterVoiceProfile = {
   characterId: SajuCharacterId;
-  /** speechSynthesis pitch 0–2 (1 = default) */
+  /** speechSynthesis pitch 0–2 (1 = default) — last-resort fallback only */
   pitch: number;
   /** speechSynthesis rate ~0.1–10 (1 = default) */
   rate: number;
-  /** Prefer these substrings in voice.name / voice.voiceURI (case-insensitive) */
   preferredNameFilters: string[];
-  /** Prefer female-leaning vs male-leaning Korean voices when names are ambiguous */
   preferFemale: boolean;
 };
 
 /**
- * Character-matching Web Speech prefs (no ElevenLabs).
- * Pitch/rate differentiate counselors when the same ko-KR system voice is used.
+ * Web Speech prefs — last-resort fallback when an ElevenLabs mp3 is missing.
  */
 export const THEATER_VOICE_PROFILES: Record<SajuCharacterId, TheaterVoiceProfile> = {
   "baek-ryeon": {

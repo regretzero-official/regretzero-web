@@ -10,3 +10,8 @@ coverage
 # Local Codex workspace artifacts
 .codex-artifacts/
 .codex-dev-server*.log
+
+# secrets
+.env
+.env.*
+!.env.example
