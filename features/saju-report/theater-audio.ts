@@ -89,7 +89,7 @@ export const THEATER_ELEVENLABS_CAST: Record<
   "han-bora": {
     characterId: "han-bora",
     voiceName: "Jessica",
-    voiceId: "cgSgspJ2msm6WN1Q7bA",
+    voiceId: "cgSgspJ2msm6clMCkdW9",
     note: "bright young female",
     stability: 0.32,
     similarityBoost: 0.7,

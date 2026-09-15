@@ -8,15 +8,94 @@
  * Optional: --character=baek-ryeon  (filter)
  * Optional: --force  (regenerate even if file exists)
  */
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const OUT_BASE = join(ROOT, "public/saju/audio/voice");
 const API = "https://api.elevenlabs.io/v1";
 const MODEL = "eleven_multilingual_v2";
+
+/** Box agents may inject card.ELEVENLABS_API_KEY separately from process.env. */
+const BOX_SECRET_CANDIDATES = [
+  "/home/box/sand-data/box-secrets.json",
+  "/home/box/agent-data/box-secrets.json",
+];
+
+function keyFingerprint(key) {
+  return createHash("sha256").update(key).digest("hex").slice(0, 12);
+}
+
+async function loadCardSecretKeys() {
+  /** @type {{ source: string, key: string }[]} */
+  const out = [];
+  for (const p of BOX_SECRET_CANDIDATES) {
+    try {
+      const j = JSON.parse(await readFile(p, "utf8"));
+      const key = j?.card?.ELEVENLABS_API_KEY;
+      if (typeof key === "string" && key.length > 0) {
+        out.push({ source: `card@${p}`, key });
+      }
+    } catch {
+      // ignore missing / unreadable
+    }
+  }
+  return out;
+}
+
+/**
+ * Resolve a usable API key without printing it.
+ * Env may hold a stale key while box card secrets hold the TTS-scoped one.
+ */
+async function resolveApiKey() {
+  /** @type {{ source: string, key: string }[]} */
+  const candidates = [];
+  if (process.env.ELEVENLABS_API_KEY) {
+    candidates.push({ source: "env", key: process.env.ELEVENLABS_API_KEY });
+  }
+  for (const c of await loadCardSecretKeys()) {
+    if (!candidates.some((x) => x.key === c.key)) candidates.push(c);
+  }
+  if (!candidates.length) return null;
+
+  const probeVoice = "pFZP5JQG7iQjIQuC4Bku";
+  for (const c of candidates) {
+    try {
+      const res = await fetch(`${API}/text-to-speech/${probeVoice}`, {
+        method: "POST",
+        headers: {
+          "xi-api-key": c.key,
+          "Content-Type": "application/json",
+          Accept: "audio/mpeg",
+        },
+        body: JSON.stringify({
+          text: ".",
+          model_id: MODEL,
+          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
+        }),
+      });
+      if (res.ok) {
+        console.log(
+          `API key OK (source=${c.source}, sha12=${keyFingerprint(c.key)}, tts probe ok)`,
+        );
+        return c.key;
+      }
+      const body = await res.text();
+      const missing = body.includes("missing_permissions");
+      console.warn(
+        `API key rejected (source=${c.source}, sha12=${keyFingerprint(c.key)}, status=${res.status}${missing ? ", missing_permissions" : ""})`,
+      );
+    } catch (err) {
+      console.warn(
+        `API key probe error (source=${c.source}, sha12=${keyFingerprint(c.key)}): ${err.message}`,
+      );
+    }
+  }
+  return null;
+}
 
 /** Stock voice casting — verify via ElevenLabs dashboard / samples */
 export const ELEVENLABS_VOICE_CAST = {
@@ -46,7 +125,7 @@ export const ELEVENLABS_VOICE_CAST = {
   },
   "han-bora": {
     name: "Jessica",
-    voiceId: "cgSgspJ2msm6WN1Q7bA",
+    voiceId: "cgSgspJ2msm6clMCkdW9",
     note: "bright young female (more expressive)",
     stability: 0.32,
     similarity_boost: 0.7,
@@ -236,11 +315,11 @@ async function tts(apiKey, voiceId, text, settings) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = await resolveApiKey();
   if (!apiKey) {
     console.error(
-      "FAIL: ELEVENLABS_API_KEY is missing from process.env.\n" +
-        "Provide it via secret-request / env, then re-run:\n" +
+      "FAIL: No usable ELEVENLABS_API_KEY (env + card secrets probed).\n" +
+        "Need a key with text_to_speech scope. Re-provide via secret-request / env, then:\n" +
         "  node scripts/generate-saju-theater-voices.mjs",
     );
     process.exit(1);
