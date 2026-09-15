@@ -17,6 +17,7 @@ export const HUB_SHELVES: HubShelf[] = [
     productIds: [
       "reunion-luck",
       "partner-heart",
+      "breakup-reason",
       "breakup-decision",
       "reunion-strategy",
     ],
@@ -31,7 +32,13 @@ export const HUB_SHELVES: HubShelf[] = [
     id: "heart-decision",
     title: "속마음 · 결정",
     subtitle: "남은 마음과, 붙잡을지 말지",
-    productIds: ["partner-heart", "breakup-decision"],
+    productIds: ["partner-heart", "breakup-decision", "breakup-reason"],
+  },
+  {
+    id: "truth-after",
+    title: "이별 이유 · 진실",
+    subtitle: "표면과 속, 그리고 그다음에 할 일",
+    productIds: ["breakup-reason", "breakup-decision", "partner-heart"],
   },
 ];
 

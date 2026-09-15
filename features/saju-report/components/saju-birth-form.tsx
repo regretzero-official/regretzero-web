@@ -399,7 +399,7 @@ export function SajuBirthFormView({
   onSubmit: () => void;
   loading: boolean;
 }) {
-  const [step, setStep] = useState<FormStepId>("gender");
+  const [step, setStep] = useState<FormStepId>("me");
   const patch = (partial: Partial<SajuBirthForm>) => setForm({ ...form, ...partial });
   const counselors = getProductCounselors(product);
   const character = SAJU_CHARACTERS.find((c) => c.id === characterId);
@@ -438,22 +438,21 @@ export function SajuBirthFormView({
   };
 
   const goNext = () => {
-    if (step === "gender") setStep("basic");
-    else if (step === "basic") setStep("partner");
+    if (step === "me") setStep("partner");
     else if (step === "partner") setStep("situation");
-    else if (step === "situation") setStep("confirm");
   };
 
   const goPrev = () => {
-    if (step === "basic") setStep("gender");
-    else if (step === "partner") setStep("basic");
+    if (step === "partner") setStep("me");
     else if (step === "situation") setStep("partner");
-    else if (step === "confirm") setStep("situation");
     else onBack();
   };
 
   const backLabel =
-    step === "gender" ? "상품으로" : step === "basic" ? "이전 · 성별" : "이전";
+    step === "me" ? "상품으로" : step === "partner" ? "이전 · 나" : "이전 · 상대";
+
+  const meOk = genderOk && basicOk;
+  const meDisableReason = genderDisableReason ?? basicDisableReason;
 
   return (
     <div className="pb-[calc(env(safe-area-inset-bottom)+168px)]">
@@ -495,7 +494,7 @@ export function SajuBirthFormView({
       </div>
 
       <div className="space-y-3 px-5 pt-3">
-        {step !== "gender" ? (
+        {step !== "me" ? (
           <>
             <CounselorSwitcher
               counselors={counselors}
@@ -511,30 +510,31 @@ export function SajuBirthFormView({
       </div>
 
       <div className="mt-5 space-y-4 px-5 pb-4">
-        {step === "gender" ? (
+        {step === "me" ? (
           <>
             <div className="pt-2">
               <h2 className="text-[1.35rem] font-bold tracking-[-0.03em] text-[#F8F4F6]">
-                나의 성별을 알려주세요
+                나를 알려 주세요
               </h2>
               <p className="mt-2 text-sm leading-6 text-[#9A9098]">
-                성별에 따라 대운의 시기가 달라져요
+                성별과 출생만 있으면 미리보기를 열 수 있어요. 로그인 없이 바로 적어요.
               </p>
             </div>
             <div
-              className="flex flex-col gap-3 pt-2"
+              className="flex flex-col gap-3 pt-1"
               role="group"
               aria-label="성별"
               aria-describedby={!genderOk ? "gender-next-hint" : undefined}
             >
+              <p className="text-xs font-semibold text-[#9A9098]">성별</p>
               {GENDER_CHOICES.map((g) => (
                 <button
                   key={g}
                   type="button"
                   onClick={() => patch({ gender: g })}
-                  className={`min-h-[56px] rounded-[18px] text-[1.05rem] font-semibold transition active:scale-[0.99] ${
+                  className={`min-h-[52px] rounded-[18px] text-[1.05rem] font-semibold transition active:scale-[0.99] ${
                     form.gender === g
-                      ? "bg-[#E8336D] text-white shadow-[0_10px_28px_rgba(232,51,109,0.35)]"
+                      ? "bg-[#F23870] text-white shadow-[0_10px_28px_rgba(242,56,112,0.35)]"
                       : "border border-white/10 bg-white/5 text-[#D8D0D4] hover:bg-white/8"
                   }`}
                 >
@@ -542,26 +542,7 @@ export function SajuBirthFormView({
                 </button>
               ))}
             </div>
-            <StickyNextBar>
-              <NextDisabledHint id="gender-next-hint" reason={genderDisableReason} />
-              {genderOk ? (
-                <p className="mb-2 text-center text-[11px] text-[#6E666C]">선택됨 · 다음으로 가도 돼요</p>
-              ) : null}
-              <button
-                type="button"
-                disabled={!genderOk}
-                onClick={goNext}
-                aria-describedby={!genderOk ? "gender-next-hint" : undefined}
-                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
-              >
-                다음 · 기본정보
-              </button>
-            </StickyNextBar>
-          </>
-        ) : null}
 
-        {step === "basic" ? (
-          <>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold text-[#9A9098]">호칭</span>
               <SoftOptional />
@@ -630,21 +611,21 @@ export function SajuBirthFormView({
             </div>
 
             <StickyNextBar>
-              <NextDisabledHint id="basic-next-hint" reason={basicDisableReason} />
+              <NextDisabledHint id="gender-next-hint" reason={meDisableReason} />
               <button
                 type="button"
-                disabled={!basicOk}
+                disabled={!meOk}
                 onClick={goNext}
-                aria-describedby={!basicOk ? "basic-next-hint" : undefined}
+                aria-describedby={!meOk ? "gender-next-hint" : undefined}
                 className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
               >
-                다음 · 상대 정보
+                다음 · 상대
               </button>
             </StickyNextBar>
           </>
         ) : null}
 
-        {step === "partner" ? (
+{step === "partner" ? (
           <>
             <div className="pt-1">
               <h2 className="text-[1.15rem] font-bold tracking-[-0.03em] text-[#F8F4F6]">
@@ -843,158 +824,28 @@ export function SajuBirthFormView({
                   : `${form.concern.length}/${CONCERN_MAX}`}
               </p>
             </label>
-            <StickyNextBar>
-              <NextDisabledHint id="situation-next-hint" reason={situationDisableReason} />
-              <button
-                type="button"
-                disabled={!situationOk}
-                onClick={goNext}
-                aria-describedby={!situationOk ? "situation-next-hint" : undefined}
-                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
-              >
-                다음 · 확인
-              </button>
-            </StickyNextBar>
-          </>
-        ) : null}
-
-        {step === "confirm" ? (
-          <>
-            <div className="space-y-3">
-              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">
-                    성별
-                  </span>
-                  <ConfirmEditButton onClick={() => setStep("gender")} />
-                </div>
-                <p className="text-sm font-semibold text-[#F4F0F2]">
-                  {form.gender || "성별 미선택"}
-                </p>
-              </div>
-
-              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">
-                    기본정보 · 나
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#B8AEB4]">
-                      양력
-                    </span>
-                    <ConfirmEditButton onClick={() => setStep("basic")} />
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-[#F4F0F2]">
-                  {form.displayName || "호칭 미입력"}
-                </p>
-                <p className="mt-1.5 text-[13px] leading-6 text-[#D8D0D4]">
-                  {formatSolarYmd(form.birthYear, form.birthMonth, form.birthDay)}
-                  <span className="mx-1.5 text-[#6E666C]">·</span>
-                  <span
-                    className={
-                      form.birthTime === "모름" || !form.birthTime.trim()
-                        ? "font-semibold text-[#FF7A99]/85"
-                        : undefined
-                    }
-                  >
-                    {formatTimeLabel(form.birthTime)}
-                  </span>
-                  {form.birthPlace ? (
-                    <>
-                      <span className="mx-1.5 text-[#6E666C]">·</span>
-                      {form.birthPlace}
-                    </>
-                  ) : null}
-                </p>
-              </div>
-
-              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">상대</span>
-                  <div className="flex items-center gap-1.5">
-                    {form.partnerBirthYear ? (
-                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#B8AEB4]">
-                        양력
-                      </span>
-                    ) : (
-                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-[#6E666C]">
-                        생일 일부 미입력
-                      </span>
-                    )}
-                    <ConfirmEditButton onClick={() => setStep("partner")} />
-                  </div>
-                </div>
-                <p className="text-sm font-semibold text-[#F4F0F2]">
-                  {form.partnerName || "이름 미입력 (상대)"}
-                  {form.partnerGender ? ` · ${form.partnerGender}` : ""}
-                </p>
-                <p className="mt-1.5 text-[13px] leading-6 text-[#D8D0D4]">
-                  {form.partnerBirthYear
-                    ? formatSolarYmd(
-                        form.partnerBirthYear,
-                        form.partnerBirthMonth,
-                        form.partnerBirthDay,
-                      )
-                    : "생일 미입력"}
-                  {form.partnerBirthTime === "모름" || form.partnerBirthTime.trim() ? (
-                    <>
-                      <span className="mx-1.5 text-[#6E666C]">·</span>
-                      <span
-                        className={
-                          form.partnerBirthTime === "모름"
-                            ? "font-semibold text-[#FF7A99]/85"
-                            : undefined
-                        }
-                      >
-                        {formatTimeLabel(form.partnerBirthTime)}
-                      </span>
-                    </>
-                  ) : null}
-                </p>
-              </div>
-
-              <div className="saju-card-elevated rounded-[20px] px-4 py-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold tracking-[0.1em] text-[#FF7A99]">
-                    상황
-                  </span>
-                  <ConfirmEditButton onClick={() => setStep("situation")} />
-                </div>
-                <p className="text-[13px] leading-6 text-[#D8D0D4]">
-                  헤어진 지{" "}
-                  <span className="font-semibold text-[#F4F0F2]">
-                    {form.monthsApart || "?"}개월
-                  </span>
-                  {form.breakupNote ? (
-                    <>
-                      <span className="mx-1.5 text-[#6E666C]">·</span>
-                      {form.breakupNote}
-                    </>
-                  ) : null}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#F4F0F2]">
-                  <span className="text-[#9A9098]">궁금한 것 · </span>
-                  {form.concern || "—"}
-                </p>
+            <div className="rounded-[16px] border border-white/10 bg-white/[0.03] px-3.5 py-3 text-[12px] leading-5 text-[#9A9098]">
+              <div className="font-semibold text-[#D8D0D4]">입력 요약</div>
+              <p className="mt-1">
+                {form.gender || "성별?"} · {formatSolarYmd(form.birthYear, form.birthMonth, form.birthDay)} ·{" "}
+                {form.partnerName || "상대"} · {form.monthsApart || "?"}개월
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <ConfirmEditButton onClick={() => setStep("me")} label="나 수정" />
+                <ConfirmEditButton onClick={() => setStep("partner")} label="상대 수정" />
               </div>
             </div>
             <p className="text-center text-[11px] leading-5 text-[#9A9098]">{scopeLine}</p>
             <StickyNextBar>
+              <NextDisabledHint id="situation-next-hint" reason={situationDisableReason} />
               <button
                 type="button"
-                disabled={loading || !genderOk || !basicOk || !situationOk}
+                disabled={loading || !meOk || !situationOk}
                 onClick={onSubmit}
-                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:opacity-50"
+                aria-describedby={!situationOk ? "situation-next-hint" : undefined}
+                className="saju-cta flex min-h-14 w-full items-center justify-center rounded-full text-base font-semibold disabled:cursor-not-allowed disabled:opacity-35"
               >
                 {loading ? "점사 준비 중…" : "무료 미리보기 보기"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep("gender")}
-                className="mt-2 flex min-h-11 w-full items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-semibold text-[#B8AEB4]"
-              >
-                처음부터 수정
               </button>
             </StickyNextBar>
           </>

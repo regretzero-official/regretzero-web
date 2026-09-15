@@ -303,14 +303,14 @@ button {
   --saju-shell-bg: #12151c;
   --saju-card: #09090b;
   --saju-card-elevated: #161920;
-  --saju-pink: #e8336d;
+  --saju-pink: #F23870;
   --saju-pink-light: #ff7a99;
   --saju-mint: #5eead4;
   --saju-ink: #f4f0f2;
   --saju-muted: #9a9098;
   --saju-subtle: #6b6570;
   --saju-border: rgba(255, 255, 255, 0.08);
-  --saju-border-strong: rgba(232, 51, 109, 0.35);
+  --saju-border-strong: rgba(242, 56, 112, 0.35);
   color-scheme: dark;
   min-height: 100dvh;
   background:
@@ -357,7 +357,7 @@ button {
 }
 
 .saju-shell .saju-cta:hover {
-  background: linear-gradient(180deg, #e8336d 0%, #d12a60 100%);
+  background: linear-gradient(180deg, #F23870 0%, #d12a60 100%);
 }
 
 .saju-shell .saju-cta:disabled {
@@ -551,4 +551,37 @@ button {
 .saju-shell ::selection {
   background: rgba(232, 51, 109, 0.35);
   color: #fff;
+}
+
+.saju-shell .saju-sticky-hub-cta {
+  background: rgba(8, 9, 13, 0.92);
+  border-top: 1px solid var(--saju-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.saju-shell .saju-shelf-card {
+  min-height: min(72dvh, 560px);
+}
+
+.saju-shell .saju-locked-skeleton {
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.07) 45%,
+    rgba(255, 255, 255, 0.03) 90%
+  );
+  background-size: 200% 100%;
+  animation: saju-skel 1.6s ease-in-out infinite;
+}
+
+@keyframes saju-skel {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saju-shell .saju-locked-skeleton {
+    animation: none;
+  }
 }

@@ -1,6 +1,6 @@
 import type { SajuProductId } from "./types";
 
-export type SajuLandingSlug = "reunion" | "heart" | "breakup" | "strategy";
+export type SajuLandingSlug = "reunion" | "heart" | "breakup" | "strategy" | "reason";
 
 export type SajuProductLanding = {
   slug: SajuLandingSlug;
@@ -192,6 +192,49 @@ export const SAJU_PRODUCT_LANDINGS: SajuProductLanding[] = [
     ctaLabel: "지금 해도 되는지 무료로 보기",
     stickyHint: "지금 미리보기 가능 · 데모 결제",
     reviewTag: "행동 전략",
+  },
+  {
+    slug: "reason",
+    productId: "breakup-reason",
+    path: "/saju/reason",
+    heroHook: "우리 사이에 다른 사람이 있었을까?",
+    heroSub:
+      "헤어진 진짜 이유가 밤에만 커질 때. 기본은 점쟁이 서나리, 이도령·차유리도 있어요.",
+    whoFor: [
+      "표면으로 들은 이유가 전부인지 의심되는 사람",
+      "다른 사람이 있었는지 자꾸 생각이 맴도는 사람",
+      "지쳐서 헤어진 건지, 마음이 식은 건지 헷갈리는 사람",
+      "진실을 알더라도 추궁 대신 내 마음을 정리하고 싶은 사람",
+    ],
+    deliverables: [
+      "한 줄 결론 — 표면 vs 속 이유",
+      "제3자 가능성의 결 (단정 없이)",
+      "피로·페이스 어긋남 풀이",
+      "진실을 안 뒤에 할 일 · 함정 경고",
+    ],
+    previewUnlockedCount: 1,
+    curiosity: [
+      "헤어진 진짜 이유는 뭐였을까?",
+      "우리 사이에 다른 사람이 있었을까?",
+      "진실을 알면 마음이 편해질까?",
+    ],
+    faq: [
+      {
+        q: "다른 사람이 있었다고 단정하나요?",
+        a: "아니요. 원국만으로 단정하지 않아요. 결·타이밍·거리감으로 읽어 드리고, 추궁은 권하지 않아요.",
+      },
+      {
+        q: "진짜 예언인가요?",
+        a: "아니요. 참고용이에요. 절대 결과가 아니에요. 원국은 만세력으로 계산하고, 해석은 위로·통찰용으로 봐 주세요.",
+      },
+      {
+        q: "무료로 어디까지 보나요?",
+        a: "출생·고민을 적으면 미리보기 일부를 먼저 보여드려요. 전체 리포트는 잠금 해제 후 확인할 수 있어요.",
+      },
+    ],
+    ctaLabel: "헤어진 진짜 이유 무료로 확인하기",
+    stickyHint: "지금 미리보기 가능 · 데모 결제",
+    reviewTag: "진짜 이유",
   },
 ];
 

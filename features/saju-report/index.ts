@@ -57,3 +57,15 @@ export type { SavedSajuReading } from "./my-readings";
 
 export { computeChart, parseBirthTime, formatChartChip, formatChartMarkdown } from "./manseryeok";
 export type { SajuChart } from "./manseryeok";
+
+export {
+  SAJU_AUTH_SHELL_KEY,
+  GOOGLE_OAUTH_ENV_TODO,
+  readSajuAuthShell,
+  stubGoogleSignIn,
+  clearSajuAuthShell,
+  isGoogleOAuthConfigured,
+} from "./auth-shell";
+export type { SajuAuthShellUser } from "./auth-shell";
+export { getReportBooks } from "./report-books";
+export type { ReportBook } from "./report-books";

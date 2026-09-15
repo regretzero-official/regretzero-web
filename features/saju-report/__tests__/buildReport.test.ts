@@ -63,18 +63,26 @@ describe("buildTemplateReport depth", () => {
     expect(buildTemplateReport("breakup-decision", form).characterName).toBe("차유리");
     expect(bodyLen("reunion-strategy")).toBeGreaterThanOrEqual(35000);
     expect(buildTemplateReport("reunion-strategy", form).characterName).toBe("한보라");
+    expect(bodyLen("breakup-reason")).toBeGreaterThanOrEqual(35000);
+    expect(buildTemplateReport("breakup-reason", form).characterName).toBe("서나리");
+    expect(buildTemplateReport("breakup-reason", form).sections.length).toBe(14);
     const seo = buildTemplateReport("partner-heart", form).sections.map((s) => s.body).join("\n");
     const cha = buildTemplateReport("breakup-decision", form).sections.map((s) => s.body).join("\n");
     const bora = buildTemplateReport("reunion-strategy", form).sections.map((s) => s.body).join("\n");
+    const reason = buildTemplateReport("breakup-reason", form).sections.map((s) => s.body).join("\n");
     expect(seo).toMatch(/느낌이 왔어|잔향|언니/);
     expect(cha).toMatch(/팩트|아껴도 돼|퍼줘/);
     expect(bora).toMatch(/헐|네 마음부터/);
+    expect(reason).toMatch(/느낌이 왔어|진짜 이유|표면/);
+    expect(reason).toMatch(/다른 사람이 있었을까/);
     expect(seo).toMatch(/다음에 네가 할 선택/);
     expect(cha).toMatch(/다음에 네가 할 선택/);
     expect(bora).toMatch(/다음에 네가 할 선택/);
+    expect(reason).toMatch(/다음에 네가 할 선택/);
     expect(seo).toMatch(/근거 한 줄/);
     expect(cha).toMatch(/근거 한 줄/);
     expect(bora).toMatch(/근거 한 줄/);
+    expect(reason).toMatch(/근거 한 줄/);
     expect(seo).toMatch(/만세력|원국/);
     expect(seo).not.toMatch(/십성으로 보면/);
     expect(seo).not.toMatch(/### 용신·희신·기신/);
@@ -107,7 +115,7 @@ describe("character voice distinctness", () => {
 
 
 describe("everyday Korean counseling (no jargon slogans)", () => {
-  const products = ["reunion-luck", "partner-heart", "breakup-decision", "reunion-strategy"] as const;
+  const products = ["reunion-luck", "partner-heart", "breakup-decision", "reunion-strategy", "breakup-reason"] as const;
 
   it("drops brand slogans and uses plain decisive Korean", () => {
     for (const id of products) {
