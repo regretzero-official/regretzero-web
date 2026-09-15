@@ -11,6 +11,7 @@ const VALID_PRODUCTS: SajuProductId[] = [
   "partner-heart",
   "breakup-decision",
   "reunion-strategy",
+  "breakup-reason",
 ];
 
 function isProductId(value: unknown): value is SajuProductId {

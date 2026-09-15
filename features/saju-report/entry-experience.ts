@@ -123,6 +123,29 @@ export const SAJU_ENTRY_BY_SLUG: Record<SajuLandingSlug, SajuEntryContent> = {
     soundEnableLabel: "소리 켜기",
     soundOnLabel: "소리 켜짐",
   },
+  reason: {
+    slug: "reason",
+    lines: [
+      "느낌이 왔어. 진짜 이유가 밤에만 커지지?",
+      "표면으로 들은 말과 속은 다를 수 있어. 단정하진 않을게.",
+      "오늘은 추궁 말고, 결부터 천천히 풀어줄게. 언니 말 들어봐.",
+    ],
+    concernChips: [
+      "진짜 이유가 궁금해요",
+      "다른 사람이 있었을까요",
+      "지쳐서 헤어진 건지 모르겠어요",
+    ],
+    meetLabel: "점사 시작하기",
+    skipLabel: "건너뛰기",
+    shrineTitle: "상담실 문을 열어요",
+    shrineLine: "불이 낮아졌어. 표면과 속, 그 사이부터 천천히 만져볼게.",
+    selfIdPrompt: "지금 가장 맴도는 쪽을 골라보세요",
+    inviteTitle: "우리 사이, 연을 알려주세요",
+    inviteLine: "이름·출생·고민만 적어도 진짜 이유 미리보기를 열어요.",
+    nextLabel: "다음",
+    soundEnableLabel: "소리 켜기",
+    soundOnLabel: "소리 켜짐",
+  },
 };
 
 export function getEntryContent(slug: SajuLandingSlug) {
