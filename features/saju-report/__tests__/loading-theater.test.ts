@@ -74,6 +74,9 @@ describe("landing sticky copy honesty", () => {
     expect(
       SAJU_PRODUCT_LANDINGS.find((l) => l.slug === "heart")?.ctaLabel,
     ).toContain("속마음");
+    expect(
+      SAJU_PRODUCT_LANDINGS.find((l) => l.slug === "reason")?.ctaLabel,
+    ).toContain("진짜 이유");
   });
 });
 

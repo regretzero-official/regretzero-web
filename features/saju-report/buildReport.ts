@@ -9,6 +9,7 @@ import { buildBreakupDecisionNarrativeSections } from "./breakupDecisionNarrativ
 import { buildPartnerHeartNarrativeSections } from "./partnerHeartNarrative";
 import { buildReunionNarrativeSections } from "./reunionNarrative";
 import { buildReunionStrategyNarrativeSections } from "./reunionStrategyNarrative";
+import { buildBreakupReasonNarrativeSections } from "./breakupReasonNarrative";
 import type {
   SajuBirthForm,
   SajuProductId,
@@ -844,6 +845,8 @@ function oneLinerFor(productId: SajuProductId, form: SajuBirthForm): string {
       return `무조건 붙여/버려가 아니다. **네가 먼저 괜찮은 상태가 돼야 해.** 그다음 남겨둘지 놓아. 여기서 멈춰.`;
     case "reunion-strategy":
       return `지금은 이렇게 해. 지금은 설득하지 마. 가벼운 안부만, 네 생활부터 챙겨. 말은 나중에. 같이 가자.`;
+    case "breakup-reason":
+      return `느낌이 왔어—사랑이 없어서 헤어진 게 아니야. 서로 페이스가 안 맞아서 지쳐서 끝난 결이야. 다른 사람 여부는 단정하지 마. 지금은 추궁보다 네 하루야.`;
   }
 }
 
@@ -875,6 +878,12 @@ function bulletsFor(productId: SajuProductId, form: SajuBirthForm): string[] {
         "해도 되는 말 / 금지 문구를 먼저 외워라.",
         "확인하고 싶을 때가 가장 보내면 안 되는 때다.",
       ];
+    case "breakup-reason":
+      return [
+        "표면 이유와 속 이유를 나눠. 미움보다 피로·페이스 어긋남이 문을 닫는 경우가 많아.",
+        "제3자 가능성은 결로 읽고, 단정·추궁은 하지 마.",
+        "진실을 안 뒤에는 전송보다 네 하루. 확인하고 싶을 때가 제일 보내면 안 되는 때야.",
+      ];
   }
 }
 
@@ -895,6 +904,9 @@ function sectionsForProduct(
   }
   if (productId === "breakup-decision") {
     return buildBreakupDecisionNarrativeSections(form, voice, chart, productTitle, one, bullets);
+  }
+  if (productId === "breakup-reason") {
+    return buildBreakupReasonNarrativeSections(form, voice, chart, productTitle, one, bullets);
   }
   return buildReunionStrategyNarrativeSections(form, voice, chart, productTitle, one, bullets);
 }

@@ -5,7 +5,8 @@ export type SajuProductId =
   | "reunion-luck"
   | "partner-heart"
   | "breakup-decision"
-  | "reunion-strategy";
+  | "reunion-strategy"
+  | "breakup-reason";
 
 export type SajuReportStep = "hub" | "form" | "preview" | "report";
 
