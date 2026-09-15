@@ -28,7 +28,8 @@ const NAV_ITEMS: NavItem[] = [
       p === "/saju/reunion" ||
       p === "/saju/heart" ||
       p === "/saju/breakup" ||
-      p === "/saju/strategy",
+      p === "/saju/strategy" ||
+      p === "/saju/reason",
   },
   {
     id: "my",

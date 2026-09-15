@@ -61,6 +61,22 @@ export const CANONICAL_SECTIONS: Record<SajuProductId, readonly string[]> = {
     "캐릭터 마지막 한마디",
     "안내",
   ],
+  "breakup-reason": [
+    "표지 / 한줄결론",
+    "1장 · 이번 점사의 질문",
+    "원국·일간 기질",
+    "연애 패턴 · 잔향의 스크립트",
+    "두 사람 사이 인연의 결",
+    "표면으로 말한 이유",
+    "헤어진 진짜 이유 — 표면 vs 속",
+    "다른 사람이 있었을까",
+    "피로·페이스 어긋남",
+    "2장 · 남은 마음과 미련의 결",
+    "진실을 안 뒤에 할 일",
+    "주의할 함정",
+    "캐릭터 마지막 한마디",
+    "안내",
+  ],
 } as const;
 
 export function getCanonicalSections(productId: SajuProductId): string[] {

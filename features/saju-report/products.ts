@@ -66,6 +66,21 @@ export const SAJU_PRODUCTS: SajuProduct[] = [
     accent: "#FB7185",
     sections: [...CANONICAL_SECTIONS["reunion-strategy"]],
   },
+  {
+    id: "breakup-reason",
+    title: "헤어진 진짜 이유 사주",
+    shortTitle: "진짜 이유",
+    painPoint: "우리 사이에 다른 사람이 있었을까? 헤어진 진짜 이유는?",
+    description: "기본은 점쟁이 서나리. 이도령·차유리에게도 맡길 수 있어요.",
+    characterId: "seo-nari",
+    characterName: "서나리",
+    counselorIds: ["seo-nari", "lee-doryeong", "cha-yuri"],
+    priceLabel: "₩9,900",
+    priceWon: SAJU_REPORT_PRICE,
+    badge: "진실",
+    accent: "#F9A8D4",
+    sections: [...CANONICAL_SECTIONS["breakup-reason"]],
+  },
 ];
 
 /** Hub character card → product with counselor preselected */
