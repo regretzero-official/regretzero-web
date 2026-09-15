@@ -49,7 +49,7 @@ export function buildPartnerHeartNarrativeSections(
 
 ${oneLiner}
 
-쉬운 이유: 지워진 게 아니라, ${p} 마음엔 남아 있는데 **손대긴 무서운 상태**야. 그 상태에서 네가 밀면 그리움이 아니라 부담만 커져. 지금은 더 밀지 마.
+쉬운 이유: ${p} 마음엔 남아 있는데 **손대긴 무서운 상태**야. 그 상태에서 네가 밀면 그리움이 아니라 부담만 커져.
 
 ${voice.openerAside(p)}
 

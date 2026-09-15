@@ -1,6 +1,7 @@
 import type { SajuChart } from "./manseryeok/types";
 import { dayMasterLabel } from "./manseryeok/computeChart";
 import type { SajuBirthForm, SajuReportSection } from "./types";
+import { partner as partnerFromForm } from "./novelHelpers";
 
 function safe(value: string, fallback: string) {
   const t = value.trim();
@@ -12,7 +13,7 @@ function you(form: SajuBirthForm) {
 }
 
 function partner(form: SajuBirthForm) {
-  return safe(form.partnerName, "그 사람");
+  return partnerFromForm(form);
 }
 
 function monthsLabel(form: SajuBirthForm) {
@@ -154,7 +155,7 @@ export function buildReunionNarrativeSections(
   chart: SajuChart,
   productTitle: string,
   oneLiner: string,
-  bullets: string[],
+  _bullets: string[],
 ): SajuReportSection[] {
   const p = partner(form);
   const y = you(form);
@@ -175,11 +176,11 @@ export function buildReunionNarrativeSections(
 
 ${oneLiner}
 
-쉬운 이유: 인연이 끊긴 게 아니야. ${p}가 **지금 손대기 무서운 상태**라서, 네가 먼저 연락·장문·고백하면 거리만 더 멀어져. 지금은 먼저 연락할 타이밍이 아니야.
+쉬운 이유: ${p}가 **지금 손대기 무서운 상태**라서, 네가 먼저 연락·장문·고백하면 거리만 더 멀어져. 그 조합이면 미움보다 **피로·자기보호**가 먼저야.
 
 ${voice.openerAside(p)}
 
-고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${monthsLabel(form)}, 네가 남긴 말—“${breakupLine(form)}”. 고민은 「${concernLine(form)}」. 그 조합이면 미움보다 **피로·자기보호**가 먼저야.
+고객 디테일: ${birthLabel(form)} · ${form.gender}. 헤어진 지 ${monthsLabel(form)}, 네가 남긴 말—“${breakupLine(form)}”. 고민은 「${concernLine(form)}」.
 
 *(근거 한 줄)* 일간 **${dm}** · ${chart.summaryLine}
 
